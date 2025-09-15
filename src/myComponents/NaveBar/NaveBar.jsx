@@ -104,17 +104,17 @@ export const NaveBar = () => {
             </div>
 
             {/* Contact Information */}
-            <div className="flex flex-col md:flex-row space-x-2 xs:flex-row xs:items-center xs:space-y-0 xs:space-x-1 sm:space-x-2 lg:space-x-2 text-gray-600">
+            <div className="flex flex-col md:flex-row space-x-2 xs:flex-row xs:items-center xs:space-y-0 xs:space-x-1 sm:space-x-2 lg:space-x-2 text-white">
               <div className="flex items-center space-x-1">
-                <MapPin className="w-1.5 h-1.5 xs:w-2 xs:h-2 sm:w-2.5 sm:h-2.5 lg:w-3 lg:h-3" style={{color: '#544a7d'}} />
+                <MapPin className="w-1.5 h-1.5 xs:w-2 xs:h-2 sm:w-2.5 sm:h-2.5 lg:w-3 lg:h-3" style={{color: '#ffffff'}} />
                 <span className="text-[8px] xs:text-[9px] sm:text-xs lg:text-xs">Dubai, UAE</span>
               </div>
-              <a href="tel:+971568011076" className="flex items-center space-x-1 hover:text-blue-600 transition-colors">
-                <Phone className="w-1.5 h-1.5 xs:w-2 xs:h-2 sm:w-2.5 sm:h-2.5 lg:w-3 lg:h-3" style={{color: '#544a7d'}} />
+              <a href="tel:+971568011076" className="flex items-center space-x-1 hover:text-blue-200 transition-colors">
+                <Phone className="w-1.5 h-1.5 xs:w-2 xs:h-2 sm:w-2.5 sm:h-2.5 lg:w-3 lg:h-3" style={{color: '#ffffff'}} />
                 <span className="text-[8px] xs:text-[9px] sm:text-xs lg:text-xs">+971568011076</span>
               </a>
-              <a href="mailto:info@marhabamovers.ae" className="flex items-center space-x-1 hover:text-blue-600 transition-colors">
-                  <Mail className="w-1.5 h-1.5 xs:w-2 xs:h-2 sm:w-2.5 sm:h-2.5 lg:w-3 lg:h-3" style={{color: '#544a7d'}} />
+              <a href="mailto:info@marhabamovers.ae" className="flex items-center space-x-1 hover:text-blue-200 transition-colors">
+                  <Mail className="w-1.5 h-1.5 xs:w-2 xs:h-2 sm:w-2.5 sm:h-2.5 lg:w-3 lg:h-3" style={{color: '#ffffff'}} />
                   <span className="text-[8px] xs:text-[9px] sm:text-xs lg:text-xs">info@marhabamovers.ae</span>
                 </a>
             </div>
