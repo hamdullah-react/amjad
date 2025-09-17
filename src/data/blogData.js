@@ -1,13 +1,13 @@
 export const blogPosts = [
   {
     id: 1,
-    title: "The Future of Web Development: Trends to Watch in 2023",
-    slug: "future-web-development-trends-2023",
-    author: "John Doe",
+    title: "10 Tips for a Stress-Free Moving Experience",
+    slug: "10-tips-for-stress-free-moving",
+    author: "Ahmed Ali",
     date: "June 15, 2023",
-    image: "/images/blog/blog1.jpg",
-    excerpt: "Explore the cutting-edge technologies and methodologies shaping the future of web development in 2023 and beyond.",
-    content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+    image: "/images/IMG-20250910-WA0015.jpg",
+    excerpt: "Moving to a new home doesn't have to be stressful. Follow these expert tips to make your next move smooth and hassle-free.",
+    content: "Moving to a new home is often listed as one of life's most stressful events, but it doesn't have to be. With proper planning and the right approach, you can transform this potentially overwhelming experience into a manageable and even positive one."
   },
   {
     id: 2,

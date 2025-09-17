@@ -123,7 +123,7 @@ export const NaveBar = () => {
       </div>
 
       {/* Main Navigation Bar */}
-      <div className="bg-[linear-gradient(135deg,_#108dc7_0%,_#ef8e38_100%)]">
+      <div className="bg-[linear-gradient(135deg,_#544a7d_0%,_#ff9a44_100%)]">
         <div className="container mx-auto px-4">
           <div className="flex h-14 items-center justify-between">
             {/* Mobile Layout */}

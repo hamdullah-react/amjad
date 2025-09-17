@@ -96,7 +96,7 @@ export const Header = () => {
                   className="object-cover"
                   priority={slide.id === 1}
                 />
-                <div className="absolute inset-0 bg-gradient-to-r from-purple-900/70 via-purple-800/50 to-yellow-400/30" />
+                <div className="absolute inset-0 bg-gradient-to-r from-[#544a7d]/70 via-[#544a7d]/50 to-[#ff9a44]/30" />
               </div>
               
               {/* Content Overlay */}

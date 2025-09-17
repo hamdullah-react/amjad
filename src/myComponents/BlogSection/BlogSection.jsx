@@ -33,8 +33,8 @@ const BlogSection = ({ posts, showAll = false }) => {
           )}
         </div>
         
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
             {displayPosts.map((post) => (
               <BlogCard key={post.id} post={post} />
             ))}

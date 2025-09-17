@@ -43,10 +43,10 @@ export default function Home() {
       {/* Welcome Section */}
       <WelcomeSection />
       
-      <div className='container'>
+      
 
       <OurServices/>
-      </div>
+      
       
       {/* Why Choose Us Section */}
       <WhyChooseUs />
