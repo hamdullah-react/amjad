@@ -13,12 +13,12 @@ const BlogSection = ({ posts, showAll = false }) => {
         {/* Header */}
         <div className="text-center mb-20">
           <div className="inline-block">
-            <h2 className="text-6xl font-extrabold text-gray-900 mb-4 tracking-tight">
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 mb-4 tracking-tight">
               Latest Blog Posts
             </h2>
             <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-orange-500 mx-auto mb-6"></div>
           </div>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed font-light">
+          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed font-light">
             Stay updated with the latest moving tips, industry news, and helpful guides to make your relocation experience smooth and stress-free.
           </p>
           {!showAll && (

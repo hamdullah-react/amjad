@@ -22,11 +22,11 @@ const BlogCard = ({ post, className = '' }) => {
         <div className="flex items-center text-xs text-gray-500 space-x-2">
           <div className="flex items-center space-x-1">
             <Calendar className="h-3 w-3" />
-            <span className="text-[10px] sm:text-xs">{post.date}</span>
+            <span className="text-[8px] sm:text-xs">{post.date}</span>
           </div>
           <div className="flex items-center space-x-1">
             <User className="h-3 w-3" />
-            <span className="text-[10px] sm:text-xs">{post.author}</span>
+            <span className="text-[8px] sm:text-xs">{post.author}</span>
           </div>
         </div>
         

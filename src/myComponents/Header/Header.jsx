@@ -131,7 +131,7 @@ export const Header = () => {
                     <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                       <Button 
                         size="lg" 
-                        className="bg-gradient-to-r from-purple-600 to-yellow-500 hover:from-purple-700 hover:to-yellow-600 text-white font-semibold px-8 py-3 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg"
+                        className="bg-gradient-to-r from-[#544a7d] to-[#ff9a44] hover:from-[#483e6a] hover:to-[#f08b35] text-white font-semibold px-8 py-3 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg"
                       >
                         Get Free Quote
                         <ArrowRight className="ml-2 h-5 w-5" />

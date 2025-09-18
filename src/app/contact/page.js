@@ -160,7 +160,7 @@ export default function ContactPage() {
               Contact Information
             </h2>
             
-            <div className="grid sm:grid-cols-2 gap-4 sm:gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-2 gap-4 sm:gap-6">
               {contactInfo.map((item, index) => {
                 const IconComponent = item.icon;
                 return (

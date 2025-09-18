@@ -107,7 +107,7 @@ export default function AboutPage() {
       {/* Why Choose Us Section */}
       <div className="mb-16">
         <h2 className="text-xl sm:text-2xl font-bold text-gray-900 text-center mb-8">Why Choose Marhaba Furniture</h2>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {[
             {
               icon: <Truck className="w-8 h-8 text-blue-600" />,
@@ -144,7 +144,7 @@ export default function AboutPage() {
       {/* Team Section */}
       <div>
         <h2 className="text-xl sm:text-2xl font-bold text-gray-900 text-center mb-8">Meet Our Team</h2>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {teamMembers.map((member, index) => (
             <div key={index} className="bg-white rounded-xl overflow-hidden shadow-md border border-gray-100 hover:shadow-lg transition-shadow duration-300">
               <div className="relative h-48 w-full">

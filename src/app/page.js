@@ -70,8 +70,8 @@ export default function Home() {
                 <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-6">
                   <feature.icon className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text:sm md:text-2xl font-bold text-gray-900 mb-4">{feature.title}</h3>
-                <p className="text-gray-600 leading-relaxed">{feature.description}</p>
+                <h3 className="text-[8px] sm:text-sm md:text-2xl font-bold text-gray-900 mb-4">{feature.title}</h3>
+                <p className="text-[8px] sm:text-sm text-gray-600 leading-relaxed">{feature.description}</p>
               </div>
             ))}
           </div>
