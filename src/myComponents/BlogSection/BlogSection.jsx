@@ -9,7 +9,7 @@ const BlogSection = ({ posts, showAll = false }) => {
   
   return (
     <section className=" py-24 bg-gray-50">
-      <div className="container mx-auto px-6">
+      <div className="max-w-6xl mx-auto px-6">
         {/* Header */}
         <div className="text-center mb-20">
           <div className="inline-block">

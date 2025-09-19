@@ -1,47 +1,76 @@
+import PageHeader from '@/myComponents/PageHeader/PageHeader'
+import { Truck, Package, Home, Users, Shield, Clock } from 'lucide-react'
+
 export default function ServicesPage() {
   const services = [
     {
-      title: "Web Development",
-      description: "Custom web applications built with modern technologies and best practices.",
-      features: ["Responsive Design", "SEO Optimized", "Fast Performance", "Secure"]
+      icon: Truck,
+      title: "Local Moving",
+      description: "Professional furniture moving services within Dubai and across the UAE.",
+      features: ["Same-day service", "Professional packing", "Careful handling", "Insurance coverage"]
     },
     {
-      title: "Mobile Development",
-      description: "Native and cross-platform mobile applications for iOS and Android.",
-      features: ["Native Performance", "Cross-Platform", "User-Friendly", "Scalable"]
+      icon: Package,
+      title: "Packing & Unpacking",
+      description: "Expert packing services to ensure your furniture is protected during transit.",
+      features: ["Quality materials", "Custom crating", "Fragile item care", "Systematic labeling"]
     },
     {
-      title: "Digital Marketing",
-      description: "Comprehensive digital marketing strategies to grow your online presence.",
-      features: ["SEO/SEM", "Social Media", "Content Marketing", "Analytics"]
+      icon: Home,
+      title: "Furniture Assembly",
+      description: "Professional assembly and disassembly of all types of furniture.",
+      features: ["Expert technicians", "All furniture types", "Tool equipped", "Clean service"]
     },
     {
-      title: "Consulting",
-      description: "Expert consultation to help you make informed technology decisions.",
-      features: ["Strategy Planning", "Technology Assessment", "Process Optimization", "Training"]
+      icon: Users,
+      title: "Office Relocation",
+      description: "Comprehensive office moving services with minimal business disruption.",
+      features: ["Weekend service", "IT equipment care", "Furniture setup", "Flexible scheduling"]
+    },
+    {
+      icon: Shield,
+      title: "Storage Solutions",
+      description: "Secure, climate-controlled storage facilities for your furniture.",
+      features: ["24/7 security", "Climate control", "Flexible terms", "Easy access"]
+    },
+    {
+      icon: Clock,
+      title: "Emergency Moving",
+      description: "Last-minute moving services available 24/7 for urgent relocations.",
+      features: ["24/7 availability", "Quick response", "Express service", "Emergency team"]
     }
   ]
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-6xl mx-auto">
-        <h1 className="text-4xl font-bold text-center mb-4">Our Services</h1>
-        <p className="text-lg text-muted-foreground text-center mb-12">
-          We offer a comprehensive range of services to help your business succeed
-        </p>
+    <div>
+      {/* Page Header Banner */}
+      <PageHeader
+        title="Our Services"
+        subtitle="Professional furniture moving and packing services tailored to your needs"
+        backgroundImage="/images/IMG-20250910-WA0018.jpg"
+        breadcrumbs={[
+          { label: 'Services', href: null }
+        ]}
+      />
+
+      <section className="py-12 sm:py-16 md:py-20">
+        <div className="max-w-6xl mx-auto px-4">
         
-        <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
           {services.map((service, index) => (
-            <div key={index} className="border rounded-lg p-6 hover:shadow-lg transition-shadow">
-              <h3 className="text-2xl font-semibold mb-3">{service.title}</h3>
-              <p className="text-muted-foreground mb-4">{service.description}</p>
+            <div key={index} className="bg-white border border-gray-200 rounded-xl p-4 md:p-5 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+              <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-r from-blue-500 to-orange-500 rounded-full flex items-center justify-center mb-3">
+                <service.icon className="w-5 h-5 md:w-6 md:h-6 text-white" />
+              </div>
+              <h3 className="text-sm md:text-base font-bold mb-2 text-gray-900">{service.title}</h3>
+              <p className="text-gray-600 mb-3 text-xs">{service.description}</p>
               
-              <div className="space-y-2">
-                <h4 className="font-medium">Key Features:</h4>
+              <div className="space-y-1 md:space-y-2">
+                <h4 className="font-semibold text-xs md:text-sm text-gray-700">Key Features:</h4>
                 <ul className="space-y-1">
                   {service.features.map((feature, featureIndex) => (
-                    <li key={featureIndex} className="text-sm text-muted-foreground flex items-center">
-                      <span className="w-2 h-2 bg-primary rounded-full mr-2"></span>
+                    <li key={featureIndex} className="text-xs md:text-sm text-gray-600 flex items-start">
+                      <span className="w-1.5 h-1.5 md:w-2 md:h-2 bg-gradient-to-r from-blue-500 to-orange-500 rounded-full mr-1.5 md:mr-2 mt-1 flex-shrink-0"></span>
                       {feature}
                     </li>
                   ))}
@@ -51,16 +80,22 @@ export default function ServicesPage() {
           ))}
         </div>
         
-        <div className="mt-12 text-center">
-          <h2 className="text-2xl font-semibold mb-4">Ready to Get Started?</h2>
-          <p className="text-muted-foreground mb-6">
-            Contact us today to discuss how we can help your business grow
-          </p>
-          <button className="bg-primary text-primary-foreground px-6 py-3 rounded-md hover:bg-primary/90 transition-colors">
-            Get In Touch
-          </button>
+          <div className="mt-16 text-center bg-gradient-to-r from-blue-50 to-orange-50 rounded-2xl p-12">
+            <h2 className="text-3xl font-bold mb-4 text-gray-900">Ready to Move?</h2>
+            <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
+              Get a free quote today and experience stress-free furniture moving with Marhaba
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <button className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-8 py-3 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl">
+                Get Free Quote
+              </button>
+              <button className="border-2 border-orange-500 text-orange-600 px-8 py-3 rounded-lg hover:bg-orange-500 hover:text-white transition-all duration-300 font-semibold">
+                Call: +971568011076
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
+      </section>
     </div>
   )
 }

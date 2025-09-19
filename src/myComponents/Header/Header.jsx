@@ -101,7 +101,7 @@ export const Header = () => {
               
               {/* Content Overlay */}
               <div className="relative z-10 h-full flex items-center">
-                <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
                   <div className="max-w-4xl mx-auto text-center text-white">
                     {/* Icon */}
                     <div className="mb-6 flex justify-center">

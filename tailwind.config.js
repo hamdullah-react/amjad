@@ -12,10 +12,14 @@ module.exports = {
   theme: {
     container: {
       center: true,
-      padding: "2rem",
-      screens: {
-        "2xl": "1400px",
-      },
+      padding: "1rem",
+   screens: {
+  sm: "100%",
+  md: "100%",
+  lg: "900px",
+  xl: "1100px",
+  "2xl": "1200px",
+},
     },
     extend: {
       backgroundImage: {

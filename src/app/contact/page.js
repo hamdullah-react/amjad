@@ -1,17 +1,30 @@
 "use client"
 
 import { useState } from 'react'
-import { Mail, Phone, MapPin, Clock } from 'lucide-react'
+import { Mail, Phone, MapPin, Clock, Send, MessageSquare, CheckCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import PageHeader from '@/myComponents/PageHeader/PageHeader'
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    phone: '',
     subject: '',
     message: ''
   })
+
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [showSuccess, setShowSuccess] = useState(false)
+  const [showError, setShowError] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
@@ -21,219 +34,385 @@ export default function ContactPage() {
     }))
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    // Handle form submission here
-    console.log('Form submitted:', formData)
-    // Reset form
-    setFormData({ name: '', email: '', subject: '', message: '' })
+    setIsSubmitting(true)
+
+    try {
+      const response = await fetch('/api/send-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      })
+
+      if (response.ok) {
+        setShowSuccess(true)
+        setFormData({ name: '', email: '', phone: '', subject: '', message: '' })
+
+        // Hide success message after 5 seconds
+        setTimeout(() => setShowSuccess(false), 5000)
+      } else {
+        // Handle error
+        const error = await response.json()
+        console.error('Error sending email:', error)
+        setErrorMessage('Failed to send message. Please try again or contact us directly.')
+        setShowError(true)
+        setTimeout(() => setShowError(false), 5000)
+      }
+    } catch (error) {
+      console.error('Error:', error)
+      setErrorMessage('Failed to send message. Please check your connection and try again.')
+      setShowError(true)
+      setTimeout(() => setShowError(false), 5000)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const contactInfo = [
     {
       icon: Mail,
-      title: "Email",
+      title: "Email Us",
       details: "info@marhabamovers.ae",
-      description: "Send us an email anytime",
-      link: "mailto:info@marhabamovers.ae"
+      description: "24/7 Support Available",
+      link: "mailto:info@marhabamovers.ae",
+      color: "blue"
     },
     {
       icon: Phone,
-      title: "Phone",
-      details: "+971568011076",
-      description: "Mon-Fri from 8am to 5pm",
-      link: "tel:+971568011076"
+      title: "Call Us",
+      details: "+971 568 011 076",
+      description: "Mon-Sat 8:00 AM - 7:00 PM",
+      link: "tel:+971568011076",
+      color: "orange"
     },
     {
       icon: MapPin,
-      title: "Address",
-      details: "Dubai, United Arab Emirates",
-      description: "Visit us at our location"
+      title: "Visit Us",
+      details: "Dubai, UAE",
+      description: "Main Office Location",
+      color: "blue"
     },
     {
       icon: Clock,
-      title: "Business Hours",
-      details: "Monday - Friday",
-      description: "8:00 AM - 5:00 PM GST"
+      title: "Working Hours",
+      details: "Monday - Saturday",
+      description: "8:00 AM - 7:00 PM GST",
+      color: "orange"
+    }
+  ]
+
+  const faqs = [
+    {
+      question: "How quickly can I get a quote?",
+      answer: "We provide instant quotes through our online form and typically respond to detailed inquiries within 2-4 hours during business hours."
+    },
+    {
+      question: "Do you offer same-day moving services?",
+      answer: "Yes, we offer same-day and emergency moving services for urgent relocations, subject to availability."
+    },
+    {
+      question: "Are your services available on weekends?",
+      answer: "Absolutely! We operate Monday through Saturday to accommodate your schedule."
+    },
+    {
+      question: "How can I track my inquiry?",
+      answer: "Once you submit your inquiry, you'll receive a confirmation email with a reference number to track your request."
     }
   ]
 
   return (
-    <div className="container mx-auto px-4 py-12 sm:py-16 md:py-20">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-12 md:mb-16">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            Contact <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-orange-600">Us</span>
-          </h1>
-          <div className="inline-flex items-center justify-center w-16 h-1 bg-gradient-to-r from-blue-500 to-orange-500 rounded-full mb-6"></div>
-          <p className="text-[8px] sm:text-sm md:text-lg text-gray-600 max-w-3xl mx-auto">
-             Get in touch with us. We'd love to hear from you and help with your furniture moving needs.
-           </p>
-        </div>
-        
-        <div className="grid lg:grid-cols-2 gap-8 md:gap-12">
-          {/* Contact Form */}
-          <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg border border-gray-100">
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6 flex items-center">
-              <Mail className="w-5 h-5 mr-2 text-blue-600" />
-              Send us a Message
+    <>
+      <PageHeader
+        title="Get In Touch"
+        subtitle="We're here to help with all your furniture moving needs. Reach out to us today!"
+        backgroundImage="/images/IMG-20250910-WA0018.jpg"
+        breadcrumbs={[{ label: 'Contact', href: null }]}
+      />
+
+      {/* Hero Section with Gradient */}
+      <section className="relative bg-gradient-to-br from-blue-50 via-white to-orange-50 py-16">
+        <div className="absolute inset-0 bg-white/40"></div>
+
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="relative text-center max-w-3xl mx-auto mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Let's Start a <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-orange-600">Conversation</span>
             </h2>
-            
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <label htmlFor="name" className="block text-[8px] sm:text-sm font-medium text-gray-700 mb-2">
-                    Full Name *
-                  </label>
-                  <Input
-                    id="name"
-                    name="name"
-                    type="text"
-                    required
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    placeholder="Your full name"
-                    className="text-[8px] sm:text-sm"
-                  />
-                </div>
-                
-                <div>
-                  <label htmlFor="email" className="block text-[8px] sm:text-sm font-medium text-gray-700 mb-2">
-                    Email Address *
-                  </label>
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    required
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    placeholder="your.email@example.com"
-                    className="text-[8px] sm:text-sm"
-                  />
-                </div>
-              </div>
-              
-              <div>
-                <label htmlFor="subject" className="block text-[8px] sm:text-sm font-medium text-gray-700 mb-2">
-                  Subject *
-                </label>
-                <Input
-                  id="subject"
-                  name="subject"
-                  type="text"
-                  required
-                  value={formData.subject}
-                  onChange={handleInputChange}
-                  placeholder="What is this regarding?"
-                  className="text-[8px] sm:text-sm"
-                />
-              </div>
-              
-              <div>
-                <label htmlFor="message" className="block text-[8px] sm:text-sm font-medium text-gray-700 mb-2">
-                  Message *
-                </label>
-                <textarea
-                  id="message"
-                  name="message"
-                  rows={6}
-                  required
-                  value={formData.message}
-                  onChange={handleInputChange}
-                  placeholder="Tell us more about your inquiry..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-[8px] sm:text-sm"
-                />
-              </div>
-              
-              <Button type="submit" className="w-full md:w-auto bg-gradient-to-r from-blue-500 to-orange-500 hover:from-blue-600 hover:to-orange-600 text-sm">
-                Send Message
-              </Button>
-            </form>
+            <p className="text-gray-600 text-lg">
+              Whether you need a quote, have questions, or ready to book our services, we're just a message away.
+            </p>
           </div>
-          
-          {/* Contact Information */}
-          <div>
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6 flex items-center">
-              <Phone className="w-5 h-5 mr-2 text-blue-600" />
-              Contact Information
-            </h2>
-            
-            <div className="grid grid-cols-2 sm:grid-cols-2 gap-4 sm:gap-6">
-              {contactInfo.map((item, index) => {
-                const IconComponent = item.icon;
-                return (
-                  <div key={index} className="bg-white p-4 sm:p-6 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition-shadow duration-300 hover:border-blue-200">
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-blue-100 to-orange-100 rounded-full flex items-center justify-center mb-4">
-                      <IconComponent className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
-                    </div>
-                    <h3 className="text-[8px] sm:text-sm md:text-lg font-bold mb-2 text-gray-800">{item.title}</h3>
-                    <p className="text-[8px] sm:text-sm font-medium mb-1 text-gray-700">{item.details}</p>
-                    <p className="text-[8px] sm:text-xs text-gray-500">{item.description}</p>
-                    {item.link && (
-                      <a 
-                        href={item.link} 
-                        className="inline-block mt-3 text-[8px] sm:text-xs text-blue-600 hover:text-blue-800 font-medium"
-                      >
-                        Contact Now
-                      </a>
-                    )}
+
+          {/* Contact Cards */}
+          <div className=" relative grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-16">
+            {contactInfo.map((item, index) => {
+              const IconComponent = item.icon;
+              return (
+                <div
+                  key={index}
+                  className="group bg-white rounded-xl p-4 md:p-5 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100"
+                >
+                  <div className={`w-12 h-12 md:w-14 md:h-14 rounded-full bg-gradient-to-r ${
+                    item.color === 'blue'
+                      ? 'from-blue-500 to-blue-600'
+                      : 'from-orange-500 to-orange-600'
+                  } flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                    <IconComponent className="w-6 h-6 md:w-7 md:h-7 text-white" />
                   </div>
-                );
-              })}
+                  <h3 className="font-bold text-base md:text-lg mb-2 text-gray-800">{item.title}</h3>
+                  <p className="font-semibold text-sm md:text-base text-gray-700 mb-1">{item.details}</p>
+                  <p className="text-xs md:text-sm text-gray-500 mb-3">{item.description}</p>
+                  {item.link && (
+                    <a
+                      href={item.link}
+                      className={`inline-flex items-center text-sm font-semibold ${
+                        item.color === 'blue' ? 'text-blue-600 hover:text-blue-700' : 'text-orange-600 hover:text-orange-700'
+                      } transition-colors`}
+                    >
+                      Contact Now →
+                    </a>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Main Content Section */}
+      <section className="py-16">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="grid lg:grid-cols-5 gap-12">
+
+          {/* Contact Form - Left Side */}
+          <div className="lg:col-span-3">
+            <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-10 border border-gray-100">
+              <div className="flex items-center mb-8">
+                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-orange-500 rounded-full flex items-center justify-center mr-4">
+                  <MessageSquare className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-2xl md:text-3xl font-bold text-gray-900">Send Us a Message</h2>
+                  <p className="text-gray-600">Fill out the form and we'll get back to you soon</p>
+                </div>
+              </div>
+
+              {/* Success Message */}
+              {showSuccess && (
+                <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center animate-fade-in">
+                  <CheckCircle className="w-5 h-5 text-green-600 mr-2" />
+                  <span className="text-green-700">Your message has been sent successfully! We'll get back to you soon.</span>
+                </div>
+              )}
+
+              {/* Error Message */}
+              {showError && (
+                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start animate-fade-in">
+                  <svg className="w-5 h-5 text-red-600 mr-2 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <div>
+                    <span className="text-red-700 block">{errorMessage}</span>
+                    <span className="text-red-600 text-sm">You can also call us at +971 568 011 076</span>
+                  </div>
+                </div>
+              )}
+
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-2">
+                      Full Name *
+                    </label>
+                    <Input
+                      id="name"
+                      name="name"
+                      type="text"
+                      required
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      placeholder="John Doe"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
+                      Email Address *
+                    </label>
+                    <Input
+                      id="email"
+                      name="email"
+                      type="email"
+                      required
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      placeholder="john@example.com"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <label htmlFor="phone" className="block text-sm font-semibold text-gray-700 mb-2">
+                      Phone Number
+                    </label>
+                    <Input
+                      id="phone"
+                      name="phone"
+                      type="tel"
+                      value={formData.phone}
+                      onChange={handleInputChange}
+                      placeholder="+971 50 123 4567"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="subject" className="block text-sm font-semibold text-gray-700 mb-2">
+                      Subject *
+                    </label>
+                    <select
+                      id="subject"
+                      name="subject"
+                      required
+                      value={formData.subject}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                    >
+                      <option value="">Select a subject</option>
+                      <option value="quote">Request a Quote</option>
+                      <option value="booking">Book a Service</option>
+                      <option value="inquiry">General Inquiry</option>
+                      <option value="complaint">Complaint</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label htmlFor="message" className="block text-sm font-semibold text-gray-700 mb-2">
+                    Message *
+                  </label>
+                  <textarea
+                    id="message"
+                    name="message"
+                    rows={5}
+                    required
+                    value={formData.message}
+                    onChange={handleInputChange}
+                    placeholder="Tell us how we can help you..."
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all resize-none"
+                  />
+                </div>
+
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full bg-gradient-to-r from-blue-600 to-orange-600 hover:from-blue-700 hover:to-orange-700 text-white font-semibold py-4 rounded-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isSubmitting ? (
+                    <span className="flex items-center justify-center">
+                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Sending...
+                    </span>
+                  ) : (
+                    <span className="flex items-center justify-center">
+                      <Send className="w-5 h-5 mr-2" />
+                      Send Message
+                    </span>
+                  )}
+                </Button>
+              </form>
             </div>
-            
-            {/* Map */}
-            <div className="mt-6 sm:mt-8 rounded-xl overflow-hidden shadow-md border border-gray-100">
-              <iframe 
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d462560.3011806427!2d54.947287526927106!3d25.076280448850334!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e5f43496ad9c645%3A0xbde66e5084295162!2sDubai%20-%20United%20Arab%20Emirates!5e0!3m2!1sen!2sus!4v1651234567890!5m2!1sen!2sus" 
-                width="100%" 
-                height="300" 
-                style={{ border: 0 }} 
-                allowFullScreen="" 
-                loading="lazy" 
-                referrerPolicy="no-referrer-when-downgrade"
-              />
+          </div>
+
+          {/* Map & Additional Info - Right Side */}
+          <div className="lg:col-span-2 space-y-8">
+            {/* Map Section */}
+            <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
+              <div className="p-6 bg-gradient-to-r from-blue-600 to-orange-600">
+                <h3 className="text-xl font-bold text-white flex items-center">
+                  <MapPin className="w-5 h-5 mr-2" />
+                  Find Us on Map
+                </h3>
+              </div>
+              <div className="h-[400px]">
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d462560.3011806427!2d54.947287526927106!3d25.076280448850334!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e5f43496ad9c645%3A0xbde66e5084295162!2sDubai%20-%20United%20Arab%20Emirates!5e0!3m2!1sen!2sus!4v1651234567890!5m2!1sen!2sus"
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  allowFullScreen=""
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
+              </div>
+            </div>
+
+            {/* Quick Response Promise */}
+            <div className="bg-gradient-to-br from-blue-50 to-orange-50 rounded-3xl p-8 border border-blue-100">
+              <h3 className="text-xl font-bold mb-4 text-gray-800">Our Response Promise</h3>
+              <div className="space-y-3">
+                <div className="flex items-center">
+                  <div className="w-2 h-2 bg-blue-600 rounded-full mr-3"></div>
+                  <p className="text-gray-700">Quote requests: Within 2 hours</p>
+                </div>
+                <div className="flex items-center">
+                  <div className="w-2 h-2 bg-orange-600 rounded-full mr-3"></div>
+                  <p className="text-gray-700">General inquiries: Within 4 hours</p>
+                </div>
+                <div className="flex items-center">
+                  <div className="w-2 h-2 bg-blue-600 rounded-full mr-3"></div>
+                  <p className="text-gray-700">Emergency requests: Within 30 minutes</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-        
-        {/* FAQ Section */}
-        <div className="mt-16">
-          <h2 className="text-2xl font-semibold text-center mb-8">Frequently Asked Questions</h2>
-          
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="border rounded-lg p-6">
-              <h3 className="font-semibold mb-2">What are your response times?</h3>
-              <p className="text-muted-foreground text-sm">
-                We typically respond to all inquiries within 24 hours during business days.
-              </p>
-            </div>
-            
-            <div className="border rounded-lg p-6">
-              <h3 className="font-semibold mb-2">Do you offer emergency support?</h3>
-              <p className="text-muted-foreground text-sm">
-                Yes, we provide 24/7 emergency support for critical issues with our premium plans.
-              </p>
-            </div>
-            
-            <div className="border rounded-lg p-6">
-              <h3 className="font-semibold mb-2">Can I schedule a consultation?</h3>
-              <p className="text-muted-foreground text-sm">
-                Absolutely! Contact us to schedule a free consultation to discuss your needs.
-              </p>
-            </div>
-            
-            <div className="border rounded-lg p-6">
-              <h3 className="font-semibold mb-2">What information should I include?</h3>
-              <p className="text-muted-foreground text-sm">
-                Please include as much detail as possible about your project or inquiry for faster assistance.
-              </p>
+
+          {/* FAQ Section */}
+          <div className="mt-20">
+            <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Frequently Asked <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-orange-600">Questions</span>
+            </h2>
+            <p className="text-gray-600 text-lg">Quick answers to common questions</p>
+          </div>
+
+            <div className="max-w-3xl mx-auto">
+              <Accordion type="single" collapsible className="space-y-4">
+                {faqs.map((faq, index) => (
+                  <AccordionItem
+                    key={index}
+                    value={`item-${index}`}
+                    className="bg-white rounded-xl shadow-lg border border-gray-100 px-6 py-2"
+                  >
+                    <AccordionTrigger className="text-left hover:no-underline">
+                      <div className="flex items-center">
+                        <div className="w-10 h-10 bg-gradient-to-r from-blue-100 to-orange-100 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
+                          <span className="text-blue-600 font-bold">?</span>
+                        </div>
+                        <span className="font-bold text-lg text-gray-800">{faq.question}</span>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="text-gray-600 leading-relaxed pt-2 pl-14">
+                      {faq.answer}
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
             </div>
           </div>
         </div>
-      </div>
-    </div>
+      </section>
+    </>
   )
 }
