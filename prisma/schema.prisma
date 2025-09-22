@@ -1,0 +1,565 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// User Management
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  role      UserRole @default(USER)
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  bookings     Booking[]
+  testimonials Testimonial[]
+  messages     ContactMessage[]
+
+  @@map("users")
+}
+
+enum UserRole {
+  ADMIN
+  MANAGER
+  EMPLOYEE
+  USER
+}
+
+// Website Content Management
+model HeroSlider {
+  id          String   @id @default(cuid())
+  title       String
+  subtitle    String?
+  description String?
+  imageUrl    String
+  buttonText  String?
+  buttonUrl   String?
+  order       Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("hero_sliders")
+}
+
+model Service {
+  id          String    @id @default(cuid())
+  title       String
+  description String
+  shortDesc   String?
+  icon        String?
+  imageUrl    String?
+  price       Decimal?
+  features    String[]
+  order       Int       @default(0)
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  bookings BookingService[]
+
+  @@map("services")
+}
+
+model ServiceArea {
+  id            String    @id @default(cuid())
+  city          String
+  emirate       String
+  area          String?
+  description   String?
+  coverage      String[]  // List of specific locations/neighborhoods
+  postalCodes   String[]
+  isActive      Boolean   @default(true)
+  isPrimary     Boolean   @default(false)  // Primary service areas
+  deliveryTime  String?   // e.g., "Same day", "Next day"
+  extraCharges  Decimal?  // Additional charges for this area
+  order         Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@map("service_areas")
+}
+
+model TeamMember {
+  id          String   @id @default(cuid())
+  name        String
+  position    String
+  department  String?
+  bio         String?
+  imageUrl    String?
+  email       String?
+  phone       String?
+  socialLinks Json?    // {linkedin: "", twitter: "", etc}
+  order       Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("team_members")
+}
+
+model Testimonial {
+  id         String   @id @default(cuid())
+  name       String
+  email      String?
+  company    String?
+  position   String?
+  content    String
+  rating     Int      @default(5)
+  imageUrl   String?
+  service    String?
+  location   String?
+  isFeatured Boolean  @default(false)
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relations
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id])
+
+  @@map("testimonials")
+}
+
+model FAQ {
+  id        String   @id @default(cuid())
+  question  String
+  answer    String
+  category  String?
+  order     Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("faqs")
+}
+
+model BlogPost {
+  id            String    @id @default(cuid())
+  title         String
+  slug          String    @unique
+  excerpt       String?
+  content       Json      // JSON structure for content blocks
+  author        String
+  category      String
+  tags          String[]
+  featuredImage String?
+  readTime      String?
+  views         Int       @default(0)
+  likes         Int       @default(0)
+  isFeatured    Boolean   @default(false)
+  status        PostStatus @default(DRAFT)
+  publishedAt   DateTime?
+  scheduledPublishAt DateTime?
+
+  // SEO Fields
+  metaTitle     String?
+  metaDescription String?
+  metaKeywords  String[]
+  ogTitle       String?
+  ogDescription String?
+  ogImage       String?
+  twitterTitle  String?
+  twitterDescription String?
+  twitterImage  String?
+  canonicalUrl  String?
+
+  // Additional Fields
+  allowComments Boolean   @default(true)
+  relatedPosts  String[]
+  viewCount     Int       @default(0)
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@map("blog_posts")
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model Gallery {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  imageUrl    String
+  category    String
+  tags        String[]
+  order       Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("gallery")
+}
+
+model WhyChooseUs {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  icon        String
+  color       String   @default("blue")
+  order       Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("why_choose_us")
+}
+
+model Statistic {
+  id          String   @id @default(cuid())
+  label       String
+  value       String
+  prefix      String?
+  suffix      String?
+  icon        String
+  color       String   @default("blue")
+  order       Int      @default(0)
+  isAnimated  Boolean  @default(true)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("statistics")
+}
+
+// Business Operations
+model Customer {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  phone     String
+  address   String?
+  city      String?
+  emirate   String?
+  type      CustomerType @default(INDIVIDUAL)
+  notes     String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  bookings Booking[]
+
+  @@map("customers")
+}
+
+enum CustomerType {
+  INDIVIDUAL
+  CORPORATE
+  REGULAR
+}
+
+model Booking {
+  id                String        @id @default(cuid())
+  bookingNumber     String        @unique @default(cuid())
+
+  // Customer Info
+  customerId        String
+  customer          Customer      @relation(fields: [customerId], references: [id])
+  userId            String?
+  user              User?         @relation(fields: [userId], references: [id])
+
+  // Location Details
+  pickupAddress     String
+  pickupCity        String
+  pickupEmirate     String
+  deliveryAddress   String
+  deliveryCity      String
+  deliveryEmirate   String
+
+  // Booking Details
+  movingDate        DateTime
+  preferredTime     String?
+  urgency           UrgencyLevel  @default(STANDARD)
+  specialInstructions String?
+
+  // Pricing
+  estimatedPrice    Decimal?
+  finalPrice        Decimal?
+  discount          Decimal?
+
+  // Status & Tracking
+  status            BookingStatus @default(PENDING)
+  assignedTeam      String?
+  vehicleAssigned   String?
+
+  // Timestamps
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  completedAt       DateTime?
+
+  // Relations
+  services          BookingService[]
+  statusHistory     BookingStatusHistory[]
+
+  @@map("bookings")
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  REFUNDED
+}
+
+enum UrgencyLevel {
+  STANDARD
+  URGENT
+  EMERGENCY
+}
+
+model BookingService {
+  id        String  @id @default(cuid())
+  bookingId String
+  serviceId String
+  quantity  Int     @default(1)
+  price     Decimal?
+  notes     String?
+
+  // Relations
+  booking   Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  service   Service @relation(fields: [serviceId], references: [id])
+
+  @@unique([bookingId, serviceId])
+  @@map("booking_services")
+}
+
+model BookingStatusHistory {
+  id        String        @id @default(cuid())
+  bookingId String
+  status    BookingStatus
+  notes     String?
+  createdBy String?
+  createdAt DateTime      @default(now())
+
+  // Relations
+  booking   Booking       @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@map("booking_status_history")
+}
+
+// Fleet Management
+model Vehicle {
+  id            String      @id @default(cuid())
+  plateNumber   String      @unique
+  type          VehicleType
+  model         String
+  year          Int?
+  capacity      String?
+  status        VehicleStatus @default(AVAILABLE)
+  lastService   DateTime?
+  nextService   DateTime?
+  notes         String?
+  isActive      Boolean     @default(true)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@map("vehicles")
+}
+
+enum VehicleType {
+  SMALL_TRUCK
+  MEDIUM_TRUCK
+  LARGE_TRUCK
+  VAN
+  PICKUP
+}
+
+enum VehicleStatus {
+  AVAILABLE
+  IN_USE
+  MAINTENANCE
+  OUT_OF_SERVICE
+}
+
+model Driver {
+  id          String      @id @default(cuid())
+  name        String
+  phone       String      @unique
+  email       String?
+  licenseNumber String    @unique
+  licenseExpiry DateTime
+  experience  Int?        // years
+  rating      Decimal?    @default(5.0)
+  status      DriverStatus @default(AVAILABLE)
+  notes       String?
+  isActive    Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@map("drivers")
+}
+
+enum DriverStatus {
+  AVAILABLE
+  ON_DUTY
+  OFF_DUTY
+  ON_LEAVE
+}
+
+// Communication
+model ContactMessage {
+  id        String      @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  subject   String?
+  message   String
+  type      MessageType @default(GENERAL)
+  status    MessageStatus @default(UNREAD)
+  priority  Priority    @default(NORMAL)
+  response  String?
+  respondedAt DateTime?
+  respondedBy String?
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  // Relations
+  userId    String?
+  user      User?       @relation(fields: [userId], references: [id])
+
+  @@map("contact_messages")
+}
+
+enum MessageType {
+  GENERAL
+  QUOTE_REQUEST
+  COMPLAINT
+  FEEDBACK
+  SUPPORT
+}
+
+enum MessageStatus {
+  UNREAD
+  READ
+  RESPONDED
+  CLOSED
+}
+
+enum Priority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+// Settings & Configuration
+model CompanySettings {
+  id    String @id @default(cuid())
+  key   String @unique
+  value Json
+  description String?
+  updatedAt DateTime @updatedAt
+
+  @@map("company_settings")
+}
+
+model SeoSettings {
+  id          String   @id @default(cuid())
+  page        String   @unique // home, about, services, etc
+  title       String
+  description String
+  keywords    String?
+  canonical   String?
+  ogTitle     String?
+  ogDescription String?
+  ogImage     String?
+  priority    Decimal? @default(1.0)
+  changeFreq  String?  @default("monthly")
+  updatedAt   DateTime @updatedAt
+
+  @@map("seo_settings")
+}
+
+model GlobalSeoSettings {
+  id                    String   @id @default(cuid())
+
+  // Global SEO
+  siteTitle             String
+  titleSeparator        String   @default("|")
+  siteDescription       String
+  keywords              Json     // Array of keywords
+  author                String?
+  robots                String   @default("index, follow")
+  googleVerification    String?
+  bingVerification      String?
+
+  // Open Graph
+  ogTitle               String?
+  ogDescription         String?
+  ogImage               String?
+  ogType                String   @default("website")
+  ogUrl                 String?
+
+  // Twitter Card
+  twitterCard           String   @default("summary_large_image")
+  twitterSite           String?
+  twitterCreator        String?
+  twitterTitle          String?
+  twitterDescription    String?
+  twitterImage          String?
+
+  // Schema Markup
+  schemaType            String   @default("LocalBusiness")
+  schemaBusinessName    String?
+  schemaBusinessType    String   @default("MovingCompany")
+  schemaPriceRange      String   @default("$$")
+  schemaLogo            String?
+  schemaImage           String?
+  schemaAddress         String?
+  schemaPhone           String?
+  schemaEmail           String?
+  schemaOpeningHours    Json?    // Array of opening hours
+  schemaGeoLatitude     String?
+  schemaGeoLongitude    String?
+  schemaRating          String?
+  schemaReviewCount     String?
+
+  // Sitemap
+  sitemapEnabled        Boolean  @default(true)
+  sitemapChangeFrequency String  @default("weekly")
+  sitemapPriority       String   @default("0.8")
+  excludedPages         Json?    // Array of excluded pages
+
+  // Analytics & Tracking
+  googleAnalyticsId     String?
+  googleTagManagerId    String?
+  facebookPixelId       String?
+  hotjarId              String?
+  clarityProjectId      String?
+
+  // Advanced
+  canonicalUrl          String?
+  alternateLanguages    Json?    // Array of {code, url}
+  structuredDataEnabled Boolean  @default(true)
+  richSnippetsEnabled   Boolean  @default(true)
+  breadcrumbsEnabled    Boolean  @default(true)
+  faqSchemaEnabled      Boolean  @default(true)
+  localBusinessSchemaEnabled Boolean @default(true)
+  customHeadScripts     String?
+  customBodyScripts     String?
+
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@map("global_seo_settings")
+}

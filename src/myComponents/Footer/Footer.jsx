@@ -41,17 +41,18 @@ const Footer = () => {
                   Subscribe to our newsletter for exclusive deals and moving advice
                 </p>
               </div>
-              <div className="flex w-full md:w-auto gap-3">
-                <input
-                  type="email"
-                  placeholder="Your email address"
-                  className="flex-1 md:w-64 px-4 py-3 rounded-lg bg-white/20 backdrop-blur-sm text-white placeholder-white/70 border border-white/30 focus:outline-none focus:border-white"
-                />
-                <button className="px-6 py-3 bg-white text-blue-600 font-semibold rounded-lg hover:bg-gray-100 transition-colors flex items-center gap-2">
-                  Subscribe
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-              </div>
+         <div className="grid grid-cols-1 md:grid-cols-2 w-full md:w-auto gap-3">
+  <input
+    type="email"
+    placeholder="Your email address"
+    className="flex-1 md:w-64 px-4 py-3 rounded-lg bg-white/20 backdrop-blur-sm text-white placeholder-white/70 border border-white/30 focus:outline-none focus:border-white"
+  />
+  <button className="px-6 py-3 bg-white text-blue-600 font-semibold rounded-lg hover:bg-gray-100 transition-colors flex items-center gap-2">
+    Subscribe
+    <ArrowRight className="w-4 h-4" />
+  </button>
+</div>
+
             </div>
           </div>
         </div>
