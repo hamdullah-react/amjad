@@ -25,6 +25,13 @@ import {
   Save
 } from 'lucide-react';
 
+const StatCard = ({ title, value, className = '' }) => (
+  <div className="bg-card rounded-lg shadow p-4 border">
+    <div className="text-sm text-muted-foreground">{title}</div>
+    <div className={`text-2xl font-bold ${className}`}>{value}</div>
+  </div>
+)
+
 export default function SEOPage() {
   const [seoData, setSeoData] = useState({
     // Global SEO
@@ -207,24 +214,32 @@ export default function SEOPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6 p-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h3 className="text-2xl font-semibold">SEO Settings</h3>
-          <p className="text-sm text-muted-foreground mt-1">
-            Manage search engine optimization and meta tags
-          </p>
+    <div className="p-6">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-foreground">SEO Settings</h1>
+        <p className="text-muted-foreground mt-2">
+          Manage search engine optimization and meta tags
+        </p>
+        <div className="mt-4">
+          <Button onClick={handleSave} disabled={saving}>
+            <Save className="h-4 w-4 mr-2" />
+            {saving ? 'Saving...' : 'Save All Changes'}
+          </Button>
         </div>
-        <Button onClick={handleSave} disabled={saving}>
-          <Save className="h-4 w-4 mr-2" />
-          {saving ? 'Saving...' : 'Save All Changes'}
-        </Button>
+      </div>
+
+      {/* Statistics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <StatCard title="Keywords" value={seoData.keywords?.length || 0} className="text-primary" />
+        <StatCard title="Schema Enabled" value={seoData.structuredDataEnabled ? "Yes" : "No"} className={seoData.structuredDataEnabled ? "text-primary" : "text-muted-foreground"} />
+        <StatCard title="Sitemap" value={seoData.sitemapEnabled ? "Enabled" : "Disabled"} className={seoData.sitemapEnabled ? "text-primary" : "text-muted-foreground"} />
+        <StatCard title="Languages" value={seoData.alternateLanguages?.length || 0} className="text-primary" />
       </div>
 
       {/* Tabs */}
-      <Tabs defaultValue="global" className="w-full">
-        <TabsList className="grid w-full grid-cols-8">
+      <div className="mb-6">
+        <Tabs defaultValue="global" className="w-full">
+          <TabsList className="grid w-full grid-cols-8">
           <TabsTrigger value="global" className="flex items-center gap-1">
             <Search className="h-3 w-3" />
             Global
@@ -257,11 +272,11 @@ export default function SEOPage() {
             <Globe className="h-3 w-3" />
             International
           </TabsTrigger>
-        </TabsList>
+          </TabsList>
 
-        {/* Global SEO */}
-        <TabsContent value="global">
-          <Card>
+          {/* Global SEO */}
+          <TabsContent value="global">
+            <Card className="border">
             <CardHeader>
               <CardTitle>Global SEO Settings</CardTitle>
               <CardDescription>
@@ -326,10 +341,10 @@ export default function SEOPage() {
                 </div>
                 <div className="flex flex-wrap gap-2 mt-2">
                   {seoData.keywords?.map((keyword, index) => (
-                    <Badge key={index} variant="secondary" className="gap-1">
+                    <Badge key={index} variant="secondary" className="gap-1 bg-muted text-muted-foreground hover:bg-muted/50">
                       {keyword}
                       <X
-                        className="h-3 w-3 cursor-pointer"
+                        className="h-3 w-3 cursor-pointer hover:text-foreground"
                         onClick={() => removeKeyword(index)}
                       />
                     </Badge>
@@ -388,11 +403,11 @@ export default function SEOPage() {
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
+          </TabsContent>
 
-        {/* Open Graph */}
-        <TabsContent value="opengraph">
-          <Card>
+          {/* Open Graph */}
+          <TabsContent value="opengraph">
+            <Card className="border">
             <CardHeader>
               <CardTitle>Open Graph Settings</CardTitle>
               <CardDescription>
@@ -473,11 +488,11 @@ export default function SEOPage() {
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
+          </TabsContent>
 
-        {/* Twitter Card */}
-        <TabsContent value="twitter">
-          <Card>
+          {/* Twitter Card */}
+          <TabsContent value="twitter">
+            <Card className="border">
             <CardHeader>
               <CardTitle>Twitter Card Settings</CardTitle>
               <CardDescription>
@@ -568,11 +583,11 @@ export default function SEOPage() {
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
+          </TabsContent>
 
-        {/* Schema Markup */}
-        <TabsContent value="schema">
-          <Card>
+          {/* Schema Markup */}
+          <TabsContent value="schema">
+            <Card className="border">
             <CardHeader>
               <CardTitle>Schema Markup Settings</CardTitle>
               <CardDescription>
@@ -764,11 +779,11 @@ export default function SEOPage() {
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
+          </TabsContent>
 
-        {/* Sitemap */}
-        <TabsContent value="sitemap">
-          <Card>
+          {/* Sitemap */}
+          <TabsContent value="sitemap">
+            <Card className="border">
             <CardHeader>
               <CardTitle>Sitemap Settings</CardTitle>
               <CardDescription>
@@ -849,10 +864,10 @@ export default function SEOPage() {
                 </div>
                 <div className="flex flex-wrap gap-2 mt-2">
                   {seoData.excludedPages?.map((page, index) => (
-                    <Badge key={index} variant="secondary" className="gap-1">
+                    <Badge key={index} variant="secondary" className="gap-1 bg-muted text-muted-foreground hover:bg-muted/50">
                       {page}
                       <X
-                        className="h-3 w-3 cursor-pointer"
+                        className="h-3 w-3 cursor-pointer hover:text-foreground"
                         onClick={() => removeExcludedPage(index)}
                       />
                     </Badge>
@@ -861,11 +876,11 @@ export default function SEOPage() {
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
+          </TabsContent>
 
-        {/* Analytics */}
-        <TabsContent value="analytics">
-          <Card>
+          {/* Analytics */}
+          <TabsContent value="analytics">
+            <Card className="border">
             <CardHeader>
               <CardTitle>Analytics & Tracking</CardTitle>
               <CardDescription>
@@ -925,11 +940,11 @@ export default function SEOPage() {
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
+          </TabsContent>
 
-        {/* Advanced */}
-        <TabsContent value="advanced">
-          <Card>
+          {/* Advanced */}
+          <TabsContent value="advanced">
+            <Card className="border">
             <CardHeader>
               <CardTitle>Advanced SEO Settings</CardTitle>
               <CardDescription>
@@ -1001,7 +1016,7 @@ export default function SEOPage() {
                   onChange={(e) => setSeoData({ ...seoData, customHeadScripts: e.target.value })}
                   placeholder="Scripts to add before </head>"
                   rows={4}
-                  className="font-mono text-sm"
+                  className="font-mono text-sm bg-muted/50"
                 />
               </div>
 
@@ -1013,16 +1028,16 @@ export default function SEOPage() {
                   onChange={(e) => setSeoData({ ...seoData, customBodyScripts: e.target.value })}
                   placeholder="Scripts to add before </body>"
                   rows={4}
-                  className="font-mono text-sm"
+                  className="font-mono text-sm bg-muted/50"
                 />
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
+          </TabsContent>
 
-        {/* International */}
-        <TabsContent value="international">
-          <Card>
+          {/* International */}
+          <TabsContent value="international">
+            <Card className="border">
             <CardHeader>
               <CardTitle>International SEO</CardTitle>
               <CardDescription>
@@ -1052,13 +1067,14 @@ export default function SEOPage() {
                   </div>
                   <div className="space-y-2">
                     {seoData.alternateLanguages?.map((lang, index) => (
-                      <div key={index} className="flex items-center gap-2 p-2 border rounded">
-                        <span className="font-medium">{lang.code}:</span>
-                        <span className="flex-1">{lang.url}</span>
+                      <div key={index} className="flex items-center gap-2 p-2 border rounded bg-card">
+                        <span className="font-medium text-foreground">{lang.code}:</span>
+                        <span className="flex-1 text-muted-foreground">{lang.url}</span>
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => removeLanguage(index)}
+                          className="hover:bg-muted/50 text-muted-foreground hover:text-foreground"
                         >
                           <X className="h-4 w-4" />
                         </Button>
@@ -1069,28 +1085,27 @@ export default function SEOPage() {
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
-      </Tabs>
+          </TabsContent>
+        </Tabs>
+      </div>
 
       {/* Image Picker Modal */}
-      {galleryOpen && (
-        <ImagePicker
-          isOpen={galleryOpen}
-          onClose={() => {
-            setGalleryOpen(false);
-            setImageTarget('');
-          }}
-          onSelect={handleImageSelect}
-        />
-      )}
+      <ImagePicker
+        isOpen={galleryOpen}
+        onClose={() => {
+          setGalleryOpen(false);
+          setImageTarget('');
+        }}
+        onSelect={handleImageSelect}
+      />
 
       {/* Processing Overlay */}
       {saving && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-[50000]">
-          <div className="bg-white p-6 rounded-lg shadow-lg">
+          <div className="bg-card rounded-lg p-6 shadow-xl border">
             <div className="flex items-center space-x-3">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              <span className="text-lg">Saving SEO settings...</span>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              <p className="text-lg font-medium text-foreground">Saving SEO settings...</p>
             </div>
           </div>
         </div>

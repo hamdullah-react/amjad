@@ -30,14 +30,10 @@ const INITIAL_FORM_DATA = {
 }
 
 const COLORS = [
-  { value: 'blue', label: 'Blue', class: 'bg-blue-500' },
-  { value: 'green', label: 'Green', class: 'bg-green-500' },
-  { value: 'red', label: 'Red', class: 'bg-red-500' },
-  { value: 'yellow', label: 'Yellow', class: 'bg-yellow-500' },
-  { value: 'purple', label: 'Purple', class: 'bg-purple-500' },
-  { value: 'pink', label: 'Pink', class: 'bg-pink-500' },
-  { value: 'indigo', label: 'Indigo', class: 'bg-indigo-500' },
-  { value: 'gray', label: 'Gray', class: 'bg-gray-500' }
+  { value: 'primary', label: 'Primary', class: 'bg-primary' },
+  { value: 'secondary', label: 'Secondary', class: 'bg-secondary' },
+  { value: 'accent', label: 'Accent', class: 'bg-accent' },
+  { value: 'muted', label: 'Muted', class: 'bg-muted' }
 ]
 
 const ICON_SUGGESTIONS = [
@@ -50,20 +46,20 @@ const ICON_SUGGESTIONS = [
 ]
 
 const StatCard = ({ title, value, className = '' }) => (
-  <div className="bg-white rounded-lg shadow p-4">
-    <div className="text-sm text-gray-600">{title}</div>
+  <div className="bg-card rounded-lg shadow p-4 border">
+    <div className="text-sm text-muted-foreground">{title}</div>
     <div className={`text-2xl font-bold ${className}`}>{value}</div>
   </div>
 )
 
 const WhyChooseUsRow = ({ item, index, totalItems, onToggleActive, onEdit, onDelete, onOrderChange, processing }) => {
   const IconComponent = ICON_SUGGESTIONS.find(i => i.value === item.icon)?.icon || Award
-  const colorClass = COLORS.find(c => c.value === item.color)?.class || 'bg-blue-500'
+  const colorClass = COLORS.find(c => c.value === item.color)?.class || 'bg-primary'
 
   return (
-    <tr className="hover:bg-gray-50">
+    <tr className="hover:bg-muted/50">
       <td className="px-6 py-4 whitespace-nowrap">
-        <span className="text-sm text-gray-500">{item.order}</span>
+        <span className="text-sm text-muted-foreground">{item.order}</span>
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
         <div className={`w-12 h-12 rounded-lg ${colorClass} flex items-center justify-center`}>
@@ -72,11 +68,11 @@ const WhyChooseUsRow = ({ item, index, totalItems, onToggleActive, onEdit, onDel
       </td>
       <td className="px-6 py-4">
         <div>
-          <p className="text-sm font-medium text-gray-900">{item.title}</p>
+          <p className="text-sm font-medium text-foreground">{item.title}</p>
         </div>
       </td>
       <td className="px-6 py-4">
-        <p className="text-sm text-gray-600 max-w-xs truncate">{item.description}</p>
+        <p className="text-sm text-muted-foreground max-w-xs truncate">{item.description}</p>
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
         <span className={`px-2 py-1 text-xs rounded-full ${colorClass} text-white`}>
@@ -85,12 +81,12 @@ const WhyChooseUsRow = ({ item, index, totalItems, onToggleActive, onEdit, onDel
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
         {item.isActive ? (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary">
             <Eye className="w-3 h-3" />
             Active
           </span>
         ) : (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-muted text-muted-foreground">
             <EyeOff className="w-3 h-3" />
             Inactive
           </span>
@@ -101,7 +97,7 @@ const WhyChooseUsRow = ({ item, index, totalItems, onToggleActive, onEdit, onDel
           <button
             onClick={() => onOrderChange(item, 'up')}
             disabled={index === 0 || processing}
-            className="p-1 text-gray-600 hover:text-gray-800 disabled:opacity-50"
+            className="p-1 text-muted-foreground hover:text-foreground disabled:opacity-50"
             title="Move up"
           >
             <ArrowUp className="w-4 h-4" />
@@ -109,28 +105,28 @@ const WhyChooseUsRow = ({ item, index, totalItems, onToggleActive, onEdit, onDel
           <button
             onClick={() => onOrderChange(item, 'down')}
             disabled={index === totalItems - 1 || processing}
-            className="p-1 text-gray-600 hover:text-gray-800 disabled:opacity-50"
+            className="p-1 text-muted-foreground hover:text-foreground disabled:opacity-50"
             title="Move down"
           >
             <ArrowDown className="w-4 h-4" />
           </button>
           <button
             onClick={() => onToggleActive(item)}
-            className="p-1 text-gray-600 hover:text-gray-800"
+            className="p-1 text-muted-foreground hover:text-foreground"
             title={item.isActive ? "Deactivate" : "Activate"}
           >
             {item.isActive ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
           </button>
           <button
             onClick={() => onEdit(item)}
-            className="p-1 text-blue-600 hover:text-blue-800"
+            className="p-1 text-primary hover:text-primary/80"
             title="Edit"
           >
             <Edit className="w-4 h-4" />
           </button>
           <button
             onClick={() => onDelete(item.id)}
-            className="p-1 text-red-600 hover:text-red-800"
+            className="p-1 text-destructive hover:text-destructive/90"
             title="Delete"
           >
             <Trash2 className="w-4 h-4" />
@@ -143,7 +139,7 @@ const WhyChooseUsRow = ({ item, index, totalItems, onToggleActive, onEdit, onDel
 
 const WhyChooseUsForm = ({ formData, setFormData }) => {
   const SelectedIcon = ICON_SUGGESTIONS.find(i => i.value === formData.icon)?.icon || Award
-  const selectedColor = COLORS.find(c => c.value === formData.color)?.class || 'bg-blue-500'
+  const selectedColor = COLORS.find(c => c.value === formData.color)?.class || 'bg-primary'
 
   return (
     <div className="space-y-4 py-4">
@@ -227,14 +223,14 @@ const WhyChooseUsForm = ({ formData, setFormData }) => {
 
       <div className="space-y-2">
         <Label>Preview</Label>
-        <div className="p-4 border rounded-lg bg-gray-50">
+        <div className="p-4 border rounded-lg bg-muted/50">
           <div className="flex items-start gap-4">
             <div className={`w-16 h-16 rounded-lg ${selectedColor} flex items-center justify-center flex-shrink-0`}>
               <SelectedIcon className="w-8 h-8 text-white" />
             </div>
             <div>
               <h4 className="font-semibold text-lg">{formData.title || 'Title Preview'}</h4>
-              <p className="text-gray-600 mt-1">{formData.description || 'Description preview will appear here'}</p>
+              <p className="text-muted-foreground mt-1">{formData.description || 'Description preview will appear here'}</p>
             </div>
           </div>
         </div>
@@ -483,16 +479,15 @@ export default function WhyChooseUsPage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
+    <div className="p-6">
+      <div className="mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Why Choose Us</h1>
-          <p className="text-gray-600 mt-2">Manage your unique selling points and benefits</p>
+          <h1 className="text-3xl font-bold text-foreground">Why Choose Us</h1>
+          <p className="text-muted-foreground mt-2">Manage your unique selling points and benefits</p>
         </div>
         <Button
           onClick={handleAdd}
-          className="bg-blue-600 hover:bg-blue-700"
+          className="bg-primary hover:bg-primary/90 text-primary-foreground"
         >
           <Plus className="w-4 h-4 mr-2" />
           Add Item
@@ -500,15 +495,15 @@ export default function WhyChooseUsPage() {
       </div>
 
       {/* Statistics */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <StatCard title="Total Items" value={stats.total} />
-        <StatCard title="Active" value={stats.active} className="text-green-600" />
-        <StatCard title="Inactive" value={stats.inactive} className="text-gray-600" />
-        <StatCard title="Color Variants" value={stats.colors} className="text-purple-600" />
+        <StatCard title="Active" value={stats.active} className="text-primary" />
+        <StatCard title="Inactive" value={stats.inactive} className="text-muted-foreground" />
+        <StatCard title="Color Variants" value={stats.colors} className="text-primary" />
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-lg shadow p-4">
+      <div className="bg-card rounded-lg shadow p-4 border">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1">
             <Input
@@ -532,16 +527,29 @@ export default function WhyChooseUsPage() {
       </div>
 
       {/* Items Table */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
+      <div className="bg-card rounded-lg shadow border">
+        <div className="p-6 border-b">
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-semibold text-foreground">Why Choose Us Items</h2>
+            <Button
+              onClick={handleAdd}
+              className="bg-primary hover:bg-primary/90 text-primary-foreground"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Add Item
+            </Button>
+          </div>
+        </div>
+        <div className="overflow-x-auto">
         {loading ? (
           <div className="p-12 text-center">
-            <div className="text-gray-500">Loading items...</div>
+            <div className="text-muted-foreground">Loading items...</div>
           </div>
         ) : filteredItems.length === 0 ? (
           <div className="p-12 text-center">
-            <Award className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-            <p className="text-gray-600 text-lg">No items found</p>
-            <p className="text-gray-500 mt-2">
+            <Award className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+            <p className="text-foreground text-lg">No items found</p>
+            <p className="text-muted-foreground mt-2">
               {searchTerm || statusFilter !== 'all'
                 ? 'Try adjusting your search or filters'
                 : 'Click "Add Item" to create your first item'}
@@ -550,32 +558,32 @@ export default function WhyChooseUsPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-muted/50 border-b">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     Order
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     Icon
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     Title
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     Description
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     Color
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-card divide-y divide-border">
                 {filteredItems.map((item, index) => (
                   <WhyChooseUsRow
                     key={item.id}
@@ -594,14 +602,15 @@ export default function WhyChooseUsPage() {
           </div>
         )}
       </div>
+      </div>
 
       {/* Processing Overlay */}
       {processing && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-[50000]">
-          <div className="bg-white rounded-lg p-6 shadow-xl">
+          <div className="bg-card rounded-lg p-6 shadow-xl border">
             <div className="flex items-center space-x-3">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              <p className="text-lg font-medium text-gray-900">{processingMessage || 'Processing...'}</p>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              <p className="text-lg font-medium text-foreground">{processingMessage || 'Processing...'}</p>
             </div>
           </div>
         </div>
@@ -609,7 +618,7 @@ export default function WhyChooseUsPage() {
 
       {/* Add/Edit Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-[90%] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editingItem ? 'Edit Item' : 'Add New Item'}</DialogTitle>
             <DialogDescription>
@@ -629,7 +638,7 @@ export default function WhyChooseUsPage() {
             <Button
               onClick={handleSubmit}
               disabled={processing || !formData.title || !formData.description}
-              className="bg-blue-600 hover:bg-blue-700"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground"
             >
               <Save className="w-4 h-4 mr-2" />
               {editingItem ? 'Update Item' : 'Create Item'}

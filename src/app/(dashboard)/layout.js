@@ -1,19 +1,10 @@
-import { Geist, Geist_Mono } from "next/font/google";
 import "../globals.css";
 import { SidebarProvider } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/dashboardComponents/app-sidebar"
 import { DashboardHeader } from "@/dashboardComponents/dashboard-header"
 import { ThemeProvider } from "@/contexts/theme-context"
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import { AuthProvider } from "@/contexts/auth-context"
+import AuthGuard from "@/components/auth/auth-guard"
 
 export const metadata = {
   title: "Dashboard | Marhaba Furniture Movers",
@@ -22,11 +13,9 @@ export const metadata = {
 
 export default function DashboardLayout({ children }) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <ThemeProvider>
+    <AuthProvider>
+      <ThemeProvider>
+        <AuthGuard requireAuth={true}>
           <SidebarProvider>
             <AppSidebar />
             <main className="flex-1 flex flex-col">
@@ -36,8 +25,8 @@ export default function DashboardLayout({ children }) {
               </div>
             </main>
           </SidebarProvider>
-        </ThemeProvider>
-      </body>
-    </html>
+        </AuthGuard>
+      </ThemeProvider>
+    </AuthProvider>
   );
 }

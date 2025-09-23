@@ -45,8 +45,8 @@ const INITIAL_FORM_DATA = {
 }
 
 const StatCard = ({ title, value, className = '' }) => (
-  <div className="bg-white rounded-lg shadow p-4">
-    <div className="text-sm text-gray-600">{title}</div>
+  <div className="bg-card rounded-lg shadow p-4 border">
+    <div className="text-sm text-muted-foreground">{title}</div>
     <div className={`text-2xl font-bold ${className}`}>{value}</div>
   </div>
 )
@@ -58,12 +58,12 @@ const TeamMemberRow = ({ member, onToggleActive, onEdit, onDelete }) => {
   }, [member.department])
 
   return (
-    <tr className="hover:bg-gray-50">
+    <tr className="hover:bg-muted/50">
       <td className="px-6 py-4 whitespace-nowrap">
-        <span className="text-sm text-gray-500">{member.order}</span>
+        <span className="text-sm text-muted-foreground">{member.order}</span>
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
-        <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-100">
+        <div className="w-12 h-12 rounded-full overflow-hidden bg-muted">
           {member.imageUrl ? (
             <img
               src={member.imageUrl}
@@ -75,32 +75,32 @@ const TeamMemberRow = ({ member, onToggleActive, onEdit, onDelete }) => {
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
-              <User className="w-6 h-6 text-gray-400" />
+              <User className="w-6 h-6 text-muted-foreground" />
             </div>
           )}
         </div>
       </td>
       <td className="px-6 py-4">
         <div>
-          <p className="text-sm font-medium text-gray-900">{member.name}</p>
-          <p className="text-xs text-gray-500">{member.position}</p>
+          <p className="text-sm font-medium text-foreground">{member.name}</p>
+          <p className="text-xs text-muted-foreground">{member.position}</p>
         </div>
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
-        <span className="text-sm text-gray-600">{departmentLabel}</span>
+        <span className="text-sm text-muted-foreground">{departmentLabel}</span>
       </td>
       <td className="px-6 py-4">
         <div className="text-xs space-y-1">
           {member.email && (
             <div className="flex items-center gap-1">
-              <Mail className="w-3 h-3 text-gray-400" />
-              <span className="text-gray-600">{member.email}</span>
+              <Mail className="w-3 h-3 text-muted-foreground" />
+              <span className="text-muted-foreground">{member.email}</span>
             </div>
           )}
           {member.phone && (
             <div className="flex items-center gap-1">
-              <Phone className="w-3 h-3 text-gray-400" />
-              <span className="text-gray-600">{member.phone}</span>
+              <Phone className="w-3 h-3 text-muted-foreground" />
+              <span className="text-muted-foreground">{member.phone}</span>
             </div>
           )}
         </div>
@@ -112,7 +112,7 @@ const TeamMemberRow = ({ member, onToggleActive, onEdit, onDelete }) => {
               href={member.socialLinks.linkedin}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-600 hover:text-blue-800"
+              className="text-primary hover:text-primary/80"
             >
               <Linkedin className="w-4 h-4" />
             </a>
@@ -122,7 +122,7 @@ const TeamMemberRow = ({ member, onToggleActive, onEdit, onDelete }) => {
               href={member.socialLinks.twitter}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-400 hover:text-blue-600"
+              className="text-primary hover:text-primary/80"
             >
               <Twitter className="w-4 h-4" />
             </a>
@@ -131,12 +131,12 @@ const TeamMemberRow = ({ member, onToggleActive, onEdit, onDelete }) => {
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
         {member.isActive ? (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary">
             <Eye className="w-3 h-3" />
             Active
           </span>
         ) : (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-muted text-muted-foreground">
             <EyeOff className="w-3 h-3" />
             Inactive
           </span>
@@ -146,21 +146,21 @@ const TeamMemberRow = ({ member, onToggleActive, onEdit, onDelete }) => {
         <div className="flex items-center gap-2">
           <button
             onClick={() => onToggleActive(member)}
-            className="p-1 text-gray-600 hover:text-gray-800"
+            className="p-1 text-muted-foreground hover:text-foreground"
             title={member.isActive ? "Deactivate" : "Activate"}
           >
             {member.isActive ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
           </button>
           <button
             onClick={() => onEdit(member)}
-            className="p-1 text-blue-600 hover:text-blue-800"
+            className="p-1 text-primary hover:text-primary/80"
             title="Edit"
           >
             <Edit className="w-4 h-4" />
           </button>
           <button
             onClick={() => onDelete(member.id)}
-            className="p-1 text-red-600 hover:text-red-800"
+            className="p-1 text-destructive hover:text-destructive/90"
             title="Delete"
           >
             <Trash2 className="w-4 h-4" />
@@ -539,99 +539,74 @@ export default function TeamPage() {
     return (
       <div className="p-6">
         <div className="flex items-center justify-center h-64">
-          <div className="text-gray-500">Loading team members...</div>
+          <div className="text-muted-foreground">Loading team members...</div>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="p-6 relative">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Team Members</h1>
-        <p className="text-gray-600 mt-2">Manage your company team members</p>
+    <div className="p-6">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-foreground">Team Members</h1>
+        <p className="text-muted-foreground mt-2">Manage your company team members</p>
       </div>
 
       {error && (
-        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+        <div className="mb-4 p-4 bg-destructive/10 border border-destructive/20 rounded-lg text-destructive">
           {error}
         </div>
       )}
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <StatCard title="Total Members" value={statistics.total} className="text-gray-900" />
-        <StatCard title="Active Members" value={statistics.active} className="text-green-600" />
-        <StatCard title="Departments" value={statistics.departments} className="text-blue-600" />
-        <StatCard title="Inactive" value={statistics.inactive} className="text-gray-400" />
+        <StatCard title="Total Members" value={statistics.total} className="text-foreground" />
+        <StatCard title="Active Members" value={statistics.active} className="text-primary" />
+        <StatCard title="Departments" value={statistics.departments} className="text-primary" />
+        <StatCard title="Inactive" value={statistics.inactive} className="text-muted-foreground" />
       </div>
 
-      {/* Search and Filter */}
-      <div className="flex justify-between items-center mb-6">
-        <div className="flex gap-2">
-          <Input
-            placeholder="Search team members..."
-            className="w-64"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
-            <SelectTrigger className="w-40">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Departments</SelectItem>
-              {DEPARTMENTS.map(dept => (
-                <SelectItem key={dept.value} value={dept.value}>
-                  {dept.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-32">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="inactive">Inactive</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <Button onClick={handleAdd} className="bg-blue-600 hover:bg-blue-700">
-          <Plus className="w-4 h-4 mr-2" />
-          Add Member
-        </Button>
-      </div>
 
       {/* Team Members Table */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-gray-50 border-b">
+      <div className="bg-card rounded-lg shadow border">
+        <div className="p-6 border-b">
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-semibold text-foreground">Team Members</h2>
+            <Button
+              onClick={handleAdd}
+              className="bg-primary hover:bg-primary/90 text-primary-foreground"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Add Member
+            </Button>
+          </div>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+          <thead className="bg-muted/50 border-b">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 Order
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 Photo
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 Name & Position
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 Department
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 Contact
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 Social
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 Status
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 Actions
               </th>
             </tr>
@@ -639,7 +614,7 @@ export default function TeamPage() {
           <tbody className="divide-y divide-gray-200">
             {sortedMembers.length === 0 ? (
               <tr>
-                <td colSpan="8" className="px-6 py-8 text-center text-gray-500">
+                <td colSpan="8" className="px-6 py-8 text-center text-muted-foreground">
                   {members.length === 0
                     ? "No team members found. Add your first team member!"
                     : "No members match your search criteria."}
@@ -658,11 +633,12 @@ export default function TeamPage() {
             )}
           </tbody>
         </table>
+        </div>
       </div>
 
       {/* Add/Edit Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-[90%] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
               {editingMember ? 'Edit Team Member' : 'Add New Team Member'}
@@ -687,7 +663,7 @@ export default function TeamPage() {
             </Button>
             <Button
               onClick={handleSubmit}
-              className="bg-blue-600 hover:bg-blue-700"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground"
               disabled={processing}
             >
               <Save className="w-4 h-4 mr-2" />
@@ -700,10 +676,10 @@ export default function TeamPage() {
       {/* Processing Overlay */}
       {processing && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-[50000]">
-          <div className="bg-white rounded-lg p-6 shadow-xl">
+          <div className="bg-card rounded-lg p-6 shadow-xl">
             <div className="flex items-center space-x-3">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              <p className="text-lg font-medium text-gray-900">{processingMessage || 'Processing...'}</p>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              <p className="text-lg font-medium text-foreground">{processingMessage || 'Processing...'}</p>
             </div>
           </div>
         </div>

@@ -164,24 +164,24 @@ export default function ContactInfoPage() {
     return (
       <div className="p-6">
         <div className="flex items-center justify-center h-64">
-          <div className="text-gray-500">Loading contact information...</div>
+          <div className="text-muted-foreground">Loading contact information...</div>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Contact Information</h1>
-          <p className="text-gray-600 mt-2">Manage your company details, logos, and social media links</p>
+          <h1 className="text-3xl font-bold text-foreground">Contact Information</h1>
+          <p className="text-muted-foreground mt-2">Manage your company details, logos, and social media links</p>
         </div>
         <Button
           onClick={handleSubmit}
           disabled={processing || !formData.companyName || !formData.email || !formData.phone || !formData.address}
-          className="bg-blue-600 hover:bg-blue-700"
+          className="bg-primary hover:bg-primary/90"
         >
           <Save className="w-4 h-4 mr-2" />
           Save Changes
@@ -189,32 +189,32 @@ export default function ContactInfoPage() {
       </div>
 
       {/* Info Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white rounded-lg shadow p-4 flex items-center gap-3">
-          <div className="p-2 bg-blue-100 rounded-lg">
-            <Mail className="w-5 h-5 text-blue-600" />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div className="bg-card rounded-lg border p-4 flex items-center gap-3">
+          <div className="p-2 bg-primary/10 rounded-lg">
+            <Mail className="w-5 h-5 text-primary" />
           </div>
           <div>
-            <p className="text-sm text-gray-600">Primary Email</p>
-            <p className="font-medium">{formData.email || 'Not set'}</p>
+            <p className="text-sm text-muted-foreground">Primary Email</p>
+            <p className="font-medium text-foreground">{formData.email || 'Not set'}</p>
           </div>
         </div>
-        <div className="bg-white rounded-lg shadow p-4 flex items-center gap-3">
-          <div className="p-2 bg-green-100 rounded-lg">
-            <Phone className="w-5 h-5 text-green-600" />
+        <div className="bg-card rounded-lg border p-4 flex items-center gap-3">
+          <div className="p-2 bg-primary/10 rounded-lg">
+            <Phone className="w-5 h-5 text-primary" />
           </div>
           <div>
-            <p className="text-sm text-gray-600">Primary Phone</p>
-            <p className="font-medium">{formData.phone || 'Not set'}</p>
+            <p className="text-sm text-muted-foreground">Primary Phone</p>
+            <p className="font-medium text-foreground">{formData.phone || 'Not set'}</p>
           </div>
         </div>
-        <div className="bg-white rounded-lg shadow p-4 flex items-center gap-3">
-          <div className="p-2 bg-purple-100 rounded-lg">
-            <MessageSquare className="w-5 h-5 text-purple-600" />
+        <div className="bg-card rounded-lg border p-4 flex items-center gap-3">
+          <div className="p-2 bg-primary/10 rounded-lg">
+            <MessageSquare className="w-5 h-5 text-primary" />
           </div>
           <div>
-            <p className="text-sm text-gray-600">WhatsApp</p>
-            <p className="font-medium">{formData.whatsapp || 'Not set'}</p>
+            <p className="text-sm text-muted-foreground">WhatsApp</p>
+            <p className="font-medium text-foreground">{formData.whatsapp || 'Not set'}</p>
           </div>
         </div>
       </div>
@@ -232,8 +232,8 @@ export default function ContactInfoPage() {
 
         {/* Company Information Tab */}
         <TabsContent value="company" className="mt-6">
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+          <div className="bg-card rounded-lg border p-6">
+            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 text-foreground">
               <Building className="w-5 h-5" />
               Company Information
             </h2>
@@ -253,8 +253,8 @@ export default function ContactInfoPage() {
 
         {/* Contact Details Tab */}
         <TabsContent value="contact" className="mt-6">
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+          <div className="bg-card rounded-lg border p-6">
+            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 text-foreground">
               <Phone className="w-5 h-5" />
               Contact Details
             </h2>
@@ -307,8 +307,8 @@ export default function ContactInfoPage() {
 
         {/* Address Information Tab */}
         <TabsContent value="address" className="mt-6">
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+          <div className="bg-card rounded-lg border p-6">
+            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 text-foreground">
               <MapPin className="w-5 h-5" />
               Address Information
             </h2>
@@ -387,8 +387,8 @@ export default function ContactInfoPage() {
 
         {/* Working Hours Tab */}
         <TabsContent value="hours" className="mt-6">
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+          <div className="bg-card rounded-lg border p-6">
+            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 text-foreground">
               <Clock className="w-5 h-5" />
               Working Hours
             </h2>
@@ -411,8 +411,8 @@ export default function ContactInfoPage() {
 
         {/* Social Media Links Tab */}
         <TabsContent value="social" className="mt-6">
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+          <div className="bg-card rounded-lg border p-6">
+            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 text-foreground">
               <Globe className="w-5 h-5" />
               Social Media Links
             </h2>
@@ -487,8 +487,8 @@ export default function ContactInfoPage() {
 
         {/* Logos Tab */}
         <TabsContent value="logos" className="mt-6">
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+          <div className="bg-card rounded-lg border p-6">
+            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 text-foreground">
               <Image className="w-5 h-5" />
               Company Logos
             </h2>
@@ -518,7 +518,7 @@ export default function ContactInfoPage() {
                       <img
                         src={formData.logoUrl}
                         alt="Logo Preview"
-                        className="h-20 object-contain bg-gray-50 p-2 rounded border"
+                        className="h-20 object-contain bg-muted/50 p-2 rounded border"
                       />
                     </div>
                   )}
@@ -550,7 +550,7 @@ export default function ContactInfoPage() {
                       <img
                         src={formData.darkLogoUrl}
                         alt="Dark Logo Preview"
-                        className="h-20 object-contain bg-gray-800 p-2 rounded border"
+                        className="h-20 object-contain bg-muted p-2 rounded border"
                       />
                     </div>
                   )}
@@ -582,7 +582,7 @@ export default function ContactInfoPage() {
                       <img
                         src={formData.faviconUrl}
                         alt="Favicon Preview"
-                        className="w-8 h-8 object-contain bg-gray-50 p-1 rounded border"
+                        className="w-8 h-8 object-contain bg-muted/50 p-1 rounded border"
                       />
                     </div>
                   )}
@@ -604,18 +604,18 @@ export default function ContactInfoPage() {
       {/* Processing Overlay */}
       {processing && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-[50000]">
-          <div className="bg-white rounded-lg p-6 shadow-xl">
+          <div className="bg-card rounded-lg border border-primary p-6 shadow-xl">
             <div className="flex items-center space-x-3">
               {processingMessage.includes('successfully') ? (
-                <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
                   <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
               ) : (
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
               )}
-              <p className="text-lg font-medium text-gray-900">{processingMessage || 'Processing...'}</p>
+              <p className="text-lg font-medium text-foreground">{processingMessage || 'Processing...'}</p>
             </div>
           </div>
         </div>

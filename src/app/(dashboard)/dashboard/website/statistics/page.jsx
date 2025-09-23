@@ -156,14 +156,14 @@ export default function StatisticsPage() {
 
   return (
     <div className="p-6">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Statistics</h1>
-        <p className="text-gray-600 mt-2">Manage your website statistics and counters</p>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-foreground">Statistics</h1>
+        <p className="text-muted-foreground mt-2">Manage your website statistics and counters</p>
       </div>
 
       {/* Preview Section */}
-      <div className="mb-8 p-6 bg-gradient-to-r from-blue-50 to-orange-50 rounded-lg">
-        <h2 className="text-lg font-semibold text-gray-800 mb-4">Preview</h2>
+      <div className="mb-6 p-6 bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg border">
+        <h2 className="text-lg font-semibold text-foreground mb-4">Preview</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {stats
             .filter(s => s.isActive)
@@ -171,14 +171,14 @@ export default function StatisticsPage() {
             .map((stat) => {
               const IconComponent = getIconComponent(stat.icon)
               return (
-                <div key={stat.id} className="text-center bg-white rounded-lg p-4 shadow-sm">
-                  <div className={`inline-block p-3 bg-gradient-to-r from-${stat.color}-500 to-${stat.color}-600 rounded-full mb-3`}>
-                    <IconComponent className="w-6 h-6 text-white" />
+                <div key={stat.id} className="text-center bg-card rounded-lg p-4 border">
+                  <div className="inline-block p-3 bg-primary rounded-full mb-3">
+                    <IconComponent className="w-6 h-6 text-primary-foreground" />
                   </div>
-                  <h3 className={`text-2xl font-bold text-${stat.color}-600`}>
+                  <h3 className="text-2xl font-bold text-primary">
                     {stat.prefix}{stat.value}{stat.suffix}
                   </h3>
-                  <p className="text-sm text-gray-600 font-medium">{stat.label}</p>
+                  <p className="text-sm text-muted-foreground font-medium">{stat.label}</p>
                 </div>
               )
             })}
@@ -187,25 +187,25 @@ export default function StatisticsPage() {
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white rounded-lg shadow p-4">
-          <div className="text-sm text-gray-600">Total Stats</div>
-          <div className="text-2xl font-bold text-gray-900">{stats.length}</div>
+        <div className="bg-card rounded-lg border p-4">
+          <div className="text-sm text-muted-foreground">Total Stats</div>
+          <div className="text-2xl font-bold text-foreground">{stats.length}</div>
         </div>
-        <div className="bg-white rounded-lg shadow p-4">
-          <div className="text-sm text-gray-600">Active</div>
-          <div className="text-2xl font-bold text-green-600">
+        <div className="bg-card rounded-lg border p-4">
+          <div className="text-sm text-muted-foreground">Active</div>
+          <div className="text-2xl font-bold text-primary">
             {stats.filter(s => s.isActive).length}
           </div>
         </div>
-        <div className="bg-white rounded-lg shadow p-4">
-          <div className="text-sm text-gray-600">Animated</div>
-          <div className="text-2xl font-bold text-blue-600">
+        <div className="bg-card rounded-lg border p-4">
+          <div className="text-sm text-muted-foreground">Animated</div>
+          <div className="text-2xl font-bold text-primary">
             {stats.filter(s => s.animated).length}
           </div>
         </div>
-        <div className="bg-white rounded-lg shadow p-4">
-          <div className="text-sm text-gray-600">Last Updated</div>
-          <div className="text-sm font-semibold text-gray-700">Today</div>
+        <div className="bg-card rounded-lg border p-4">
+          <div className="text-sm text-muted-foreground">Last Updated</div>
+          <div className="text-sm font-semibold text-foreground">Today</div>
         </div>
       </div>
 
@@ -227,114 +227,116 @@ export default function StatisticsPage() {
             </SelectContent>
           </Select>
         </div>
-        <Button onClick={handleAdd} className="bg-blue-600 hover:bg-blue-700">
+        <Button onClick={handleAdd}>
           <Plus className="w-4 h-4 mr-2" />
           Add Statistic
         </Button>
       </div>
 
       {/* Statistics Table */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-gray-50 border-b">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Order
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Icon
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Label
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Value
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Display
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Animation
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Status
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200">
-            {stats.sort((a, b) => a.displayOrder - b.displayOrder).map((stat) => {
-              const IconComponent = getIconComponent(stat.icon)
-              return (
-                <tr key={stat.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {stat.displayOrder}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className={`inline-flex p-2 rounded-lg bg-${stat.color}-100`}>
-                      <IconComponent className={`w-5 h-5 text-${stat.color}-600`} />
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{stat.label}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{stat.value}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-mono text-gray-700">
-                      {stat.prefix}{stat.value}{stat.suffix}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      stat.animated
-                        ? 'bg-blue-100 text-blue-800'
-                        : 'bg-gray-100 text-gray-800'
-                    }`}>
-                      {stat.animated ? 'Animated' : 'Static'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <button
-                      onClick={() => handleToggleActive(stat.id)}
-                      className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        stat.isActive
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-gray-100 text-gray-800'
-                      }`}
-                    >
-                      {stat.isActive ? 'Active' : 'Inactive'}
-                    </button>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="flex gap-2">
+      <div className="overflow-x-auto">
+        <div className="bg-card rounded-lg border overflow-hidden">
+          <table className="w-full">
+            <thead className="bg-muted/50 border-b">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  Order
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  Icon
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  Label
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  Value
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  Display
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  Animation
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  Status
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {stats.sort((a, b) => a.displayOrder - b.displayOrder).map((stat) => {
+                const IconComponent = getIconComponent(stat.icon)
+                return (
+                  <tr key={stat.id} className="hover:bg-muted/50">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
+                      {stat.displayOrder}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="inline-flex p-2 rounded-lg bg-primary/10">
+                        <IconComponent className="w-5 h-5 text-primary" />
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-medium text-foreground">{stat.label}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-foreground">{stat.value}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-mono text-muted-foreground">
+                        {stat.prefix}{stat.value}{stat.suffix}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                        stat.animated
+                          ? 'bg-primary/10 text-primary'
+                          : 'bg-muted text-muted-foreground'
+                      }`}>
+                        {stat.animated ? 'Animated' : 'Static'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
                       <button
-                        onClick={() => handleEdit(stat)}
-                        className="text-blue-600 hover:text-blue-900"
+                        onClick={() => handleToggleActive(stat.id)}
+                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                          stat.isActive
+                            ? 'bg-primary/10 text-primary'
+                            : 'bg-muted text-muted-foreground'
+                        }`}
                       >
-                        <Edit className="w-4 h-4" />
+                        {stat.isActive ? 'Active' : 'Inactive'}
                       </button>
-                      <button
-                        onClick={() => handleDelete(stat.id)}
-                        className="text-red-600 hover:text-red-900"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleEdit(stat)}
+                          className="text-primary hover:text-primary/80"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(stat.id)}
+                          className="text-destructive hover:text-destructive/80"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* Add/Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-[90%]">
           <DialogHeader>
             <DialogTitle>{editingStat ? 'Edit Statistic' : 'Add New Statistic'}</DialogTitle>
             <DialogDescription>
@@ -447,7 +449,7 @@ export default function StatisticsPage() {
               <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
                 Cancel
               </Button>
-              <Button onClick={handleSubmit} className="bg-blue-600 hover:bg-blue-700">
+              <Button onClick={handleSubmit}>
                 {editingStat ? 'Update' : 'Add'} Statistic
               </Button>
             </div>

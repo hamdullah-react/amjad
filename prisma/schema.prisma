@@ -222,6 +222,25 @@ model WhyChooseUs {
   @@map("why_choose_us")
 }
 
+model WelcomeSection {
+  id              String   @id @default(cuid())
+  title           String
+  subtitle        String
+  description     String
+  ceoName         String
+  ceoPosition     String   @default("Chief Executive Officer")
+  ceoMessage      String
+  buttonText      String?
+  buttonUrl       String?
+  features        Json     // Array of {title, description, icon}
+  stats           Json     // Array of {label, value}
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("welcome_section")
+}
+
 model Statistic {
   id          String   @id @default(cuid())
   label       String

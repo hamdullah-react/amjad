@@ -1,7 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Plus, Edit, Trash2, Eye, EyeOff, Image, Save, X, ImageIcon } from 'lucide-react'
+import {
+  Plus, Edit, Trash2, Eye, EyeOff, Save, X, Image, ArrowUp, ArrowDown
+} from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -14,30 +16,37 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ImagePicker } from "@/components/ui/image-picker"
+
+const INITIAL_FORM_DATA = {
+  title: '',
+  subtitle: '',
+  description: '',
+  imageUrl: '',
+  buttonText: '',
+  buttonUrl: '',
+  order: 0,
+  isActive: true
+}
+
+const StatCard = ({ title, value, className = '' }) => (
+  <div className="bg-card rounded-lg shadow p-4 border">
+    <div className="text-sm text-muted-foreground">{title}</div>
+    <div className={`text-2xl font-bold ${className}`}>{value}</div>
+  </div>
+)
 
 export default function HeroSliderPage() {
   const [slides, setSlides] = useState([])
-  const [filteredSlides, setFilteredSlides] = useState([])
   const [loading, setLoading] = useState(true)
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [viewDialogOpen, setViewDialogOpen] = useState(false)
+  const [viewingSlide, setViewingSlide] = useState(null)
+  const [editingSlide, setEditingSlide] = useState(null)
+  const [formData, setFormData] = useState(INITIAL_FORM_DATA)
   const [processing, setProcessing] = useState(false)
   const [processingMessage, setProcessingMessage] = useState('')
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [editingSlide, setEditingSlide] = useState(null)
-  const [searchTerm, setSearchTerm] = useState('')
-  const [statusFilter, setStatusFilter] = useState('all')
   const [isImagePickerOpen, setIsImagePickerOpen] = useState(false)
-  const [formData, setFormData] = useState({
-    title: '',
-    subtitle: '',
-    description: '',
-    imageUrl: '',
-    buttonText: '',
-    buttonUrl: '',
-    order: 0,
-    isActive: true
-  })
 
   // Fetch slides from API
   const fetchSlides = async () => {
@@ -48,9 +57,6 @@ export default function HeroSliderPage() {
 
       if (result.success) {
         setSlides(result.data)
-        setFilteredSlides(result.data)
-      } else {
-        console.error('Failed to fetch slides:', result.message)
       }
     } catch (error) {
       console.error('Error fetching slides:', error)
@@ -59,70 +65,46 @@ export default function HeroSliderPage() {
     }
   }
 
-  // Load slides on component mount
   useEffect(() => {
     fetchSlides()
   }, [])
 
-  // Filter slides based on search term and status
-  useEffect(() => {
-    let filtered = slides
+  const handleInputChange = (e) => {
+    const { name, value } = e.target
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }))
+  }
 
-    // Apply search filter
-    if (searchTerm) {
-      filtered = filtered.filter(slide =>
-        slide.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (slide.subtitle && slide.subtitle.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (slide.description && slide.description.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (slide.buttonText && slide.buttonText.toLowerCase().includes(searchTerm.toLowerCase()))
-      )
+  const handleOpenDialog = (slide = null) => {
+    if (slide) {
+      setEditingSlide(slide)
+      setFormData(slide)
+    } else {
+      setEditingSlide(null)
+      setFormData({ ...INITIAL_FORM_DATA, order: slides.length + 1 })
     }
+    setIsDialogOpen(true)
+  }
 
-    // Apply status filter
-    if (statusFilter !== 'all') {
-      filtered = filtered.filter(slide =>
-        statusFilter === 'active' ? slide.isActive : !slide.isActive
-      )
-    }
-
-    setFilteredSlides(filtered)
-  }, [slides, searchTerm, statusFilter])
-
-  const handleAdd = () => {
+  const handleCloseDialog = () => {
+    setIsDialogOpen(false)
     setEditingSlide(null)
-    setFormData({
-      title: '',
-      subtitle: '',
-      description: '',
-      imageUrl: '',
-      buttonText: '',
-      buttonUrl: '',
-      order: slides.length + 1,
-      isActive: true
-    })
-    setIsModalOpen(true)
+    setFormData(INITIAL_FORM_DATA)
   }
 
-  const handleEdit = (slide) => {
-    setEditingSlide(slide)
-    setFormData({
-      title: slide.title,
-      subtitle: slide.subtitle || '',
-      description: slide.description || '',
-      imageUrl: slide.imageUrl,
-      buttonText: slide.buttonText || '',
-      buttonUrl: slide.buttonUrl || '',
-      order: slide.order,
-      isActive: slide.isActive
-    })
-    setIsModalOpen(true)
+  const handleViewSlide = (slide) => {
+    setViewingSlide(slide)
+    setViewDialogOpen(true)
   }
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setProcessing(true)
+    setProcessingMessage(editingSlide ? 'Updating slide...' : 'Creating slide...')
+
     try {
-      setProcessing(true)
-      setProcessingMessage(editingSlide ? 'Updating slide...' : 'Creating slide...')
-
       const url = editingSlide
         ? `/api/hero-slider/${editingSlide.id}`
         : '/api/hero-slider'
@@ -134,91 +116,98 @@ export default function HeroSliderPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(formData),
       })
 
-      const result = await response.json()
+      const data = await response.json()
 
-      if (result.success) {
-        setIsModalOpen(false)
-        setEditingSlide(null)
-        setFormData({
-          title: '',
-          subtitle: '',
-          description: '',
-          imageUrl: '',
-          buttonText: '',
-          buttonUrl: '',
-          order: 0,
-          isActive: true
-        })
-        await fetchSlides() // Refresh the list
-      } else {
-        console.error('Failed to save slide:', result.message)
-        alert('Failed to save slide: ' + result.message)
+      if (data.success) {
+        handleCloseDialog()
+        fetchSlides()
       }
     } catch (error) {
       console.error('Error saving slide:', error)
-      alert('Error saving slide')
     } finally {
       setProcessing(false)
       setProcessingMessage('')
     }
   }
 
-  const handleDelete = async (id) => {
-    if (confirm('Are you sure you want to delete this slide?')) {
-      try {
-        setProcessing(true)
-        setProcessingMessage('Deleting slide...')
-
-        const response = await fetch(`/api/hero-slider/${id}`, {
-          method: 'DELETE'
-        })
-
-        const result = await response.json()
-
-        if (result.success) {
-          await fetchSlides() // Refresh the list
-        } else {
-          console.error('Failed to delete slide:', result.message)
-          alert('Failed to delete slide')
-        }
-      } catch (error) {
-        console.error('Error deleting slide:', error)
-        alert('Error deleting slide')
-      } finally {
-        setProcessing(false)
-        setProcessingMessage('')
-      }
-    }
-  }
-
   const handleToggleActive = async (slide) => {
+    setProcessing(true)
+    setProcessingMessage('Updating status...')
     try {
-      setProcessing(true)
-      setProcessingMessage('Updating status...')
-
       const response = await fetch(`/api/hero-slider/${slide.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          ...slide,
-          isActive: !slide.isActive
-        })
+        body: JSON.stringify({ isActive: !slide.isActive }),
       })
 
-      const result = await response.json()
-
-      if (result.success) {
-        await fetchSlides() // Refresh the list
-      } else {
-        console.error('Failed to toggle slide status:', result.message)
+      const data = await response.json()
+      if (data.success) {
+        fetchSlides()
       }
     } catch (error) {
-      console.error('Error toggling slide status:', error)
+      console.error('Error toggling active state:', error)
+    } finally {
+      setProcessing(false)
+      setProcessingMessage('')
+    }
+  }
+
+  const handleOrderChange = async (slide, direction) => {
+    setProcessing(true)
+    setProcessingMessage('Updating order...')
+
+    try {
+      const currentIndex = slides.findIndex(s => s.id === slide.id)
+      const newIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1
+
+      if (newIndex < 0 || newIndex >= slides.length) return
+
+      const targetSlide = slides[newIndex]
+
+      // Swap orders
+      await Promise.all([
+        fetch(`/api/hero-slider/${slide.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ order: targetSlide.order })
+        }),
+        fetch(`/api/hero-slider/${targetSlide.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ order: slide.order })
+        })
+      ])
+
+      fetchSlides()
+    } catch (error) {
+      console.error('Error changing order:', error)
+    } finally {
+      setProcessing(false)
+      setProcessingMessage('')
+    }
+  }
+
+  const handleDelete = async (slideId) => {
+    if (!confirm('Are you sure you want to delete this slide?')) return
+
+    setProcessing(true)
+    setProcessingMessage('Deleting slide...')
+    try {
+      const response = await fetch(`/api/hero-slider/${slideId}`, {
+        method: 'DELETE',
+      })
+
+      const data = await response.json()
+      if (data.success) {
+        fetchSlides()
+      }
+    } catch (error) {
+      console.error('Error deleting slide:', error)
     } finally {
       setProcessing(false)
       setProcessingMessage('')
@@ -226,231 +215,250 @@ export default function HeroSliderPage() {
   }
 
   const handleImageSelect = (imageUrl) => {
-    setFormData({ ...formData, imageUrl })
+    setFormData(prev => ({ ...prev, imageUrl }))
     setIsImagePickerOpen(false)
   }
 
   if (loading) {
     return (
-      <div className="p-6">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-gray-500">Loading slides...</div>
-        </div>
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
       </div>
     )
   }
 
   return (
-    <div className="p-6 relative">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Hero Slider</h1>
-        <p className="text-gray-600 mt-2">Manage your website's hero slider content</p>
+    <div className="p-6">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-foreground">Hero Slider</h1>
+        <p className="text-muted-foreground mt-2">Manage the hero slider images and content on your homepage</p>
       </div>
 
       {/* Statistics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white rounded-lg shadow p-4">
-          <div className="text-sm text-gray-600">Total Slides</div>
-          <div className="text-2xl font-bold text-gray-900">{slides.length}</div>
-        </div>
-        <div className="bg-white rounded-lg shadow p-4">
-          <div className="text-sm text-gray-600">Active Slides</div>
-          <div className="text-2xl font-bold text-green-600">
-            {slides.filter(slide => slide.isActive).length}
-          </div>
-        </div>
-        <div className="bg-white rounded-lg shadow p-4">
-          <div className="text-sm text-gray-600">Inactive Slides</div>
-          <div className="text-2xl font-bold text-gray-400">
-            {slides.filter(slide => !slide.isActive).length}
-          </div>
-        </div>
-        <div className="bg-white rounded-lg shadow p-4">
-          <div className="text-sm text-gray-600">Last Updated</div>
-          <div className="text-sm font-semibold text-gray-700">
-            {slides.length > 0 ? new Date(slides[0].updatedAt).toLocaleDateString() : 'N/A'}
-          </div>
-        </div>
-      </div>
-
-      {/* Search and Filter */}
-      <div className="flex justify-between items-center mb-6">
-        <div className="flex gap-2">
-          <Input
-            placeholder="Search slides..."
-            className="w-64"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-32">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="inactive">Inactive</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <Button onClick={handleAdd} className="bg-blue-600 hover:bg-blue-700">
-          <Plus className="w-4 h-4 mr-2" />
-          Add Slide
-        </Button>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <StatCard title="Total Slides" value={slides.length} />
+        <StatCard
+          title="Active Slides"
+          value={slides.filter(s => s.isActive).length}
+          className="text-primary"
+        />
+        <StatCard
+          title="Inactive Slides"
+          value={slides.filter(s => !s.isActive).length}
+          className="text-muted-foreground"
+        />
       </div>
 
       {/* Slides Table */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-gray-50 border-b">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Order
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Preview
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Title
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Subtitle
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Button
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Status
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200">
-            {filteredSlides.length === 0 ? (
-              <tr>
-                <td colSpan="7" className="px-6 py-8 text-center text-gray-500">
-                  {slides.length === 0 ? "No slides found. Create your first slide!" : "No slides match your search criteria."}
-                </td>
-              </tr>
-            ) : (
-              filteredSlides.map((slide) => (
-                <tr key={slide.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {slide.order}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="w-16 h-12 bg-gray-100 rounded flex items-center justify-center overflow-hidden">
-                      {slide.imageUrl ? (
-                        <img
-                          src={slide.imageUrl}
-                          alt={slide.title}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <Image className="w-6 h-6 text-gray-400" />
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="text-sm font-medium text-gray-900">{slide.title}</div>
-                    {slide.description && (
-                      <div className="text-sm text-gray-500 max-w-xs truncate">
-                        {slide.description}
-                      </div>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{slide.subtitle || '-'}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{slide.buttonText || '-'}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <button
-                      onClick={() => handleToggleActive(slide)}
-                      className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                        slide.isActive
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-gray-100 text-gray-800'
-                      }`}
-                    >
-                      {slide.isActive ? (
-                        <>
-                          <Eye className="w-3 h-3 mr-1" />
-                          Active
-                        </>
-                      ) : (
-                        <>
-                          <EyeOff className="w-3 h-3 mr-1" />
-                          Inactive
-                        </>
-                      )}
-                    </button>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => handleEdit(slide)}
-                        className="text-blue-600 hover:text-blue-900"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(slide.id)}
-                        className="text-red-600 hover:text-red-900"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
+      <div className="bg-card rounded-lg shadow border">
+        <div className="p-6 border-b">
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-semibold text-foreground">Hero Slides</h2>
+            <Button
+              onClick={() => handleOpenDialog()}
+              disabled={processing}
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Add New Slide
+            </Button>
+          </div>
+        </div>
+
+        {slides.length === 0 ? (
+          <div className="p-12 text-center">
+            <Image className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+            <p className="text-muted-foreground mb-4">No slides found</p>
+            <Button onClick={() => handleOpenDialog()}>
+              <Plus className="mr-2 h-4 w-4" />
+              Create Your First Slide
+            </Button>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-muted/50 border-b">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    Order
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    Image
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    Title & Subtitle
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    Description
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    Button
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    Actions
+                  </th>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {slides.sort((a, b) => a.order - b.order).map((slide, index) => (
+                  <tr
+                    key={slide.id}
+                    className="hover:bg-muted/50 cursor-pointer"
+                    onClick={() => handleViewSlide(slide)}
+                  >
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="text-sm text-muted-foreground">{slide.order}</span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="w-20 h-12 rounded overflow-hidden bg-muted">
+                        {slide.imageUrl ? (
+                          <img
+                            src={slide.imageUrl}
+                            alt={slide.title}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <Image className="w-6 h-6 text-muted-foreground" />
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div>
+                        <p className="text-sm font-medium text-foreground">{slide.title}</p>
+                        {slide.subtitle && (
+                          <p className="text-xs text-muted-foreground">{slide.subtitle}</p>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <p className="text-sm text-muted-foreground max-w-xs truncate">
+                        {slide.description || '-'}
+                      </p>
+                    </td>
+                    <td className="px-6 py-4">
+                      {slide.buttonText ? (
+                        <span className="text-sm text-primary">{slide.buttonText}</span>
+                      ) : (
+                        <span className="text-sm text-muted-foreground">No button</span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {slide.isActive ? (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary">
+                          <Eye className="w-3 h-3" />
+                          Active
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-muted text-muted-foreground">
+                          <EyeOff className="w-3 h-3" />
+                          Inactive
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleOrderChange(slide, 'up')
+                          }}
+                          disabled={index === 0 || processing}
+                          className="p-1 text-muted-foreground hover:text-muted-foreground disabled:opacity-50"
+                          title="Move up"
+                        >
+                          <ArrowUp className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleOrderChange(slide, 'down')
+                          }}
+                          disabled={index === slides.length - 1 || processing}
+                          className="p-1 text-muted-foreground hover:text-muted-foreground disabled:opacity-50"
+                          title="Move down"
+                        >
+                          <ArrowDown className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleToggleActive(slide)
+                          }}
+                          className="p-1 text-muted-foreground hover:text-muted-foreground"
+                          title={slide.isActive ? "Deactivate" : "Activate"}
+                          disabled={processing}
+                        >
+                          {slide.isActive ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleOpenDialog(slide)
+                          }}
+                          className="p-1 text-primary hover:text-primary/80"
+                          title="Edit"
+                          disabled={processing}
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleDelete(slide.id)
+                          }}
+                          className="p-1 text-red-600 hover:text-red-800"
+                          title="Delete"
+                          disabled={processing}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
-      {/* Add/Edit Modal */}
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>{editingSlide ? 'Edit Slide' : 'Add New Slide'}</DialogTitle>
+      {/* Add/Edit Dialog */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="max-w-[90%] w-full max-h-[90vh] overflow-hidden flex flex-col">
+          <DialogHeader className="flex-shrink-0">
+            <DialogTitle>
+              {editingSlide ? 'Edit Slide' : 'Add New Slide'}
+            </DialogTitle>
             <DialogDescription>
-              {editingSlide ? 'Update the slide details' : 'Create a new slide for your hero carousel'}
+              Configure the slide content and appearance
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="title">Title *</Label>
-                <Input
-                  id="title"
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  placeholder="Enter slide title"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="order">Display Order</Label>
-                <Input
-                  id="order"
-                  type="number"
-                  value={formData.order}
-                  onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) })}
-                  min="1"
-                />
-              </div>
+
+          <form onSubmit={handleSubmit} className="space-y-6 overflow-y-auto flex-1 pr-2">
+            <div className="space-y-2">
+              <Label htmlFor="title">Title *</Label>
+              <Input
+                id="title"
+                name="title"
+                value={formData.title}
+                onChange={handleInputChange}
+                className="w-full"
+                required
+              />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="subtitle">Subtitle</Label>
               <Input
                 id="subtitle"
+                name="subtitle"
                 value={formData.subtitle}
-                onChange={(e) => setFormData({ ...formData, subtitle: e.target.value })}
-                placeholder="Enter slide subtitle"
+                onChange={handleInputChange}
+                className="w-full"
               />
             </div>
 
@@ -458,116 +466,241 @@ export default function HeroSliderPage() {
               <Label htmlFor="description">Description</Label>
               <Textarea
                 id="description"
+                name="description"
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="Enter slide description"
-                rows={3}
+                onChange={handleInputChange}
+                rows={4}
+                className="w-full resize-none"
               />
             </div>
 
             <div className="space-y-2">
               <Label>Image *</Label>
-              <div className="space-y-2">
-                <div className="flex gap-2">
-                  <Input
-                    placeholder="Enter image URL"
-                    value={formData.imageUrl}
-                    onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-                    className="flex-1"
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setIsImagePickerOpen(true)}
-                  >
-                    <ImageIcon className="w-4 h-4 mr-2" />
-                    Gallery
-                  </Button>
-                </div>
-                {formData.imageUrl && (
-                  <div className="mt-2">
-                    <img
-                      src={formData.imageUrl}
-                      alt="Preview"
-                      className="w-32 h-24 object-cover rounded border"
-                    />
-                  </div>
-                )}
+              <div className="flex flex-col sm:flex-row gap-2">
+                <Input
+                  value={formData.imageUrl}
+                  onChange={(e) => setFormData(prev => ({ ...prev, imageUrl: e.target.value }))}
+                  placeholder="Enter image URL or select from gallery"
+                  className="flex-1"
+                  required
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsImagePickerOpen(true)}
+                  className="sm:w-auto w-full"
+                >
+                  <Image className="mr-2 h-4 w-4" />
+                  Gallery
+                </Button>
               </div>
+              {formData.imageUrl && (
+                <div className="mt-2 overflow-hidden rounded-lg">
+                  <img
+                    src={formData.imageUrl}
+                    alt="Preview"
+                    className="w-full h-40 object-cover"
+                  />
+                </div>
+              )}
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="buttonText">Button Text</Label>
                 <Input
                   id="buttonText"
+                  name="buttonText"
                   value={formData.buttonText}
-                  onChange={(e) => setFormData({ ...formData, buttonText: e.target.value })}
-                  placeholder="Enter button text"
+                  onChange={handleInputChange}
+                  className="w-full"
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="buttonUrl">Button URL</Label>
                 <Input
                   id="buttonUrl"
+                  name="buttonUrl"
                   value={formData.buttonUrl}
-                  onChange={(e) => setFormData({ ...formData, buttonUrl: e.target.value })}
-                  placeholder="Enter button URL"
+                  onChange={handleInputChange}
+                  className="w-full"
                 />
               </div>
             </div>
 
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="isActive"
-                checked={formData.isActive}
-                onCheckedChange={(checked) => setFormData({ ...formData, isActive: checked })}
-              />
-              <Label htmlFor="isActive">Active (visible on website)</Label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="order">Display Order</Label>
+                <Input
+                  id="order"
+                  name="order"
+                  type="number"
+                  value={formData.order}
+                  onChange={handleInputChange}
+                  className="w-full"
+                />
+              </div>
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="isActive"
+                  checked={formData.isActive}
+                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, isActive: checked }))}
+                />
+                <Label htmlFor="isActive">Active</Label>
+              </div>
             </div>
 
-            <div className="flex justify-end gap-2 pt-4">
-              <Button variant="outline" onClick={() => {
-                setIsModalOpen(false)
-                setEditingSlide(null)
-                setFormData({
-                  title: '',
-                  subtitle: '',
-                  description: '',
-                  imageUrl: '',
-                  buttonText: '',
-                  buttonUrl: '',
-                  order: slides.length + 1,
-                  isActive: true
-                })
-              }}>
-                <X className="w-4 h-4 mr-2" />
+            <div className="flex justify-end gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleCloseDialog}
+                disabled={processing}
+              >
                 Cancel
               </Button>
-              <Button onClick={handleSubmit} className="bg-blue-600 hover:bg-blue-700">
-                <Save className="w-4 h-4 mr-2" />
-                {editingSlide ? 'Update' : 'Create'} Slide
+              <Button type="submit" disabled={processing}>
+                {processing ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Save className="mr-2 h-4 w-4" />
+                    {editingSlide ? 'Update' : 'Create'} Slide
+                  </>
+                )}
               </Button>
             </div>
-          </div>
+          </form>
         </DialogContent>
       </Dialog>
 
-      {/* Image Picker Modal */}
+      {/* View Details Dialog */}
+      <Dialog open={viewDialogOpen} onOpenChange={setViewDialogOpen}>
+        <DialogContent className="max-w-[90%] w-full max-h-[90vh] overflow-hidden flex flex-col">
+          <DialogHeader className="flex-shrink-0">
+            <DialogTitle>Slide Details</DialogTitle>
+            <DialogDescription>
+              Complete information about this slide
+            </DialogDescription>
+          </DialogHeader>
+
+          {viewingSlide && (
+            <div className="space-y-6 overflow-y-auto flex-1 pr-2">
+              {/* Image Preview */}
+              {viewingSlide.imageUrl && (
+                <div>
+                  <p className="text-sm text-muted-foreground mb-2">Slide Image</p>
+                  <img
+                    src={viewingSlide.imageUrl}
+                    alt={viewingSlide.title}
+                    className="w-full h-64 object-cover rounded-lg"
+                  />
+                </div>
+              )}
+
+              {/* Basic Information */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-foreground border-b pb-2">Content Information</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">Title</p>
+                    <p className="font-medium break-words">{viewingSlide.title}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">Subtitle</p>
+                    <p className="font-medium break-words">{viewingSlide.subtitle || 'Not set'}</p>
+                  </div>
+                </div>
+                {viewingSlide.description && (
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">Description</p>
+                    <p className="text-foreground break-words">{viewingSlide.description}</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Button Configuration */}
+              {(viewingSlide.buttonText || viewingSlide.buttonUrl) && (
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-foreground border-b pb-2">Button Configuration</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">Button Text</p>
+                      <p className="font-medium break-words">{viewingSlide.buttonText || 'Not set'}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">Button URL</p>
+                      <p className="font-medium text-primary break-all">{viewingSlide.buttonUrl || 'Not set'}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Status & Metadata */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-foreground border-b pb-2">Status & Information</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">Order</p>
+                    <p className="font-medium">{viewingSlide.order}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">Status</p>
+                    {viewingSlide.isActive ? (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary">
+                        <Eye className="w-3 h-3" />
+                        Active
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-muted text-muted-foreground">
+                        <EyeOff className="w-3 h-3" />
+                        Inactive
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex justify-end gap-3 pt-4 border-t">
+                <Button
+                  variant="outline"
+                  onClick={() => setViewDialogOpen(false)}
+                >
+                  Close
+                </Button>
+                <Button
+                  onClick={() => {
+                    setViewDialogOpen(false)
+                    handleOpenDialog(viewingSlide)
+                  }}
+                >
+                  <Edit className="mr-2 h-4 w-4" />
+                  Edit Slide
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Image Picker Dialog */}
       <ImagePicker
         isOpen={isImagePickerOpen}
         onClose={() => setIsImagePickerOpen(false)}
         onSelect={handleImageSelect}
-        selectedImageUrl={formData.imageUrl}
       />
 
       {/* Processing Overlay */}
       {processing && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-[50000]">
-          <div className="bg-white rounded-lg p-6 shadow-xl">
+          <div className="bg-card rounded-lg p-6 shadow-xl border">
             <div className="flex items-center space-x-3">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              <p className="text-lg font-medium text-gray-900">{processingMessage || 'Processing...'}</p>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              <p className="text-lg font-medium text-foreground">{processingMessage || 'Processing...'}</p>
             </div>
           </div>
         </div>

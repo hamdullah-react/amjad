@@ -268,7 +268,7 @@ export default function GalleryPage() {
     return (
       <div className="p-6">
         <div className="flex items-center justify-center h-64">
-          <div className="text-gray-500">Loading gallery...</div>
+          <div className="text-muted-foreground">Loading gallery...</div>
         </div>
       </div>
     )
@@ -277,29 +277,29 @@ export default function GalleryPage() {
   return (
     <div className="p-6 relative">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Gallery</h1>
-        <p className="text-gray-600 mt-2">Manage your website gallery images</p>
+        <h1 className="text-3xl font-bold text-foreground">Gallery</h1>
+        <p className="text-muted-foreground mt-2">Manage your website gallery images</p>
       </div>
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white rounded-lg shadow p-4">
-          <div className="text-sm text-gray-600">Total Images</div>
-          <div className="text-2xl font-bold text-gray-900">{images.length}</div>
+        <div className="bg-card rounded-lg shadow p-4">
+          <div className="text-sm text-muted-foreground">Total Images</div>
+          <div className="text-2xl font-bold text-foreground">{images.length}</div>
         </div>
-        <div className="bg-white rounded-lg shadow p-4">
-          <div className="text-sm text-gray-600">Active Images</div>
-          <div className="text-2xl font-bold text-green-600">
+        <div className="bg-card rounded-lg shadow p-4">
+          <div className="text-sm text-muted-foreground">Active Images</div>
+          <div className="text-2xl font-bold text-primary">
             {images.filter(img => img.isActive).length}
           </div>
         </div>
-        <div className="bg-white rounded-lg shadow p-4">
-          <div className="text-sm text-gray-600">Categories</div>
-          <div className="text-2xl font-bold text-blue-600">{categories.length}</div>
+        <div className="bg-card rounded-lg shadow p-4">
+          <div className="text-sm text-muted-foreground">Categories</div>
+          <div className="text-2xl font-bold text-primary">{categories.length}</div>
         </div>
-        <div className="bg-white rounded-lg shadow p-4">
-          <div className="text-sm text-gray-600">Last Updated</div>
-          <div className="text-sm font-semibold text-gray-700">
+        <div className="bg-card rounded-lg shadow p-4">
+          <div className="text-sm text-muted-foreground">Last Updated</div>
+          <div className="text-sm font-semibold text-foreground">
             {images.length > 0 ? new Date(images[0].updatedAt).toLocaleDateString() : 'N/A'}
           </div>
         </div>
@@ -338,23 +338,23 @@ export default function GalleryPage() {
             </SelectContent>
           </Select>
         </div>
-        <Button onClick={handleAdd} className="bg-blue-600 hover:bg-blue-700">
+        <Button onClick={handleAdd} className="bg-primary hover:bg-primary/90 text-primary-foreground">
           <Plus className="w-4 h-4 mr-2" />
           Add Image
         </Button>
       </div>
 
       {/* Images Grid */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
+      <div className="bg-card rounded-lg shadow overflow-hidden">
         {filteredImages.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">
+          <div className="p-8 text-center text-muted-foreground">
             {images.length === 0 ? "No images found. Upload your first image!" : "No images match your search criteria."}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 p-6">
             {filteredImages.map((image) => (
-              <div key={image.id} className="relative group bg-gray-50 rounded-lg overflow-hidden">
-                <div className="aspect-w-16 aspect-h-12 bg-gray-100">
+              <div key={image.id} className="relative group bg-muted/50 rounded-lg overflow-hidden">
+                <div className="aspect-w-16 aspect-h-12 bg-muted">
                   <img
                     src={image.imageUrl}
                     alt={image.title}
@@ -371,19 +371,19 @@ export default function GalleryPage() {
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleEdit(image)}
-                      className="p-2 bg-white rounded-full text-blue-600 hover:text-blue-800"
+                      className="p-2 bg-card rounded-full text-primary hover:text-primary/80"
                     >
                       <Edit className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => handleToggleActive(image)}
-                      className="p-2 bg-white rounded-full text-gray-600 hover:text-gray-800"
+                      className="p-2 bg-card rounded-full text-muted-foreground hover:text-foreground"
                     >
                       {image.isActive ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                     </button>
                     <button
                       onClick={() => handleDelete(image.id)}
-                      className="p-2 bg-white rounded-full text-red-600 hover:text-red-800"
+                      className="p-2 bg-card rounded-full text-destructive hover:text-destructive/90"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -392,16 +392,16 @@ export default function GalleryPage() {
 
                 {/* Info */}
                 <div className="p-4">
-                  <h3 className="font-semibold text-gray-900 truncate">{image.title}</h3>
-                  <p className="text-sm text-gray-600 truncate">{image.description || 'No description'}</p>
+                  <h3 className="font-semibold text-foreground truncate">{image.title}</h3>
+                  <p className="text-sm text-muted-foreground truncate">{image.description || 'No description'}</p>
                   <div className="flex justify-between items-center mt-2">
-                    <span className="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded">
+                    <span className="text-xs bg-muted text-muted-foreground px-2 py-1 rounded">
                       {image.category}
                     </span>
                     <span className={`text-xs px-2 py-1 rounded ${
                       image.isActive
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-gray-100 text-gray-800'
+                        ? 'bg-primary/10 text-primary'
+                        : 'bg-muted text-muted-foreground'
                     }`}>
                       {image.isActive ? 'Active' : 'Inactive'}
                     </span>
@@ -472,7 +472,7 @@ export default function GalleryPage() {
                   disabled={uploading}
                   className="flex-1"
                 />
-                <span className="text-sm text-gray-500 self-center">or</span>
+                <span className="text-sm text-muted-foreground self-center">or</span>
                 <Input
                   placeholder="Enter image URL"
                   value={formData.imageUrl}
@@ -481,7 +481,7 @@ export default function GalleryPage() {
                 />
               </div>
               {uploading && (
-                <p className="text-sm text-blue-600">Uploading image...</p>
+                <p className="text-sm text-primary">Uploading image...</p>
               )}
               {formData.imageUrl && (
                 <div className="mt-2">
@@ -537,7 +537,7 @@ export default function GalleryPage() {
                 <X className="w-4 h-4 mr-2" />
                 Cancel
               </Button>
-              <Button onClick={handleSubmit} className="bg-blue-600 hover:bg-blue-700" disabled={uploading}>
+              <Button onClick={handleSubmit} className="bg-primary hover:bg-primary/90 text-primary-foreground" disabled={uploading}>
                 <Save className="w-4 h-4 mr-2" />
                 {editingImage ? 'Update' : 'Create'} Image
               </Button>
@@ -549,10 +549,10 @@ export default function GalleryPage() {
       {/* Processing Overlay */}
       {processing && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-[50000]">
-          <div className="bg-white rounded-lg p-6 shadow-xl">
+          <div className="bg-card rounded-lg p-6 shadow-xl">
             <div className="flex items-center space-x-3">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              <p className="text-lg font-medium text-gray-900">{processingMessage || 'Processing...'}</p>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              <p className="text-lg font-medium text-foreground">{processingMessage || 'Processing...'}</p>
             </div>
           </div>
         </div>

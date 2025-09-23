@@ -285,7 +285,7 @@ export default function ServiceAreasPage() {
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
         {loading ? (
           [...Array(5)].map((_, i) => (
-            <div key={i} className="bg-white p-3 sm:p-4 rounded-lg border">
+            <div key={i} className="bg-card p-3 sm:p-4 rounded-lg border">
               <div className="flex items-center gap-3">
                 <Skeleton className="h-10 w-10 rounded-lg" />
                 <div className="flex-1">
@@ -297,13 +297,13 @@ export default function ServiceAreasPage() {
           ))
         ) : (
           <>
-            <div className="bg-white p-3 sm:p-4 rounded-lg border">
+            <div className="bg-card p-3 sm:p-4 rounded-lg border">
               <div className="flex items-center gap-2 sm:gap-3">
-                <div className="p-1.5 sm:p-2 bg-blue-100 rounded-lg">
-                  <MapPin className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
+                <div className="p-1.5 sm:p-2 bg-primary/10 rounded-lg">
+                  <MapPin className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                 </div>
                 <div>
-                  <p className="text-xs sm:text-sm font-medium text-gray-600">Total Areas</p>
+                  <p className="text-xs sm:text-sm font-medium text-muted-foreground">Total Areas</p>
                   <p className="text-xl sm:text-2xl font-bold">
                     {searching || deleting ? <Loader2 className="h-5 w-5 sm:h-6 sm:w-6 animate-spin inline" /> : stats.total}
                   </p>
@@ -311,10 +311,10 @@ export default function ServiceAreasPage() {
               </div>
             </div>
 
-            <div className="bg-white p-3 sm:p-4 rounded-lg border">
+            <div className="bg-card p-3 sm:p-4 rounded-lg border">
               <div className="flex items-center gap-2 sm:gap-3">
-                <div className="p-1.5 sm:p-2 bg-green-100 rounded-lg">
-                  <Package className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
+                <div className="p-1.5 sm:p-2 bg-primary/10 rounded-lg">
+                  <Package className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                 </div>
                 <div>
                   <p className="text-xs sm:text-sm font-medium text-gray-600">Active</p>
@@ -325,10 +325,10 @@ export default function ServiceAreasPage() {
               </div>
             </div>
 
-            <div className="bg-white p-3 sm:p-4 rounded-lg border">
+            <div className="bg-card p-3 sm:p-4 rounded-lg border">
               <div className="flex items-center gap-2 sm:gap-3">
-                <div className="p-1.5 sm:p-2 bg-yellow-100 rounded-lg">
-                  <Star className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-600" />
+                <div className="p-1.5 sm:p-2 bg-primary/10 rounded-lg">
+                  <Star className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                 </div>
                 <div>
                   <p className="text-xs sm:text-sm font-medium text-gray-600">Primary</p>
@@ -339,10 +339,10 @@ export default function ServiceAreasPage() {
               </div>
             </div>
 
-            <div className="bg-white p-3 sm:p-4 rounded-lg border">
+            <div className="bg-card p-3 sm:p-4 rounded-lg border">
               <div className="flex items-center gap-2 sm:gap-3">
-                <div className="p-1.5 sm:p-2 bg-purple-100 rounded-lg">
-                  <Map className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600" />
+                <div className="p-1.5 sm:p-2 bg-primary/10 rounded-lg">
+                  <Map className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                 </div>
                 <div>
                   <p className="text-xs sm:text-sm font-medium text-gray-600">Emirates</p>
@@ -353,10 +353,10 @@ export default function ServiceAreasPage() {
               </div>
             </div>
 
-            <div className="bg-white p-3 sm:p-4 rounded-lg border">
+            <div className="bg-card p-3 sm:p-4 rounded-lg border">
               <div className="flex items-center gap-2 sm:gap-3">
-                <div className="p-1.5 sm:p-2 bg-gray-100 rounded-lg">
-                  <X className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600" />
+                <div className="p-1.5 sm:p-2 bg-muted rounded-lg">
+                  <X className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
                 </div>
                 <div>
                   <p className="text-xs sm:text-sm font-medium text-gray-600">Inactive</p>
@@ -371,13 +371,13 @@ export default function ServiceAreasPage() {
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-3 bg-white p-3 sm:p-4 rounded-lg border">
+      <div className="flex flex-col sm:flex-row gap-3 bg-card p-3 sm:p-4 rounded-lg border">
         <div className="flex-1">
           <div className="relative">
             {searching ? (
-              <Loader2 className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-blue-500 animate-spin" />
+              <Loader2 className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-primary animate-spin" />
             ) : (
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             )}
             <Input
               placeholder="Search areas..."
@@ -416,29 +416,29 @@ export default function ServiceAreasPage() {
       </div>
 
       {/* Table/Cards */}
-      <div className="bg-white rounded-lg border overflow-hidden relative">
+      <div className="bg-card rounded-lg border overflow-hidden relative">
         {searching && (
-          <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-10">
+          <div className="absolute inset-0 bg-card/80 backdrop-blur-sm flex items-center justify-center z-10">
             <div className="flex items-center gap-3">
-              <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
-              <span className="text-sm text-gray-600">Searching service areas...</span>
+              <Loader2 className="h-5 w-5 animate-spin text-primary" />
+              <span className="text-sm text-muted-foreground">Searching service areas...</span>
             </div>
           </div>
         )}
         {/* Desktop Table */}
         <div className="hidden md:block overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50 border-b">
+            <thead className="bg-muted/50 border-b">
               <tr>
-                <th className="text-left p-4 font-medium text-gray-900">Location</th>
-                <th className="text-left p-4 font-medium text-gray-900">Coverage</th>
-                <th className="text-left p-4 font-medium text-gray-900">Delivery</th>
-                <th className="text-left p-4 font-medium text-gray-900">Extra Charges</th>
-                <th className="text-left p-4 font-medium text-gray-900">Status</th>
-                <th className="text-left p-4 font-medium text-gray-900">Actions</th>
+                <th className="text-left p-4 font-medium text-foreground">Location</th>
+                <th className="text-left p-4 font-medium text-foreground">Coverage</th>
+                <th className="text-left p-4 font-medium text-foreground">Delivery</th>
+                <th className="text-left p-4 font-medium text-foreground">Extra Charges</th>
+                <th className="text-left p-4 font-medium text-foreground">Status</th>
+                <th className="text-left p-4 font-medium text-foreground">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody className="divide-y divide-border">
               {loading ? (
                 [...Array(5)].map((_, i) => (
                   <tr key={i}>
@@ -470,22 +470,22 @@ export default function ServiceAreasPage() {
                 filteredAreas.map((area) => (
                   <React.Fragment key={area.id}>
                     <tr
-                      className="hover:bg-gray-50 cursor-pointer"
+                      className="hover:bg-muted/50 cursor-pointer"
                       onClick={() => setExpandedRow(expandedRow === area.id ? null : area.id)}
                     >
                       <td className="p-4">
                         <div className="flex items-start gap-2">
                           <div>
                             <div className="flex items-center gap-2">
-                              <p className="font-medium text-gray-900">
+                              <p className="font-medium text-foreground">
                                 {area.city}
-                                {area.area && <span className="text-gray-500"> - {area.area}</span>}
+                                {area.area && <span className="text-muted-foreground"> - {area.area}</span>}
                               </p>
                               {area.isPrimary && (
-                                <Star className="h-4 w-4 text-yellow-500" />
+                                <Star className="h-4 w-4 text-primary" />
                               )}
                             </div>
-                            <p className="text-sm text-gray-500">{area.emirate}</p>
+                            <p className="text-sm text-muted-foreground">{area.emirate}</p>
                           </div>
                           <button
                             onClick={(e) => {
@@ -495,16 +495,16 @@ export default function ServiceAreasPage() {
                             className="ml-auto"
                           >
                             {expandedRow === area.id ? (
-                              <ChevronUp className="h-4 w-4 text-gray-400" />
+                              <ChevronUp className="h-4 w-4 text-muted-foreground" />
                             ) : (
-                              <ChevronDown className="h-4 w-4 text-gray-400" />
+                              <ChevronDown className="h-4 w-4 text-muted-foreground" />
                             )}
                           </button>
                         </div>
                       </td>
                       <td className="p-4">
                         <div className="flex items-center gap-2">
-                          <MapPin className="h-4 w-4 text-gray-400" />
+                          <MapPin className="h-4 w-4 text-muted-foreground" />
                           <span className="text-sm">
                             {area.coverage.length} areas
                           </span>
@@ -512,24 +512,24 @@ export default function ServiceAreasPage() {
                       </td>
                       <td className="p-4">
                         <div className="flex items-center gap-1">
-                          <Clock className="h-4 w-4 text-gray-400" />
+                          <Clock className="h-4 w-4 text-muted-foreground" />
                           <span className="text-sm">{area.deliveryTime || 'Standard'}</span>
                         </div>
                       </td>
                       <td className="p-4">
                         {area.extraCharges ? (
                           <div className="flex items-center gap-1">
-                            <DollarSign className="h-4 w-4 text-gray-400" />
+                            <DollarSign className="h-4 w-4 text-muted-foreground" />
                             <span className="text-sm font-medium">+{area.extraCharges} AED</span>
                           </div>
                         ) : (
-                          <span className="text-sm text-gray-500">-</span>
+                          <span className="text-sm text-muted-foreground">-</span>
                         )}
                       </td>
                       <td className="p-4">
                         <Badge
                           variant={area.isActive ? "default" : "secondary"}
-                          className={area.isActive ? "bg-green-100 text-green-800" : ""}
+                          className={area.isActive ? "bg-primary/10 text-primary" : ""}
                         >
                           {area.isActive ? 'Active' : 'Inactive'}
                         </Badge>
@@ -560,18 +560,18 @@ export default function ServiceAreasPage() {
                       </td>
                     </tr>
                     {expandedRow === area.id && (
-                      <tr className="bg-gray-50">
+                      <tr className="bg-muted/50">
                         <td colSpan="6" className="p-4">
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             {area.description && (
                               <div>
-                                <p className="text-sm font-medium text-gray-700 mb-1">Description</p>
-                                <p className="text-sm text-gray-600">{area.description}</p>
+                                <p className="text-sm font-medium text-foreground mb-1">Description</p>
+                                <p className="text-sm text-muted-foreground">{area.description}</p>
                               </div>
                             )}
                             {area.coverage.length > 0 && (
                               <div>
-                                <p className="text-sm font-medium text-gray-700 mb-1">Coverage Areas</p>
+                                <p className="text-sm font-medium text-foreground mb-1">Coverage Areas</p>
                                 <div className="flex flex-wrap gap-1">
                                   {area.coverage.map((location, i) => (
                                     <Badge key={i} variant="outline" className="text-xs">
@@ -583,7 +583,7 @@ export default function ServiceAreasPage() {
                             )}
                             {area.postalCodes.length > 0 && (
                               <div>
-                                <p className="text-sm font-medium text-gray-700 mb-1">Postal Codes</p>
+                                <p className="text-sm font-medium text-foreground mb-1">Postal Codes</p>
                                 <div className="flex flex-wrap gap-1">
                                   {area.postalCodes.map((code, i) => (
                                     <Badge key={i} variant="secondary" className="text-xs">
@@ -605,7 +605,7 @@ export default function ServiceAreasPage() {
         </div>
 
         {/* Mobile Cards */}
-        <div className="md:hidden divide-y divide-gray-200">
+        <div className="md:hidden divide-y divide-border">
           {loading ? (
             [...Array(5)].map((_, i) => (
               <div key={i} className="p-4">
@@ -623,25 +623,25 @@ export default function ServiceAreasPage() {
                 <div className="flex items-start justify-between mb-2">
                   <div>
                     <div className="flex items-center gap-2">
-                      <p className="font-medium text-gray-900">
+                      <p className="font-medium text-foreground">
                         {area.city}
-                        {area.area && <span className="text-gray-500"> - {area.area}</span>}
+                        {area.area && <span className="text-muted-foreground"> - {area.area}</span>}
                       </p>
                       {area.isPrimary && (
-                        <Star className="h-3 w-3 text-yellow-500" />
+                        <Star className="h-3 w-3 text-primary" />
                       )}
                     </div>
-                    <p className="text-xs text-gray-500">{area.emirate}</p>
+                    <p className="text-xs text-muted-foreground">{area.emirate}</p>
                   </div>
                   <Badge
                     variant={area.isActive ? "default" : "secondary"}
-                    className={`text-xs ${area.isActive ? "bg-green-100 text-green-800" : ""}`}
+                    className={`text-xs ${area.isActive ? "bg-primary/10 text-primary" : ""}`}
                   >
                     {area.isActive ? 'Active' : 'Inactive'}
                   </Badge>
                 </div>
 
-                <div className="flex flex-wrap gap-3 mb-3 text-xs text-gray-600">
+                <div className="flex flex-wrap gap-3 mb-3 text-xs text-muted-foreground">
                   <span className="flex items-center gap-1">
                     <MapPin className="h-3 w-3" />
                     {area.coverage.length} areas
@@ -659,7 +659,7 @@ export default function ServiceAreasPage() {
                 </div>
 
                 {area.description && (
-                  <p className="text-xs text-gray-600 mb-3">{area.description}</p>
+                  <p className="text-xs text-muted-foreground mb-3">{area.description}</p>
                 )}
 
                 <div className="flex items-center gap-2">
@@ -687,9 +687,9 @@ export default function ServiceAreasPage() {
 
         {filteredAreas.length === 0 && !loading && (
           <div className="text-center py-12">
-            <MapPin className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No service areas found</h3>
-            <p className="text-gray-500 mb-4">Add your first service area to get started.</p>
+            <MapPin className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-foreground mb-2">No service areas found</h3>
+            <p className="text-muted-foreground mb-4">Add your first service area to get started.</p>
             <Button onClick={() => openModal()}>
               <Plus className="h-4 w-4 mr-2" />
               Add Service Area
@@ -701,8 +701,8 @@ export default function ServiceAreasPage() {
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-2 sm:p-4">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between p-4 sm:p-6 border-b sticky top-0 bg-white z-10">
+          <div className="bg-card rounded-lg shadow-xl w-full max-w-[90%] max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-4 sm:p-6 border-b sticky top-0 bg-card z-10">
               <h2 className="text-lg sm:text-xl font-semibold">
                 {editingArea ? 'Edit Service Area' : 'Add Service Area'}
               </h2>
@@ -901,9 +901,9 @@ export default function ServiceAreasPage() {
       {/* Processing Overlay */}
       {processing && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-[50000]">
-          <div className="bg-white p-6 rounded-lg shadow-lg">
+          <div className="bg-card p-6 rounded-lg shadow-lg">
             <div className="flex items-center space-x-3">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
               <span className="text-lg">
                 {editingArea ? 'Updating service area...' : 'Creating service area...'}
               </span>
@@ -915,9 +915,9 @@ export default function ServiceAreasPage() {
       {/* Deleting Overlay */}
       {deleting && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-[50000]">
-          <div className="bg-white p-6 rounded-lg shadow-lg">
+          <div className="bg-card p-6 rounded-lg shadow-lg">
             <div className="flex items-center space-x-3">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
               <span className="text-lg">Deleting service area...</span>
             </div>
           </div>

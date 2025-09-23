@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useTheme } from '@/contexts/theme-context';
+import { useAuth } from '@/contexts/auth-context';
+import { useRouter } from 'next/navigation';
 import {
   Bell,
   Search,
@@ -31,11 +33,16 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export function DashboardHeader() {
-  const [currentTime, setCurrentTime] = useState(new Date());
+  const [currentTime, setCurrentTime] = useState(null);
   const [notifications, setNotifications] = useState(3);
   const { theme, toggleTheme } = useTheme();
+  const { user, signOut } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
+    // Set initial time on client side only
+    setCurrentTime(new Date());
+
     const timer = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
@@ -60,6 +67,15 @@ export function DashboardHeader() {
     });
   };
 
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      router.push('/auth/login');
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
+  };
+
   return (
     <header className="sticky top-0 z-40 border-b bg-white/95 dark:bg-gray-900/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-gray-900/60">
       <div className="flex h-16 items-center gap-4 px-4 sm:px-6">
@@ -69,23 +85,25 @@ export function DashboardHeader() {
 
           <div className="hidden lg:flex flex-col">
             <h1 className="text-lg font-semibold">Marhaba Movers Dashboard</h1>
-            <p className="text-xs text-muted-foreground">
-              {formatDate(currentTime)} • {formatTime(currentTime)}
-            </p>
+            {currentTime && (
+              <p className="text-xs text-muted-foreground">
+                {formatDate(currentTime)} • {formatTime(currentTime)}
+              </p>
+            )}
           </div>
 
           {/* Quick Stats - Desktop */}
           <div className="hidden xl:flex items-center gap-4 ml-8">
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 rounded-lg">
-              <Package className="h-4 w-4 text-blue-600" />
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-primary/10 rounded-lg">
+              <Package className="h-4 w-4 text-primary" />
               <span className="text-sm font-medium">12 New Orders</span>
             </div>
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-green-50 rounded-lg">
-              <TrendingUp className="h-4 w-4 text-green-600" />
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-primary/10 rounded-lg">
+              <TrendingUp className="h-4 w-4 text-primary" />
               <span className="text-sm font-medium">+23% Today</span>
             </div>
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-purple-50 rounded-lg">
-              <MapPin className="h-4 w-4 text-purple-600" />
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-primary/10 rounded-lg">
+              <MapPin className="h-4 w-4 text-primary" />
               <span className="text-sm font-medium">5 Active Areas</span>
             </div>
           </div>
@@ -151,7 +169,7 @@ export function DashboardHeader() {
                 </span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-center justify-center text-blue-600">
+              <DropdownMenuItem className="text-center justify-center text-primary">
                 View all notifications
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -162,12 +180,21 @@ export function DashboardHeader() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="flex items-center gap-2 px-2">
                 <Avatar className="h-8 w-8">
-                  <AvatarImage src="/images/avatar.png" alt="Admin" />
-                  <AvatarFallback>AD</AvatarFallback>
+                  <AvatarImage src="/images/avatar.png" alt={user?.user_metadata?.full_name || user?.email || 'Admin'} />
+                  <AvatarFallback>
+                    {user?.user_metadata?.full_name
+                      ? user.user_metadata.full_name.split(' ').map(n => n[0]).join('').toUpperCase()
+                      : user?.email?.[0]?.toUpperCase() || 'AD'
+                    }
+                  </AvatarFallback>
                 </Avatar>
                 <div className="hidden sm:flex flex-col items-start">
-                  <span className="text-sm font-medium">Admin User</span>
-                  <span className="text-xs text-muted-foreground">Administrator</span>
+                  <span className="text-sm font-medium">
+                    {user?.user_metadata?.full_name || user?.email || 'Admin User'}
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    {user?.user_metadata?.role || 'Administrator'}
+                  </span>
                 </div>
                 <ChevronDown className="h-4 w-4 hidden sm:block" />
               </Button>
@@ -184,7 +211,7 @@ export function DashboardHeader() {
                 <span>Settings</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-red-600">
+              <DropdownMenuItem className="text-red-600" onClick={handleLogout}>
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Log out</span>
               </DropdownMenuItem>
@@ -195,16 +222,16 @@ export function DashboardHeader() {
 
       {/* Mobile Stats Bar */}
       <div className="flex xl:hidden items-center gap-3 px-4 pb-3 overflow-x-auto">
-        <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 rounded-lg whitespace-nowrap">
-          <Package className="h-3 w-3 text-blue-600" />
+        <div className="flex items-center gap-2 px-3 py-1.5 bg-primary/10 rounded-lg whitespace-nowrap">
+          <Package className="h-3 w-3 text-primary" />
           <span className="text-xs font-medium">12 Orders</span>
         </div>
-        <div className="flex items-center gap-2 px-3 py-1.5 bg-green-50 rounded-lg whitespace-nowrap">
-          <TrendingUp className="h-3 w-3 text-green-600" />
+        <div className="flex items-center gap-2 px-3 py-1.5 bg-primary/10 rounded-lg whitespace-nowrap">
+          <TrendingUp className="h-3 w-3 text-primary" />
           <span className="text-xs font-medium">+23%</span>
         </div>
-        <div className="flex items-center gap-2 px-3 py-1.5 bg-purple-50 rounded-lg whitespace-nowrap">
-          <MapPin className="h-3 w-3 text-purple-600" />
+        <div className="flex items-center gap-2 px-3 py-1.5 bg-primary/10 rounded-lg whitespace-nowrap">
+          <MapPin className="h-3 w-3 text-primary" />
           <span className="text-xs font-medium">5 Areas</span>
         </div>
       </div>

@@ -197,6 +197,10 @@ const data = {
           url: "/dashboard/website/hero-slider",
         },
         {
+          title: "Welcome Section",
+          url: "/dashboard/website/welcome-section",
+        },
+        {
           title: "Services Content",
           url: "/dashboard/website/services",
         },
@@ -298,7 +302,7 @@ export function AppSidebar({
         {/* <NavProjects projects={data.projects} /> */}
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        {/* <NavUser user={data.user} /> */}
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

@@ -343,10 +343,10 @@ export default function BlogPage() {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'PUBLISHED': return 'bg-green-100 text-green-800 border-green-200';
-      case 'DRAFT': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'ARCHIVED': return 'bg-gray-100 text-gray-800 border-gray-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+      case 'PUBLISHED': return 'bg-primary/10 text-primary border-primary/20';
+      case 'DRAFT': return 'bg-muted text-muted-foreground border-muted';
+      case 'ARCHIVED': return 'bg-muted/50 text-muted-foreground border-muted';
+      default: return 'bg-muted text-muted-foreground border-muted';
     }
   };
 
@@ -393,7 +393,7 @@ export default function BlogPage() {
         {loading ? (
           <>
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="bg-white p-3 sm:p-4 rounded-lg border">
+              <div key={i} className="bg-card p-3 sm:p-4 rounded-lg border">
                 <div className="flex items-center gap-3">
                   <Skeleton className="h-10 w-10 rounded-lg" />
                   <div className="flex-1">
@@ -406,13 +406,13 @@ export default function BlogPage() {
           </>
         ) : (
           <>
-            <div className="bg-white p-3 sm:p-4 rounded-lg border relative">
+            <div className="bg-card p-3 sm:p-4 rounded-lg border relative">
               <div className="flex items-center gap-2 sm:gap-3">
-                <div className="p-1.5 sm:p-2 bg-blue-100 rounded-lg">
-                  <BookOpen className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
+                <div className="p-1.5 sm:p-2 bg-primary/10 rounded-lg">
+                  <BookOpen className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                 </div>
                 <div>
-                  <p className="text-xs sm:text-sm font-medium text-gray-600">Total Posts</p>
+                  <p className="text-xs sm:text-sm font-medium text-muted-foreground">Total Posts</p>
                   <p className="text-xl sm:text-2xl font-bold">
                     {searching || deleting ? <Loader2 className="h-5 w-5 sm:h-6 sm:w-6 animate-spin inline" /> : stats.total}
                   </p>
@@ -420,13 +420,13 @@ export default function BlogPage() {
               </div>
             </div>
 
-            <div className="bg-white p-3 sm:p-4 rounded-lg border relative">
+            <div className="bg-card p-3 sm:p-4 rounded-lg border relative">
               <div className="flex items-center gap-2 sm:gap-3">
-                <div className="p-1.5 sm:p-2 bg-green-100 rounded-lg">
-                  <Eye className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
+                <div className="p-1.5 sm:p-2 bg-primary/10 rounded-lg">
+                  <Eye className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                 </div>
                 <div>
-                  <p className="text-xs sm:text-sm font-medium text-gray-600">Published</p>
+                  <p className="text-xs sm:text-sm font-medium text-muted-foreground">Published</p>
                   <p className="text-xl sm:text-2xl font-bold">
                     {searching || deleting ? <Loader2 className="h-5 w-5 sm:h-6 sm:w-6 animate-spin inline" /> : stats.published}
                   </p>
@@ -434,13 +434,13 @@ export default function BlogPage() {
               </div>
             </div>
 
-            <div className="bg-white p-3 sm:p-4 rounded-lg border relative">
+            <div className="bg-card p-3 sm:p-4 rounded-lg border relative">
               <div className="flex items-center gap-2 sm:gap-3">
-                <div className="p-1.5 sm:p-2 bg-yellow-100 rounded-lg">
-                  <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-600" />
+                <div className="p-1.5 sm:p-2 bg-muted rounded-lg">
+                  <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
                 </div>
                 <div>
-                  <p className="text-xs sm:text-sm font-medium text-gray-600">Drafts</p>
+                  <p className="text-xs sm:text-sm font-medium text-muted-foreground">Drafts</p>
                   <p className="text-xl sm:text-2xl font-bold">
                     {searching || deleting ? <Loader2 className="h-5 w-5 sm:h-6 sm:w-6 animate-spin inline" /> : stats.draft}
                   </p>
@@ -448,13 +448,13 @@ export default function BlogPage() {
               </div>
             </div>
 
-            <div className="bg-white p-3 sm:p-4 rounded-lg border relative">
+            <div className="bg-card p-3 sm:p-4 rounded-lg border relative">
               <div className="flex items-center gap-2 sm:gap-3">
-                <div className="p-1.5 sm:p-2 bg-gray-100 rounded-lg">
-                  <Archive className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600" />
+                <div className="p-1.5 sm:p-2 bg-muted rounded-lg">
+                  <Archive className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
                 </div>
                 <div>
-                  <p className="text-xs sm:text-sm font-medium text-gray-600">Archived</p>
+                  <p className="text-xs sm:text-sm font-medium text-muted-foreground">Archived</p>
                   <p className="text-xl sm:text-2xl font-bold">
                     {searching || deleting ? <Loader2 className="h-5 w-5 sm:h-6 sm:w-6 animate-spin inline" /> : stats.archived}
                   </p>
@@ -466,13 +466,13 @@ export default function BlogPage() {
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-3 bg-white p-3 sm:p-4 rounded-lg border">
+      <div className="flex flex-col sm:flex-row gap-3 bg-card p-3 sm:p-4 rounded-lg border">
         <div className="flex-1">
           <div className="relative">
             {searching ? (
-              <Loader2 className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-blue-500 animate-spin" />
+              <Loader2 className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-primary animate-spin" />
             ) : (
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             )}
             <Input
               placeholder="Search posts..."
@@ -512,12 +512,12 @@ export default function BlogPage() {
       </div>
 
       {/* Posts Table/Cards */}
-      <div className="bg-white rounded-lg border overflow-hidden relative">
+      <div className="bg-card rounded-lg border overflow-hidden relative">
         {searching && (
-          <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-10">
+          <div className="absolute inset-0 bg-card/80 backdrop-blur-sm flex items-center justify-center z-10">
             <div className="flex items-center gap-3">
-              <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
-              <span className="text-sm text-gray-600">Searching posts...</span>
+              <Loader2 className="h-5 w-5 animate-spin text-primary" />
+              <span className="text-sm text-muted-foreground">Searching posts...</span>
             </div>
           </div>
         )}
@@ -525,14 +525,14 @@ export default function BlogPage() {
         {/* Desktop Table */}
         <div className="hidden md:block overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50 border-b">
+            <thead className="bg-muted/50 border-b">
               <tr>
-                <th className="text-left p-4 font-medium text-gray-900">Post</th>
-                <th className="text-left p-4 font-medium text-gray-900">Author</th>
-                <th className="text-left p-4 font-medium text-gray-900">Category</th>
-                <th className="text-left p-4 font-medium text-gray-900">Status</th>
-                <th className="text-left p-4 font-medium text-gray-900">Date</th>
-                <th className="text-left p-4 font-medium text-gray-900">Actions</th>
+                <th className="text-left p-4 font-medium text-foreground">Post</th>
+                <th className="text-left p-4 font-medium text-foreground">Author</th>
+                <th className="text-left p-4 font-medium text-foreground">Category</th>
+                <th className="text-left p-4 font-medium text-foreground">Status</th>
+                <th className="text-left p-4 font-medium text-foreground">Date</th>
+                <th className="text-left p-4 font-medium text-foreground">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
@@ -564,7 +564,7 @@ export default function BlogPage() {
                 filteredPosts.map((post) => (
                 <tr
                   key={post.id}
-                  className="hover:bg-gray-50 cursor-pointer"
+                  className="hover:bg-muted/50 cursor-pointer"
                   onClick={() => openDetailModal(post)}
                 >
                   <td className="p-4">
@@ -578,14 +578,14 @@ export default function BlogPage() {
                       )}
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
-                          <p className="font-medium text-gray-900 truncate">
+                          <p className="font-medium text-foreground truncate">
                             {post.title}
                           </p>
                           {post.isFeatured && (
-                            <Star className="h-4 w-4 text-yellow-500" />
+                            <Star className="h-4 w-4 text-primary" />
                           )}
                         </div>
-                        <p className="text-sm text-gray-500 truncate mt-1">
+                        <p className="text-sm text-muted-foreground truncate mt-1">
                           {post.excerpt || getContentPreview(post.content)}
                         </p>
                         {post.tags.length > 0 && (
@@ -607,8 +607,8 @@ export default function BlogPage() {
                   </td>
                   <td className="p-4">
                     <div className="flex items-center gap-2">
-                      <User className="h-4 w-4 text-gray-400" />
-                      <span className="text-sm text-gray-900">{post.author}</span>
+                      <User className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm text-foreground">{post.author}</span>
                     </div>
                   </td>
                   <td className="p-4">
@@ -620,7 +620,7 @@ export default function BlogPage() {
                     </Badge>
                   </td>
                   <td className="p-4">
-                    <div className="text-sm text-gray-900">
+                    <div className="text-sm text-foreground">
                       {new Date(post.publishedAt || post.createdAt).toLocaleDateString()}
                     </div>
                   </td>
@@ -684,7 +684,7 @@ export default function BlogPage() {
             filteredPosts.map((post) => (
               <div
                 key={post.id}
-                className="p-4 hover:bg-gray-50 cursor-pointer"
+                className="p-4 hover:bg-muted/50 cursor-pointer"
                 onClick={() => openDetailModal(post)}
               >
                 <div className="flex items-start gap-3 mb-3">
@@ -702,11 +702,11 @@ export default function BlogPage() {
                           {post.title}
                         </p>
                         {post.isFeatured && (
-                          <Star className="h-3 w-3 text-yellow-500 inline ml-1" />
+                          <Star className="h-3 w-3 text-primary inline ml-1" />
                         )}
                       </div>
                     </div>
-                    <p className="text-sm text-gray-500 line-clamp-2 mt-1">
+                    <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
                       {post.excerpt || getContentPreview(post.content)}
                     </p>
                     <div className="flex flex-wrap gap-2 mt-2">
@@ -725,7 +725,7 @@ export default function BlogPage() {
                   </div>
                 </div>
                 <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-4 text-xs text-gray-500">
+                  <div className="flex items-center gap-4 text-xs text-muted-foreground">
                     <span className="flex items-center gap-1">
                       <User className="h-3 w-3" />
                       {post.author}
@@ -765,9 +765,9 @@ export default function BlogPage() {
 
         {filteredPosts.length === 0 && !loading && (
           <div className="text-center py-12">
-            <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No blog posts found</h3>
-            <p className="text-gray-500 mb-4">Get started by creating your first blog post.</p>
+            <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-foreground mb-2">No blog posts found</h3>
+            <p className="text-muted-foreground mb-4">Get started by creating your first blog post.</p>
             <Button onClick={() => openModal()} disabled={processing}>
               {processing ? (
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />

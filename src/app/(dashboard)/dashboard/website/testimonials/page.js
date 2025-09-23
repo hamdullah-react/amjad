@@ -35,8 +35,8 @@ const INITIAL_FORM_DATA = {
 }
 
 const StatCard = ({ title, value, className = '' }) => (
-  <div className="bg-white rounded-lg shadow p-4">
-    <div className="text-sm text-gray-600">{title}</div>
+  <div className="bg-card rounded-lg shadow p-4 border">
+    <div className="text-sm text-muted-foreground">{title}</div>
     <div className={`text-2xl font-bold ${className}`}>{value}</div>
   </div>
 )
@@ -56,8 +56,8 @@ const RatingStars = ({ rating, onClick, size = 'sm' }) => {
           <Star
             className={`${sizeClasses} ${
               star <= rating
-                ? 'fill-yellow-400 text-yellow-400'
-                : 'fill-gray-200 text-gray-200'
+                ? 'fill-primary text-primary'
+                : 'fill-muted text-muted'
             }`}
           />
         </button>
@@ -68,9 +68,9 @@ const RatingStars = ({ rating, onClick, size = 'sm' }) => {
 
 const TestimonialRow = ({ testimonial, onToggleActive, onToggleFeatured, onEdit, onDelete }) => {
   return (
-    <tr className="hover:bg-gray-50">
+    <tr className="hover:bg-muted/50">
       <td className="px-6 py-4 whitespace-nowrap">
-        <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-100">
+        <div className="w-12 h-12 rounded-full overflow-hidden bg-muted">
           {testimonial.imageUrl ? (
             <img
               src={testimonial.imageUrl}
@@ -82,55 +82,55 @@ const TestimonialRow = ({ testimonial, onToggleActive, onToggleFeatured, onEdit,
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
-              <User className="w-6 h-6 text-gray-400" />
+              <User className="w-6 h-6 text-muted-foreground" />
             </div>
           )}
         </div>
       </td>
       <td className="px-6 py-4">
         <div>
-          <p className="text-sm font-medium text-gray-900">{testimonial.name}</p>
-          <p className="text-xs text-gray-500">{testimonial.email || '-'}</p>
+          <p className="text-sm font-medium text-foreground">{testimonial.name}</p>
+          <p className="text-xs text-muted-foreground">{testimonial.email || '-'}</p>
         </div>
       </td>
       <td className="px-6 py-4">
         <div className="text-sm">
           {testimonial.company && (
             <div className="flex items-center gap-1">
-              <Building className="w-3 h-3 text-gray-400" />
-              <span className="text-gray-600">{testimonial.company}</span>
+              <Building className="w-3 h-3 text-muted-foreground" />
+              <span className="text-muted-foreground">{testimonial.company}</span>
             </div>
           )}
           {testimonial.position && (
-            <p className="text-xs text-gray-500">{testimonial.position}</p>
+            <p className="text-xs text-muted-foreground">{testimonial.position}</p>
           )}
         </div>
       </td>
       <td className="px-6 py-4">
-        <p className="text-sm text-gray-600 max-w-xs truncate">{testimonial.content}</p>
+        <p className="text-sm text-muted-foreground max-w-xs truncate">{testimonial.content}</p>
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
         <RatingStars rating={testimonial.rating} />
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
         {testimonial.service && (
-          <span className="text-sm text-gray-600">{testimonial.service}</span>
+          <span className="text-sm text-muted-foreground">{testimonial.service}</span>
         )}
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
         <div className="flex gap-2">
           {testimonial.isFeatured && (
-            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary">
               Featured
             </span>
           )}
           {testimonial.isActive ? (
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary">
               <Eye className="w-3 h-3" />
               Active
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-muted text-muted-foreground">
               <EyeOff className="w-3 h-3" />
               Inactive
             </span>
@@ -141,21 +141,21 @@ const TestimonialRow = ({ testimonial, onToggleActive, onToggleFeatured, onEdit,
         <div className="flex items-center gap-2">
           <button
             onClick={() => onToggleFeatured(testimonial)}
-            className="p-1 text-yellow-600 hover:text-yellow-800"
+            className="p-1 text-primary hover:text-primary/80"
             title={testimonial.isFeatured ? "Unfeature" : "Feature"}
           >
-            <Star className={`w-4 h-4 ${testimonial.isFeatured ? 'fill-yellow-600' : ''}`} />
+            <Star className={`w-4 h-4 ${testimonial.isFeatured ? 'fill-primary' : ''}`} />
           </button>
           <button
             onClick={() => onToggleActive(testimonial)}
-            className="p-1 text-gray-600 hover:text-gray-800"
+            className="p-1 text-muted-foreground hover:text-muted-foreground"
             title={testimonial.isActive ? "Deactivate" : "Activate"}
           >
             {testimonial.isActive ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
           </button>
           <button
             onClick={() => onEdit(testimonial)}
-            className="p-1 text-blue-600 hover:text-blue-800"
+            className="p-1 text-primary hover:text-primary/80"
             title="Edit"
           >
             <Edit className="w-4 h-4" />
@@ -564,66 +564,65 @@ export default function TestimonialsPage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Testimonials</h1>
-          <p className="text-gray-600 mt-2">Manage customer testimonials and reviews</p>
-        </div>
-        <Button
-          onClick={handleAdd}
-          className="bg-blue-600 hover:bg-blue-700"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Add Testimonial
-        </Button>
+    <div className="p-6">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-foreground">Testimonials</h1>
+        <p className="text-muted-foreground mt-2">Manage customer testimonials and reviews</p>
       </div>
 
       {/* Statistics */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <StatCard title="Total Testimonials" value={stats.total} />
-        <StatCard title="Active" value={stats.active} className="text-green-600" />
-        <StatCard title="Featured" value={stats.featured} className="text-yellow-600" />
-        <StatCard title="Avg Rating" value={`${stats.avgRating} ⭐`} className="text-blue-600" />
-      </div>
-
-      {/* Filters */}
-      <div className="bg-white rounded-lg shadow p-4">
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1">
-            <Input
-              placeholder="Search testimonials..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full"
-            />
-          </div>
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-full md:w-48">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Testimonials</SelectItem>
-              <SelectItem value="active">Active Only</SelectItem>
-              <SelectItem value="inactive">Inactive Only</SelectItem>
-              <SelectItem value="featured">Featured Only</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        <StatCard title="Active" value={stats.active} className="text-primary" />
+        <StatCard title="Featured" value={stats.featured} className="text-primary" />
+        <StatCard title="Avg Rating" value={`${stats.avgRating} ⭐`} className="text-primary" />
       </div>
 
       {/* Testimonials Table */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
+      <div className="bg-card rounded-lg shadow border">
+        <div className="p-6 border-b">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold text-foreground">Customer Testimonials</h2>
+            <Button
+              onClick={handleAdd}
+              disabled={processing}
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Add Testimonial
+            </Button>
+          </div>
+          {/* Filters */}
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex-1">
+              <Input
+                placeholder="Search testimonials..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full"
+              />
+            </div>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-full md:w-48">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Testimonials</SelectItem>
+                <SelectItem value="active">Active Only</SelectItem>
+                <SelectItem value="inactive">Inactive Only</SelectItem>
+                <SelectItem value="featured">Featured Only</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
         {loading ? (
           <div className="p-12 text-center">
-            <div className="text-gray-500">Loading testimonials...</div>
+            <div className="text-muted-foreground">Loading testimonials...</div>
           </div>
         ) : filteredTestimonials.length === 0 ? (
           <div className="p-12 text-center">
-            <Quote className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-            <p className="text-gray-600 text-lg">No testimonials found</p>
-            <p className="text-gray-500 mt-2">
+            <Quote className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+            <p className="text-muted-foreground text-lg">No testimonials found</p>
+            <p className="text-muted-foreground mt-2">
               {searchTerm || statusFilter !== 'all'
                 ? 'Try adjusting your search or filters'
                 : 'Click "Add Testimonial" to create your first testimonial'}
@@ -632,35 +631,35 @@ export default function TestimonialsPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-muted/50 border-b">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     Photo
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     Customer
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     Company
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     Testimonial
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     Rating
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     Service
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="divide-y divide-border">
                 {filteredTestimonials.map((testimonial) => (
                   <TestimonialRow
                     key={testimonial.id}
@@ -680,10 +679,10 @@ export default function TestimonialsPage() {
       {/* Processing Overlay */}
       {processing && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-[50000]">
-          <div className="bg-white rounded-lg p-6 shadow-xl">
+          <div className="bg-card rounded-lg p-6 shadow-xl border">
             <div className="flex items-center space-x-3">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              <p className="text-lg font-medium text-gray-900">{processingMessage || 'Processing...'}</p>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              <p className="text-lg font-medium text-foreground">{processingMessage || 'Processing...'}</p>
             </div>
           </div>
         </div>
@@ -691,7 +690,7 @@ export default function TestimonialsPage() {
 
       {/* Add/Edit Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-[90%] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editingTestimonial ? 'Edit Testimonial' : 'Add New Testimonial'}</DialogTitle>
             <DialogDescription>
@@ -713,7 +712,6 @@ export default function TestimonialsPage() {
             <Button
               onClick={handleSubmit}
               disabled={processing || !formData.name || !formData.content}
-              className="bg-blue-600 hover:bg-blue-700"
             >
               <Save className="w-4 h-4 mr-2" />
               {editingTestimonial ? 'Update Testimonial' : 'Create Testimonial'}

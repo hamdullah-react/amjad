@@ -33,20 +33,20 @@ const INITIAL_FORM_DATA = {
 }
 
 const StatCard = ({ title, value, className = '' }) => (
-  <div className="bg-white rounded-lg shadow p-4">
-    <div className="text-sm text-gray-600">{title}</div>
+  <div className="bg-card rounded-lg shadow p-4">
+    <div className="text-sm text-muted-foreground">{title}</div>
     <div className={`text-2xl font-bold ${className}`}>{value}</div>
   </div>
 )
 
 const ServiceRow = ({ service, index, totalServices, onToggleActive, onEdit, onDelete, onOrderChange, processing }) => {
   return (
-    <tr className="hover:bg-gray-50">
+    <tr className="hover:bg-muted/50">
       <td className="px-6 py-4 whitespace-nowrap">
-        <span className="text-sm text-gray-500">{service.order}</span>
+        <span className="text-sm text-muted-foreground">{service.order}</span>
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
-        <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-100">
+        <div className="w-12 h-12 rounded-lg overflow-hidden bg-muted">
           {service.imageUrl ? (
             <img
               src={service.imageUrl}
@@ -58,58 +58,58 @@ const ServiceRow = ({ service, index, totalServices, onToggleActive, onEdit, onD
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
-              <Package className="w-6 h-6 text-gray-400" />
+              <Package className="w-6 h-6 text-muted-foreground" />
             </div>
           )}
         </div>
       </td>
       <td className="px-6 py-4">
         <div>
-          <p className="text-sm font-medium text-gray-900">{service.title}</p>
+          <p className="text-sm font-medium text-foreground">{service.title}</p>
           {service.shortDesc && (
-            <p className="text-xs text-gray-500">{service.shortDesc}</p>
+            <p className="text-xs text-muted-foreground">{service.shortDesc}</p>
           )}
         </div>
       </td>
       <td className="px-6 py-4">
-        <p className="text-sm text-gray-600 max-w-xs truncate">{service.description}</p>
+        <p className="text-sm text-muted-foreground max-w-xs truncate">{service.description}</p>
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
         {service.price ? (
-          <span className="flex items-center text-green-600 font-medium">
+          <span className="flex items-center text-primary font-medium">
             <DollarSign className="h-4 w-4" />
             {service.price}
           </span>
         ) : (
-          <span className="text-gray-400">-</span>
+          <span className="text-muted-foreground">-</span>
         )}
       </td>
       <td className="px-6 py-4">
         {service.features && service.features.length > 0 ? (
           <div className="flex flex-wrap gap-1">
             {service.features.slice(0, 2).map((feature, i) => (
-              <span key={i} className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">
+              <span key={i} className="px-2 py-1 bg-muted text-muted-foreground text-xs rounded">
                 {feature.substring(0, 20)}...
               </span>
             ))}
             {service.features.length > 2 && (
-              <span className="px-2 py-1 bg-gray-100 text-gray-500 text-xs rounded">
+              <span className="px-2 py-1 bg-muted text-muted-foreground text-xs rounded">
                 +{service.features.length - 2}
               </span>
             )}
           </div>
         ) : (
-          <span className="text-gray-400 text-sm">No features</span>
+          <span className="text-muted-foreground text-sm">No features</span>
         )}
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
         {service.isActive ? (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary">
             <Eye className="w-3 h-3" />
             Active
           </span>
         ) : (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-muted text-muted-foreground">
             <EyeOff className="w-3 h-3" />
             Inactive
           </span>
@@ -120,7 +120,7 @@ const ServiceRow = ({ service, index, totalServices, onToggleActive, onEdit, onD
           <button
             onClick={() => onOrderChange(service, 'up')}
             disabled={index === 0 || processing}
-            className="p-1 text-gray-600 hover:text-gray-800 disabled:opacity-50"
+            className="p-1 text-muted-foreground hover:text-foreground disabled:opacity-50"
             title="Move up"
           >
             <ArrowUp className="w-4 h-4" />
@@ -128,28 +128,28 @@ const ServiceRow = ({ service, index, totalServices, onToggleActive, onEdit, onD
           <button
             onClick={() => onOrderChange(service, 'down')}
             disabled={index === totalServices - 1 || processing}
-            className="p-1 text-gray-600 hover:text-gray-800 disabled:opacity-50"
+            className="p-1 text-muted-foreground hover:text-foreground disabled:opacity-50"
             title="Move down"
           >
             <ArrowDown className="w-4 h-4" />
           </button>
           <button
             onClick={() => onToggleActive(service)}
-            className="p-1 text-gray-600 hover:text-gray-800"
+            className="p-1 text-muted-foreground hover:text-foreground"
             title={service.isActive ? "Deactivate" : "Activate"}
           >
             {service.isActive ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
           </button>
           <button
             onClick={() => onEdit(service)}
-            className="p-1 text-blue-600 hover:text-blue-800"
+            className="p-1 text-primary hover:text-primary/80"
             title="Edit"
           >
             <Edit className="w-4 h-4" />
           </button>
           <button
             onClick={() => onDelete(service.id)}
-            className="p-1 text-red-600 hover:text-red-800"
+            className="p-1 text-destructive hover:text-destructive/90"
             title="Delete"
           >
             <Trash2 className="w-4 h-4" />
@@ -306,13 +306,13 @@ const ServiceForm = ({ formData, setFormData, isImagePickerOpen, setIsImagePicke
               {formData.features.map((feature, index) => (
                 <div
                   key={index}
-                  className="flex items-center justify-between bg-gray-50 px-3 py-2 rounded"
+                  className="flex items-center justify-between bg-muted/50 px-3 py-2 rounded"
                 >
                   <span className="text-sm">{feature}</span>
                   <button
                     type="button"
                     onClick={() => removeFeature(index)}
-                    className="text-red-500 hover:text-red-700"
+                    className="text-destructive hover:text-destructive/90"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -586,12 +586,12 @@ export default function ServicesContentPage() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Services Content</h1>
-          <p className="text-gray-600 mt-2">Manage your website services and offerings</p>
+          <h1 className="text-3xl font-bold text-foreground">Services Content</h1>
+          <p className="text-muted-foreground mt-2">Manage your website services and offerings</p>
         </div>
         <Button
           onClick={handleAdd}
-          className="bg-blue-600 hover:bg-blue-700"
+          className="bg-primary hover:bg-primary/90 text-primary-foreground"
         >
           <Plus className="w-4 h-4 mr-2" />
           Add Service
@@ -601,13 +601,13 @@ export default function ServicesContentPage() {
       {/* Statistics */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <StatCard title="Total Services" value={stats.total} />
-        <StatCard title="Active" value={stats.active} className="text-green-600" />
-        <StatCard title="Inactive" value={stats.inactive} className="text-gray-600" />
-        <StatCard title="With Pricing" value={stats.withPrice} className="text-blue-600" />
+        <StatCard title="Active" value={stats.active} className="text-primary" />
+        <StatCard title="Inactive" value={stats.inactive} className="text-muted-foreground" />
+        <StatCard title="With Pricing" value={stats.withPrice} className="text-primary" />
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-lg shadow p-4">
+      <div className="bg-card rounded-lg shadow p-4">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1">
             <Input
@@ -631,16 +631,16 @@ export default function ServicesContentPage() {
       </div>
 
       {/* Services Table */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
+      <div className="bg-card rounded-lg shadow overflow-hidden">
         {loading ? (
           <div className="p-12 text-center">
-            <div className="text-gray-500">Loading services...</div>
+            <div className="text-muted-foreground">Loading services...</div>
           </div>
         ) : filteredServices.length === 0 ? (
           <div className="p-12 text-center">
-            <Package className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-            <p className="text-gray-600 text-lg">No services found</p>
-            <p className="text-gray-500 mt-2">
+            <Package className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+            <p className="text-foreground text-lg">No services found</p>
+            <p className="text-muted-foreground mt-2">
               {searchTerm || statusFilter !== 'all'
                 ? 'Try adjusting your search or filters'
                 : 'Click "Add Service" to create your first service'}
@@ -649,35 +649,35 @@ export default function ServicesContentPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-muted/50 border-b">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     Order
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     Image
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     Service
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     Description
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     Price
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     Features
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-card divide-y divide-border">
                 {filteredServices.map((service, index) => (
                   <ServiceRow
                     key={service.id}
@@ -700,10 +700,10 @@ export default function ServicesContentPage() {
       {/* Processing Overlay */}
       {processing && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-[50000]">
-          <div className="bg-white rounded-lg p-6 shadow-xl">
+          <div className="bg-card rounded-lg p-6 shadow-xl">
             <div className="flex items-center space-x-3">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              <p className="text-lg font-medium text-gray-900">{processingMessage || 'Processing...'}</p>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              <p className="text-lg font-medium text-foreground">{processingMessage || 'Processing...'}</p>
             </div>
           </div>
         </div>
@@ -711,7 +711,7 @@ export default function ServicesContentPage() {
 
       {/* Add/Edit Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-[90%] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editingService ? 'Edit Service' : 'Add New Service'}</DialogTitle>
             <DialogDescription>
@@ -735,7 +735,7 @@ export default function ServicesContentPage() {
             <Button
               onClick={handleSubmit}
               disabled={processing || !formData.title || !formData.description}
-              className="bg-blue-600 hover:bg-blue-700"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground"
             >
               <Save className="w-4 h-4 mr-2" />
               {editingService ? 'Update Service' : 'Create Service'}

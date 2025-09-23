@@ -181,11 +181,11 @@ export default function BookingsPage() {
 
   const getStatusBadge = (status) => {
     const statusConfig = {
-      'pending': { color: 'bg-yellow-100 text-yellow-800', icon: AlertCircle },
-      'confirmed': { color: 'bg-blue-100 text-blue-800', icon: CheckCircle },
-      'in-progress': { color: 'bg-purple-100 text-purple-800', icon: Clock },
-      'completed': { color: 'bg-green-100 text-green-800', icon: CheckCircle },
-      'cancelled': { color: 'bg-red-100 text-red-800', icon: XCircle }
+      'pending': { color: 'bg-muted text-muted-foreground', icon: AlertCircle },
+      'confirmed': { color: 'bg-primary/10 text-primary', icon: CheckCircle },
+      'in-progress': { color: 'bg-primary/20 text-primary', icon: Clock },
+      'completed': { color: 'bg-primary/10 text-primary', icon: CheckCircle },
+      'cancelled': { color: 'bg-destructive/10 text-destructive', icon: XCircle }
     }
 
     const config = statusConfig[status] || statusConfig['pending']
@@ -223,7 +223,7 @@ export default function BookingsPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold">Bookings Management</h1>
-            <p className="text-gray-500">Manage all customer bookings and schedules</p>
+            <p className="text-muted-foreground">Manage all customer bookings and schedules</p>
           </div>
           <Button className="bg-gradient-to-r from-blue-600 to-orange-600 text-white">
             <Plus className="w-4 h-4 mr-2" />
@@ -234,7 +234,7 @@ export default function BookingsPage() {
         {/* Filters and Search */}
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input
               type="text"
               placeholder="Search bookings by ID, customer, or service..."
@@ -253,102 +253,102 @@ export default function BookingsPage() {
 
         {/* Stats Cards */}
         <div className="grid gap-4 md:grid-cols-5">
-          <div className="bg-white rounded-lg border p-4">
+          <div className="bg-card rounded-lg border p-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-gray-600">Total</span>
-              <AlertCircle className="w-4 h-4 text-gray-400" />
+              <span className="text-sm text-muted-foreground">Total</span>
+              <AlertCircle className="w-4 h-4 text-muted-foreground" />
             </div>
             <p className="text-2xl font-bold">156</p>
           </div>
-          <div className="bg-yellow-50 rounded-lg border border-yellow-200 p-4">
+          <div className="bg-muted rounded-lg border p-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-yellow-700">Pending</span>
-              <AlertCircle className="w-4 h-4 text-yellow-600" />
+              <span className="text-sm text-foreground">Pending</span>
+              <AlertCircle className="w-4 h-4 text-muted-foreground" />
             </div>
-            <p className="text-2xl font-bold text-yellow-700">23</p>
+            <p className="text-2xl font-bold text-foreground">23</p>
           </div>
-          <div className="bg-blue-50 rounded-lg border border-blue-200 p-4">
+          <div className="bg-primary/5 rounded-lg border p-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-blue-700">Confirmed</span>
-              <CheckCircle className="w-4 h-4 text-blue-600" />
+              <span className="text-sm text-primary">Confirmed</span>
+              <CheckCircle className="w-4 h-4 text-primary" />
             </div>
-            <p className="text-2xl font-bold text-blue-700">45</p>
+            <p className="text-2xl font-bold text-primary">45</p>
           </div>
-          <div className="bg-purple-50 rounded-lg border border-purple-200 p-4">
+          <div className="bg-primary/10 rounded-lg border p-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-purple-700">In Progress</span>
-              <Clock className="w-4 h-4 text-purple-600" />
+              <span className="text-sm text-primary">In Progress</span>
+              <Clock className="w-4 h-4 text-primary" />
             </div>
-            <p className="text-2xl font-bold text-purple-700">12</p>
+            <p className="text-2xl font-bold text-primary">12</p>
           </div>
-          <div className="bg-green-50 rounded-lg border border-green-200 p-4">
+          <div className="bg-primary/5 rounded-lg border p-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-green-700">Completed</span>
-              <CheckCircle className="w-4 h-4 text-green-600" />
+              <span className="text-sm text-primary">Completed</span>
+              <CheckCircle className="w-4 h-4 text-primary" />
             </div>
-            <p className="text-2xl font-bold text-green-700">76</p>
+            <p className="text-2xl font-bold text-primary">76</p>
           </div>
         </div>
 
         {/* Bookings Table */}
-        <div className="bg-white rounded-xl border overflow-hidden">
+        <div className="bg-card rounded-xl border overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b">
+              <thead className="bg-muted/50 border-b">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     Booking ID
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     Customer
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     Service
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     Schedule
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     Amount
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {bookings.map((booking) => (
-                  <tr key={booking.id} className="hover:bg-gray-50">
+                  <tr key={booking.id} className="hover:bg-muted/50">
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">{booking.id}</div>
+                      <div className="text-sm font-medium text-foreground">{booking.id}</div>
                     </td>
                     <td className="px-6 py-4">
                       <div>
-                        <div className="text-sm font-medium text-gray-900">{booking.customer.name}</div>
-                        <div className="text-xs text-gray-500">{booking.customer.phone}</div>
-                        <div className="text-xs text-gray-500">{booking.customer.email}</div>
+                        <div className="text-sm font-medium text-foreground">{booking.customer.name}</div>
+                        <div className="text-xs text-muted-foreground">{booking.customer.phone}</div>
+                        <div className="text-xs text-muted-foreground">{booking.customer.email}</div>
                       </div>
                     </td>
                     <td className="px-6 py-4">
                       <div>
-                        <div className="text-sm font-medium text-gray-900">{booking.service}</div>
-                        <div className="text-xs text-gray-500">{booking.items}</div>
+                        <div className="text-sm font-medium text-foreground">{booking.service}</div>
+                        <div className="text-xs text-muted-foreground">{booking.items}</div>
                       </div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="text-sm">
-                        <div className="flex items-center gap-1 text-gray-900">
+                        <div className="flex items-center gap-1 text-foreground">
                           <Calendar className="w-3 h-3" />
                           {booking.pickup.date}
                         </div>
-                        <div className="flex items-center gap-1 text-gray-500">
+                        <div className="flex items-center gap-1 text-muted-foreground">
                           <Clock className="w-3 h-3" />
                           {booking.pickup.time}
                         </div>
-                        <div className="flex items-center gap-1 text-gray-500 text-xs mt-1">
+                        <div className="flex items-center gap-1 text-muted-foreground text-xs mt-1">
                           <MapPin className="w-3 h-3" />
                           {booking.pickup.address}
                         </div>
@@ -358,7 +358,7 @@ export default function BookingsPage() {
                       {getStatusBadge(booking.status)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-semibold text-gray-900">{booking.amount}</div>
+                      <div className="text-sm font-semibold text-foreground">{booking.amount}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-2">
@@ -368,7 +368,7 @@ export default function BookingsPage() {
                         <Button variant="ghost" size="icon" className="h-8 w-8">
                           <Edit className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-red-600 hover:text-red-700">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive/90">
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
@@ -381,12 +381,12 @@ export default function BookingsPage() {
 
           {/* Pagination */}
           <div className="px-6 py-4 border-t flex items-center justify-between">
-            <div className="text-sm text-gray-500">
+            <div className="text-sm text-muted-foreground">
               Showing 1 to 6 of 156 results
             </div>
             <div className="flex gap-2">
               <Button variant="outline" size="sm" disabled>Previous</Button>
-              <Button variant="outline" size="sm" className="bg-blue-600 text-white hover:bg-blue-700">1</Button>
+              <Button variant="outline" size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">1</Button>
               <Button variant="outline" size="sm">2</Button>
               <Button variant="outline" size="sm">3</Button>
               <Button variant="outline" size="sm">Next</Button>
