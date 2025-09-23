@@ -5,6 +5,8 @@ import { Mail, Phone, MapPin, Clock, Send, MessageSquare, CheckCircle } from 'lu
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import PageHeader from '@/myComponents/PageHeader/PageHeader'
+import ContactSkeleton from '@/components/contact/ContactSkeleton'
+import { useContact } from '@/contexts/contact-context'
 import {
   Accordion,
   AccordionContent,
@@ -25,6 +27,7 @@ export default function ContactPage() {
   const [showSuccess, setShowSuccess] = useState(false)
   const [showError, setShowError] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
+  const { contactInfo, loading: isLoadingContact } = useContact()
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
@@ -34,76 +37,7 @@ export default function ContactPage() {
     }))
   }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-
-    try {
-      const response = await fetch('/api/send-email', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      })
-
-      if (response.ok) {
-        setShowSuccess(true)
-        setFormData({ name: '', email: '', phone: '', subject: '', message: '' })
-
-        // Hide success message after 5 seconds
-        setTimeout(() => setShowSuccess(false), 5000)
-      } else {
-        // Handle error
-        const error = await response.json()
-        console.error('Error sending email:', error)
-        setErrorMessage('Failed to send message. Please try again or contact us directly.')
-        setShowError(true)
-        setTimeout(() => setShowError(false), 5000)
-      }
-    } catch (error) {
-      console.error('Error:', error)
-      setErrorMessage('Failed to send message. Please check your connection and try again.')
-      setShowError(true)
-      setTimeout(() => setShowError(false), 5000)
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
-
-  const contactInfo = [
-    {
-      icon: Mail,
-      title: "Email Us",
-      details: "info@marhabamovers.ae",
-      description: "24/7 Support Available",
-      link: "mailto:info@marhabamovers.ae",
-      color: "blue"
-    },
-    {
-      icon: Phone,
-      title: "Call Us",
-      details: "+971 568 011 076",
-      description: "Mon-Sat 8:00 AM - 7:00 PM",
-      link: "tel:+971568011076",
-      color: "orange"
-    },
-    {
-      icon: MapPin,
-      title: "Visit Us",
-      details: "Dubai, UAE",
-      description: "Main Office Location",
-      color: "blue"
-    },
-    {
-      icon: Clock,
-      title: "Working Hours",
-      details: "Monday - Saturday",
-      description: "8:00 AM - 7:00 PM GST",
-      color: "orange"
-    }
-  ]
-
+  // Default FAQs (you can move this to API later)
   const faqs = [
     {
       question: "How quickly can I get a quote?",
@@ -122,6 +56,150 @@ export default function ContactPage() {
       answer: "Once you submit your inquiry, you'll receive a confirmation email with a reference number to track your request."
     }
   ]
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setIsSubmitting(true)
+
+    try {
+      const response = await fetch('/api/send-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      })
+
+      if (response.ok) {
+        setShowSuccess(true)
+        setFormData({ name: '', email: '', phone: '', subject: '', message: '' })
+        setTimeout(() => setShowSuccess(false), 5000)
+      } else {
+        const error = await response.json()
+        console.error('Error sending email:', error)
+        setErrorMessage('Failed to send message. Please try again or contact us directly.')
+        setShowError(true)
+        setTimeout(() => setShowError(false), 5000)
+      }
+    } catch (error) {
+      console.error('Error:', error)
+      setErrorMessage('Failed to send message. Please check your connection and try again.')
+      setShowError(true)
+      setTimeout(() => setShowError(false), 5000)
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  // Prepare contact cards data from API response
+  const getContactCards = () => {
+    if (!contactInfo) {
+      // Return default values if no data from API
+      return [
+        {
+          icon: Mail,
+          title: "Email Us",
+          details: "info@marhabamovers.ae",
+          description: "24/7 Support Available",
+          link: "mailto:info@marhabamovers.ae",
+          color: "blue"
+        },
+        {
+          icon: Phone,
+          title: "Call Us",
+          details: "+971 568 011 076",
+          description: "Mon-Sat 8:00 AM - 7:00 PM",
+          link: "tel:+971568011076",
+          color: "orange"
+        },
+        {
+          icon: MapPin,
+          title: "Visit Us",
+          details: "Dubai, UAE",
+          description: "Main Office Location",
+          color: "blue"
+        },
+        {
+          icon: Clock,
+          title: "Working Hours",
+          details: "Monday - Saturday",
+          description: "8:00 AM - 7:00 PM GST",
+          color: "orange"
+        }
+      ]
+    }
+
+    // Use data from API
+    const cards = []
+
+    if (contactInfo.email) {
+      cards.push({
+        icon: Mail,
+        title: "Email Us",
+        details: contactInfo.email,
+        description: "24/7 Support Available",
+        link: `mailto:${contactInfo.email}`,
+        color: "blue"
+      })
+    }
+
+    if (contactInfo.phone) {
+      cards.push({
+        icon: Phone,
+        title: "Call Us",
+        details: contactInfo.phone,
+        description: contactInfo.workingHours?.monday || "Mon-Sat 8:00 AM - 7:00 PM",
+        link: `tel:${contactInfo.phone.replace(/[^0-9+]/g, '')}`,
+        color: "orange"
+      })
+    }
+
+    if (contactInfo.address || contactInfo.city || contactInfo.emirate) {
+      const locationParts = [contactInfo.address, contactInfo.city, contactInfo.emirate].filter(Boolean)
+      cards.push({
+        icon: MapPin,
+        title: "Visit Us",
+        details: locationParts.join(', ') || "Dubai, UAE",
+        description: "Main Office Location",
+        color: "blue",
+        link: contactInfo.googleMapsUrl
+      })
+    }
+
+    if (contactInfo.workingHours) {
+      const workingDays = Object.entries(contactInfo.workingHours)
+        .filter(([day, hours]) => hours && hours !== 'Closed')
+        .map(([day]) => day.charAt(0).toUpperCase() + day.slice(1))
+
+      const firstDay = workingDays[0] || 'Monday'
+      const lastDay = workingDays[workingDays.length - 1] || 'Saturday'
+
+      cards.push({
+        icon: Clock,
+        title: "Working Hours",
+        details: `${firstDay} - ${lastDay}`,
+        description: contactInfo.workingHours.monday || "8:00 AM - 7:00 PM GST",
+        color: "orange"
+      })
+    }
+
+    return cards
+  }
+
+  // Show skeleton while loading
+  if (isLoadingContact) {
+    return (
+      <>
+        <PageHeader
+          title="Get In Touch"
+          subtitle="We're here to help with all your furniture moving needs. Reach out to us today!"
+          backgroundImage="/images/IMG-20250910-WA0018.jpg"
+          breadcrumbs={[{ label: 'Contact', href: null }]}
+        />
+        <ContactSkeleton />
+      </>
+    )
+  }
 
   return (
     <>
@@ -148,7 +226,7 @@ export default function ContactPage() {
 
           {/* Contact Cards */}
           <div className=" relative grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-16">
-            {contactInfo.map((item, index) => {
+            {getContactCards().map((item, index) => {
               const IconComponent = item.icon;
               return (
                 <div
@@ -216,7 +294,7 @@ export default function ContactPage() {
                   </svg>
                   <div>
                     <span className="text-red-700 block">{errorMessage}</span>
-                    <span className="text-red-600 text-sm">You can also call us at +971 568 011 076</span>
+                    <span className="text-red-600 text-sm">You can also call us at {contactInfo?.phone || '+971 568 011 076'}</span>
                   </div>
                 </div>
               )}
@@ -346,7 +424,7 @@ export default function ContactPage() {
               </div>
               <div className="h-[400px]">
                 <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d462560.3011806427!2d54.947287526927106!3d25.076280448850334!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e5f43496ad9c645%3A0xbde66e5084295162!2sDubai%20-%20United%20Arab%20Emirates!5e0!3m2!1sen!2sus!4v1651234567890!5m2!1sen!2sus"
+                  src={contactInfo?.googleMapsUrl || "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d462560.3011806427!2d54.947287526927106!3d25.076280448850334!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e5f43496ad9c645%3A0xbde66e5084295162!2sDubai%20-%20United%20Arab%20Emirates!5e0!3m2!1sen!2sus!4v1651234567890!5m2!1sen!2sus"}
                   width="100%"
                   height="100%"
                   style={{ border: 0 }}

@@ -80,15 +80,31 @@ export default function WelcomeSectionPage() {
     try {
       setLoading(true)
       const response = await fetch('/api/welcome-section')
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
       const data = await response.json()
+      console.log('Welcome section API response:', data)
 
       if (data.success) {
         // Handle both single object and array
-        const sectionData = Array.isArray(data.data) ? data.data : [data.data]
-        setSections(sectionData.filter(Boolean)) // Filter out null values
+        if (data.data) {
+          const sectionData = Array.isArray(data.data) ? data.data : [data.data]
+          setSections(sectionData.filter(Boolean)) // Filter out null values
+        } else {
+          // No sections found
+          setSections([])
+          console.log('No welcome sections found in database')
+        }
+      } else {
+        console.error('API returned success: false', data.message)
+        alert(`Error: ${data.message || 'Failed to fetch welcome sections'}`)
       }
     } catch (error) {
       console.error('Error fetching sections:', error)
+      alert(`Failed to fetch welcome sections: ${error.message}`)
     } finally {
       setLoading(false)
     }

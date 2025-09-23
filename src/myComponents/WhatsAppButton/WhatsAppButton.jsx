@@ -2,13 +2,17 @@
 
 import React, { useState, useEffect } from 'react';
 import { MessageCircle, X } from 'lucide-react';
+import { useContact } from '@/contexts/contact-context';
 
 const WhatsAppButton = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
+  const { contactInfo } = useContact();
 
-  // WhatsApp number for Marhaba Movers
-  const phoneNumber = "971568011076"; // UAE number without +
+  // Get WhatsApp number from context or use default
+  const phoneNumber = contactInfo?.whatsapp?.replace(/[^0-9]/g, '') ||
+                     contactInfo?.phone?.replace(/[^0-9]/g, '') ||
+                     "971568011076"; // Default UAE number without +
   const message = "Hello! I need help with furniture moving services.";
 
   // Show button after scrolling down a bit

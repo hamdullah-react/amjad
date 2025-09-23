@@ -5,7 +5,10 @@ import Image from 'next/image'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Navigation, Pagination, Autoplay, EffectFade } from 'swiper/modules'
 import { Button } from '@/components/ui/button'
+import { useHeroSlider } from '@/contexts/hero-slider-context'
+import HeaderSkeleton from '@/components/layout/HeaderSkeleton'
 import { ArrowRight, Truck, Package, Shield, Clock, Users } from 'lucide-react'
+import Link from 'next/link'
 
 // Import Swiper styles
 import 'swiper/css'
@@ -13,50 +16,27 @@ import 'swiper/css/navigation'
 import 'swiper/css/pagination'
 import 'swiper/css/effect-fade'
 
-const slides = [
-  {
-    id: 1,
-    title: "Professional Moving Services",
-    subtitle: "Your Trusted Moving Partner",
-    description: "Experience seamless relocation with our expert team. We handle your belongings with utmost care and ensure safe delivery to your new destination.",
-    image: "/carousel/1.jpg",
-    icon: Truck
-  },
-  {
-    id: 2,
-    title: "Secure Packing Solutions",
-    subtitle: "Premium Packing Materials",
-    description: "Our specialized packing services use high-quality materials to protect your valuables during transit. Every item is carefully wrapped and secured.",
-    image: "/carousel/2.jpg",
-    icon: Package
-  },
-  {
-    id: 3,
-    title: "Insured & Licensed",
-    subtitle: "Complete Peace of Mind",
-    description: "All our services are fully insured and licensed. Your belongings are protected throughout the entire moving process with comprehensive coverage.",
-    image: "/carousel/3.jpg",
-    icon: Shield
-  },
-  {
-    id: 4,
-    title: "24/7 Support Service",
-    subtitle: "Always Here When You Need Us",
-    description: "Our dedicated customer support team is available round the clock to assist you with any queries or concerns during your moving journey.",
-    image: "/carousel/4.jpg",
-    icon: Clock
-  },
-  {
-    id: 5,
-    title: "Expert Team",
-    subtitle: "Experienced Professionals",
-    description: "Our skilled and experienced team ensures your move is handled with expertise and care. We bring years of experience to make your relocation smooth.",
-    image: "/carousel/5.jpg",
-    icon: Users
-  }
-]
+// Icon mapping for string icon names from API
+const iconMap = {
+  'Truck': Truck,
+  'Package': Package,
+  'Shield': Shield,
+  'Clock': Clock,
+  'Users': Users
+}
 
 export const Header = () => {
+  const { slides, loading } = useHeroSlider()
+
+
+  if (loading) {
+    return <HeaderSkeleton />
+  }
+
+  // If no slides available, return null or a placeholder
+  if (!slides || slides.length === 0) {
+    return <HeaderSkeleton />
+  }
   return (
     <section className="relative w-full h-[90vh] overflow-hidden">
       <Swiper
@@ -84,17 +64,18 @@ export const Header = () => {
         className="h-full w-full"
       >
         {slides.map((slide) => {
-          const IconComponent = slide.icon
+          // Get icon component from map or use default
+          const IconComponent = iconMap[slide.icon] || Truck
           return (
             <SwiperSlide key={slide.id} className="relative">
               {/* Background Image */}
               <div className="absolute inset-0 ">
                 <Image
-                  src={slide.image}
+                  src={slide.imageUrl || slide.image || '/carousel/1.jpg'}
                   alt={slide.title}
                   fill
                   className="object-cover"
-                  priority={slide.id === 1}
+                  priority={slide.order === 1 || slide.id === 1}
                 />
                 <div className="absolute inset-0 bg-gradient-to-r from-[#544a7d]/70 via-[#544a7d]/50 to-[#ff9a44]/30" />
               </div>
@@ -129,20 +110,26 @@ export const Header = () => {
                     
                     {/* CTA Buttons */}
                     <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                      <Button 
-                        size="lg" 
-                        className="bg-gradient-to-r from-[#544a7d] to-[#ff9a44] hover:from-[#483e6a] hover:to-[#f08b35] text-white font-semibold px-8 py-3 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg"
-                      >
-                        Get Free Quote
-                        <ArrowRight className="ml-2 h-5 w-5" />
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="lg"
-                        className="border-2 border-white text-white hover:bg-white hover:text-purple-600 font-semibold px-8 py-3 rounded-full transition-all duration-300 bg-transparent"
-                      >
-                        Learn More
-                      </Button>
+                      {slide.buttonText && (
+                        <Link href={slide.buttonUrl || '/contact'}>
+                          <Button
+                            size="lg"
+                            className="bg-gradient-to-r from-[#544a7d] to-[#ff9a44] hover:from-[#483e6a] hover:to-[#f08b35] text-white font-semibold px-8 py-3 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg"
+                          >
+                            {slide.buttonText}
+                            <ArrowRight className="ml-2 h-5 w-5" />
+                          </Button>
+                        </Link>
+                      )}
+                      <Link href="/about">
+                        <Button
+                          variant="outline"
+                          size="lg"
+                          className="border-2 border-white text-white hover:bg-white hover:text-purple-600 font-semibold px-8 py-3 rounded-full transition-all duration-300 bg-transparent"
+                        >
+                          Learn More
+                        </Button>
+                      </Link>
                     </div>
                   </div>
                 </div>

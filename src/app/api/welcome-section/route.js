@@ -4,6 +4,19 @@ import prisma from '@/lib/prisma';
 // GET welcome section
 export async function GET(request) {
   try {
+    // Check if prisma is properly initialized
+    if (!prisma) {
+      console.error('Prisma client is not initialized');
+      return NextResponse.json(
+        {
+          success: false,
+          message: 'Database connection error',
+          error: 'Prisma client not initialized'
+        },
+        { status: 500 }
+      );
+    }
+
     const { searchParams } = new URL(request.url);
     const isActive = searchParams.get('active');
 
@@ -12,12 +25,16 @@ export async function GET(request) {
       where.isActive = isActive === 'true';
     }
 
+    console.log('Fetching welcome sections with filter:', where);
+
     const welcomeSections = await prisma.welcomeSection.findMany({
       where,
       orderBy: {
         createdAt: 'desc'
       }
     });
+
+    console.log(`Found ${welcomeSections.length} welcome sections`);
 
     // If there's only one active section, return it directly
     if (welcomeSections.length === 1) {
@@ -27,14 +44,34 @@ export async function GET(request) {
       });
     }
 
+    // If no sections found, return null instead of empty array
+    if (welcomeSections.length === 0) {
+      return NextResponse.json({
+        success: true,
+        data: null,
+        message: 'No welcome sections found'
+      });
+    }
+
     return NextResponse.json({
       success: true,
       data: welcomeSections
     });
   } catch (error) {
     console.error('Error fetching welcome section:', error);
+    console.error('Error details:', {
+      message: error.message,
+      code: error.code,
+      meta: error.meta
+    });
+
     return NextResponse.json(
-      { success: false, message: 'Failed to fetch welcome section' },
+      {
+        success: false,
+        message: 'Failed to fetch welcome section',
+        error: error.message,
+        details: process.env.NODE_ENV === 'development' ? error : undefined
+      },
       { status: 500 }
     );
   }

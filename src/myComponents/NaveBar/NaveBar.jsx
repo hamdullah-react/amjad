@@ -3,7 +3,9 @@
 import React, { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Menu, Search, X, MapPin, Phone, Mail, Facebook, Twitter, Youtube, Instagram, Home, Users, Settings, MapIcon, BookOpen, MessageCircle, ChevronDown, Truck, Shield, Clock, Award } from 'lucide-react'
+import NavBarSkeleton from '@/components/layout/NavBarSkeleton'
+import { useContact } from '@/contexts/contact-context'
+import { Menu, Search, X, MapPin, Phone, Mail, Facebook, Twitter, Youtube, Instagram, Home, Users, Settings, MapIcon, BookOpen, MessageCircle, ChevronDown, Truck, Shield, Clock, Award, Linkedin } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -51,7 +53,10 @@ export const NaveBar = () => {
   const [activeDropdown, setActiveDropdown] = useState(null)
   const [mobileDropdowns, setMobileDropdowns] = useState({})
   const [isScrolled, setIsScrolled] = useState(false)
+  const { contactInfo, loading: isLoadingContact } = useContact()
   const navRef = useRef(null)
+
+  // console.log("contactInfo",contactInfo)
 
   // Handle scroll effect
   useEffect(() => {
@@ -88,6 +93,10 @@ export const NaveBar = () => {
     }))
   }
 
+  if (isLoadingContact) {
+    return <NavBarSkeleton />
+  }
+
   return (
     <>
       {/* Top Info Bar */}
@@ -96,36 +105,53 @@ export const NaveBar = () => {
           <div className="flex justify-between items-center py-2 text-xs">
             {/* Left - Contact Info */}
             <div className="flex items-center space-x-4">
-              <a href="tel:+971568011076" className="flex items-center space-x-1 hover:text-blue-100 transition-colors">
-                <Phone className="w-3 h-3" />
-                <span className="hidden sm:inline">+971 568 011 076</span>
-                <span className="sm:hidden">Call</span>
-              </a>
-              <a href="mailto:info@marhabamovers.ae" className="hidden md:flex items-center space-x-1 hover:text-blue-100 transition-colors">
-                <Mail className="w-3 h-3" />
-                <span>info@marhabamovers.ae</span>
-              </a>
+              {contactInfo?.phone && (
+                <a href={`tel:${contactInfo.phone.replace(/[^0-9+]/g, '')}`} className="flex items-center space-x-1 hover:text-blue-100 transition-colors">
+                  <Phone className="w-3 h-3" />
+                  <span className="hidden sm:inline">{contactInfo.phone}</span>
+                  <span className="sm:hidden">Call</span>
+                </a>
+              )}
+              {contactInfo?.email && (
+                <a href={`mailto:${contactInfo.email}`} className="hidden md:flex items-center space-x-1 hover:text-blue-100 transition-colors">
+                  <Mail className="w-3 h-3" />
+                  <span>{contactInfo.email}</span>
+                </a>
+              )}
               <div className="flex items-center space-x-1">
                 <MapPin className="w-3 h-3" />
-                <span>Dubai, UAE</span>
+                <span>{[contactInfo?.city, contactInfo?.emirate].filter(Boolean).join(', ') || 'Dubai, UAE'}</span>
               </div>
             </div>
 
             {/* Right - Social Icons */}
             <div className="flex items-center space-x-2">
               <span className="hidden sm:inline mr-2 text-white/80">Follow us:</span>
-              <a href="#" className="w-7 h-7 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-all">
-                <Facebook className="w-3.5 h-3.5" />
-              </a>
-              <a href="#" className="w-7 h-7 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-all">
-                <Twitter className="w-3.5 h-3.5" />
-              </a>
-              <a href="#" className="w-7 h-7 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-all">
-                <Youtube className="w-3.5 h-3.5" />
-              </a>
-              <a href="#" className="w-7 h-7 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-all">
-                <Instagram className="w-3.5 h-3.5" />
-              </a>
+              {contactInfo?.socialLinks?.facebook && (
+                <a href={contactInfo.socialLinks.facebook} target="_blank" rel="noopener noreferrer" className="w-7 h-7 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-all">
+                  <Facebook className="w-3.5 h-3.5" />
+                </a>
+              )}
+              {contactInfo?.socialLinks?.twitter && (
+                <a href={contactInfo.socialLinks.twitter} target="_blank" rel="noopener noreferrer" className="w-7 h-7 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-all">
+                  <Twitter className="w-3.5 h-3.5" />
+                </a>
+              )}
+              {contactInfo?.socialLinks?.youtube && (
+                <a href={contactInfo.socialLinks.youtube} target="_blank" rel="noopener noreferrer" className="w-7 h-7 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-all">
+                  <Youtube className="w-3.5 h-3.5" />
+                </a>
+              )}
+              {contactInfo?.socialLinks?.instagram && (
+                <a href={contactInfo.socialLinks.instagram} target="_blank" rel="noopener noreferrer" className="w-7 h-7 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-all">
+                  <Instagram className="w-3.5 h-3.5" />
+                </a>
+              )}
+              {contactInfo?.socialLinks?.linkedin && (
+                <a href={contactInfo.socialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="w-7 h-7 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-all">
+                  <Linkedin className="w-3.5 h-3.5" />
+                </a>
+              )}
             </div>
           </div>
         </div>
@@ -139,8 +165,8 @@ export const NaveBar = () => {
             {/* Logo */}
             <Link href="/" className="flex items-center space-x-2 group">
               <Image
-                src="/images/logo.png"
-                alt="Marhaba Furniture Movers"
+                src={contactInfo?.logoUrl|| "/images/logo.png"}
+                alt={contactInfo?.companyName || "Marhaba Furniture Movers"}
                 width={140}
                 height={50}
                 className="object-contain group-hover:scale-105 transition-transform"
@@ -241,11 +267,11 @@ export const NaveBar = () => {
                   <div className="bg-gradient-to-br from-blue-600 to-orange-600 p-6">
                     <SheetTitle>
                       <Image
-                        src="/images/logo.png"
-                        alt="Marhaba Furniture Movers"
+                        src={contactInfo?.logos?.primary || "/images/logo.png"}
+                        alt={contactInfo?.companyName || "Marhaba Furniture Movers"}
                         width={140}
                         height={50}
-                        className="object-contain"
+                        className="object-contain bg-white p-2 rounded"
                       />
                     </SheetTitle>
                   </div>
@@ -323,10 +349,17 @@ export const NaveBar = () => {
                   {/* Mobile Contact Info */}
                   <div className="p-4 bg-gray-50 border-t">
                     <p className="text-xs text-gray-500 mb-2">Need Help?</p>
-                    <a href="tel:+971568011076" className="flex items-center space-x-2 text-blue-600 font-semibold">
-                      <Phone className="w-4 h-4" />
-                      <span>+971 568 011 076</span>
-                    </a>
+                    {contactInfo?.phone ? (
+                      <a href={`tel:${contactInfo.phone.replace(/[^0-9+]/g, '')}`} className="flex items-center space-x-2 text-blue-600 font-semibold">
+                        <Phone className="w-4 h-4" />
+                        <span>{contactInfo.phone}</span>
+                      </a>
+                    ) : (
+                      <a href="tel:+971568011076" className="flex items-center space-x-2 text-blue-600 font-semibold">
+                        <Phone className="w-4 h-4" />
+                        <span>+971 568 011 076</span>
+                      </a>
+                    )}
                   </div>
                 </SheetContent>
               </Sheet>

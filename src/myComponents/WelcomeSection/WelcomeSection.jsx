@@ -1,7 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { CheckCircle, Award, Users } from 'lucide-react';
+import { useWelcome } from '@/contexts/welcome-context';
+import WelcomeSkeleton from '@/components/welcome/WelcomeSkeleton';
 
 const ICON_MAP = {
   CheckCircle: CheckCircle,
@@ -10,73 +12,16 @@ const ICON_MAP = {
 };
 
 const WelcomeSection = () => {
-  const [sectionData, setSectionData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { welcomeData: content, loading } = useWelcome();
 
-  useEffect(() => {
-    const fetchWelcomeData = async () => {
-      try {
-        const response = await fetch('/api/welcome-section?active=true');
-        const data = await response.json();
-
-        if (data.success && data.data) {
-          setSectionData(data.data);
-        }
-      } catch (error) {
-        console.error('Error fetching welcome section:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchWelcomeData();
-  }, []);
-
-  // Default data if no active section from database
-  const defaultData = {
-    title: 'Welcome To',
-    subtitle: 'MARHABA FURNITURE',
-    description: 'Your trusted partner for seamless furniture moving and packing services. We handle your belongings with the utmost care and professionalism.',
-    ceoName: 'Amjadullah',
-    ceoPosition: 'Chief Executive Officer',
-    ceoMessage: 'We are committed to providing exceptional moving services that exceed your expectations. Your satisfaction is our top priority.',
-    buttonText: 'Learn More',
-    buttonUrl: '#',
-    features: [
-      {
-        title: 'Professional Service',
-        description: 'Experienced team with years of expertise in furniture moving and packing.',
-        icon: 'CheckCircle'
-      },
-      {
-        title: 'Quality Guarantee',
-        description: '100% satisfaction guaranteed with comprehensive insurance coverage.',
-        icon: 'Award'
-      },
-      {
-        title: 'Customer First',
-        description: 'Dedicated customer support and personalized service for every client.',
-        icon: 'Users'
-      }
-    ],
-    stats: [
-      { label: 'Happy Customers', value: '500+' },
-      { label: 'Years Experience', value: '10+' }
-    ]
-  };
-
-  const content = sectionData || defaultData;
-
+  // Show skeleton while loading
   if (loading) {
-    return (
-      <section className="py-20 bg-gradient-to-br from-blue-50 to-orange-50">
-        <div className="container mx-auto px-4">
-          <div className="flex justify-center items-center min-h-[400px]">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-          </div>
-        </div>
-      </section>
-    );
+    return <WelcomeSkeleton />;
+  }
+
+  // If no data from API, don't render the section
+  if (!content) {
+    return null;
   }
 
   return (
