@@ -582,3 +582,11 @@ model GlobalSeoSettings {
 
   @@map("global_seo_settings")
 }
+
+model AboutUs {
+  id        Int      @id @default(autoincrement())
+  data      Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+

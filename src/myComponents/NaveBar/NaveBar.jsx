@@ -56,7 +56,7 @@ export const NaveBar = () => {
   const { contactInfo, loading: isLoadingContact } = useContact()
   const navRef = useRef(null)
 
-  // console.log("contactInfo",contactInfo)
+  console.log("contactInfo",contactInfo)
 
   // Handle scroll effect
   useEffect(() => {

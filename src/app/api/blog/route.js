@@ -30,7 +30,7 @@ export async function GET(request) {
       where.OR = [
         { title: { contains: search, mode: 'insensitive' } },
         { excerpt: { contains: search, mode: 'insensitive' } },
-        { content: { contains: search, mode: 'insensitive' } },
+        // { content: { contains: search, mode: 'insensitive' } }, // Commenting out as content is JSON
         { tags: { has: search } }
       ];
     }
@@ -130,7 +130,7 @@ export async function POST(request) {
         title,
         slug: finalSlug,
         excerpt,
-        content: content || { blocks: [] }, // Default empty content structure
+        content: content || '', // Accept HTML string or JSON structure
         author,
         category,
         tags: tags || [],

@@ -201,6 +201,10 @@ const data = {
           url: "/dashboard/website/welcome-section",
         },
         {
+          title: "About Us Section",
+          url: "/dashboard/website/about",
+        },
+        {
           title: "Services Content",
           url: "/dashboard/website/services",
         },

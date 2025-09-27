@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import '@/styles/tiptap.css';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ContentBlockEditor } from '@/components/ui/content-block-editor';
+import { TipTapEditor } from '@/components/ui/tiptap-editor';
 import { ImagePicker } from '@/components/ui/image-picker';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -56,7 +57,7 @@ export default function BlogPage() {
     title: '',
     slug: '',
     excerpt: '',
-    content: { blocks: [] }, // JSON structure for content blocks
+    content: '', // HTML content from TipTap editor
     author: '',
     category: '',
     tags: [],
@@ -131,7 +132,7 @@ export default function BlogPage() {
       title: '',
       slug: '',
       excerpt: '',
-      content: { blocks: [] },
+      content: '', // HTML content from TipTap editor
       author: '',
       category: '',
       tags: [],
@@ -169,7 +170,7 @@ export default function BlogPage() {
         title: post.title || '',
         slug: post.slug || '',
         excerpt: post.excerpt || '',
-        content: post.content || { blocks: [] },
+        content: post.content || '',
         author: post.author || '',
         category: post.category || '',
         tags: post.tags || [],
@@ -351,16 +352,27 @@ export default function BlogPage() {
   };
 
   const getContentPreview = (content) => {
-    if (!content || !content.blocks) return '';
+    if (!content) return '';
 
-    // Extract text from first few blocks
-    const textBlocks = content.blocks
-      .filter(block => ['paragraph', 'heading', 'quote'].includes(block.type))
-      .slice(0, 2)
-      .map(block => block.content || '')
-      .join(' ');
+    // If content is HTML, strip HTML tags and get plain text
+    if (typeof content === 'string') {
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = content;
+      const textContent = tempDiv.textContent || tempDiv.innerText || '';
+      return textContent.slice(0, 150) + (textContent.length > 150 ? '...' : '');
+    }
 
-    return textBlocks.slice(0, 150) + (textBlocks.length > 150 ? '...' : '');
+    // Legacy support for block-based content
+    if (content.blocks) {
+      const textBlocks = content.blocks
+        .filter(block => ['paragraph', 'heading', 'quote'].includes(block.type))
+        .slice(0, 2)
+        .map(block => block.content || '')
+        .join(' ');
+      return textBlocks.slice(0, 150) + (textBlocks.length > 150 ? '...' : '');
+    }
+
+    return '';
   };
 
 
@@ -782,18 +794,19 @@ export default function BlogPage() {
 
       {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-2 sm:p-4">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-5xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between p-4 sm:p-6 border-b sticky top-0 bg-white z-10">
-              <h2 className="text-lg sm:text-xl font-semibold">
-                {editingPost ? 'Edit Post' : 'Create New Post'}
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50">
+          <div className="bg-white w-full h-full overflow-hidden flex flex-col">
+            <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b bg-gradient-to-r from-blue-50 to-indigo-50 sticky top-0 z-20 flex-shrink-0">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
+                {editingPost ? 'Edit Blog Post' : 'Create New Blog Post'}
               </h2>
-              <Button variant="ghost" size="sm" onClick={closeModal}>
-                <X className="h-4 w-4" />
+              <Button variant="ghost" size="sm" onClick={closeModal} className="hover:bg-gray-100 rounded-lg">
+                <X className="h-5 w-5" />
               </Button>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-4 sm:p-6">
+            <div className="flex-1 overflow-y-auto">
+              <form onSubmit={handleSubmit} className="max-w-7xl mx-auto p-4 sm:p-6">
               <Tabs defaultValue="content" className="w-full">
                 <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4">
                   <TabsTrigger value="content" className="text-xs sm:text-sm">Content</TabsTrigger>
@@ -884,9 +897,10 @@ export default function BlogPage() {
 
                   <div className="space-y-2">
                     <Label>Content *</Label>
-                    <ContentBlockEditor
+                    <TipTapEditor
                       value={formData.content}
                       onChange={(content) => setFormData({ ...formData, content })}
+                      placeholder="Start writing your blog post..."
                     />
                   </div>
                 </TabsContent>
@@ -1325,36 +1339,71 @@ export default function BlogPage() {
                       <div className="p-3 bg-gray-50 rounded">
                         <p className="text-xs text-gray-500">Word Count</p>
                         <p className="text-lg font-medium">
-                          {formData.content?.blocks?.reduce((count, block) => {
-                            if (block.content && typeof block.content === 'string') {
-                              return count + block.content.split(/\s+/).length;
+                          {(() => {
+                            if (typeof formData.content === 'string') {
+                              const tempDiv = document.createElement('div');
+                              tempDiv.innerHTML = formData.content;
+                              const text = tempDiv.textContent || tempDiv.innerText || '';
+                              return text.trim().split(/\s+/).filter(word => word.length > 0).length;
                             }
-                            return count;
-                          }, 0) || 0}
+                            // Legacy support for block-based content
+                            if (formData.content?.blocks) {
+                              return formData.content.blocks.reduce((count, block) => {
+                                if (block.content && typeof block.content === 'string') {
+                                  return count + block.content.split(/\s+/).length;
+                                }
+                                return count;
+                              }, 0);
+                            }
+                            return 0;
+                          })()}
                         </p>
                       </div>
 
                       <div className="p-3 bg-gray-50 rounded">
                         <p className="text-xs text-gray-500">Character Count</p>
                         <p className="text-lg font-medium">
-                          {formData.content?.blocks?.reduce((count, block) => {
-                            if (block.content && typeof block.content === 'string') {
-                              return count + block.content.length;
+                          {(() => {
+                            if (typeof formData.content === 'string') {
+                              const tempDiv = document.createElement('div');
+                              tempDiv.innerHTML = formData.content;
+                              const text = tempDiv.textContent || tempDiv.innerText || '';
+                              return text.length;
                             }
-                            return count;
-                          }, 0) || 0}
+                            // Legacy support for block-based content
+                            if (formData.content?.blocks) {
+                              return formData.content.blocks.reduce((count, block) => {
+                                if (block.content && typeof block.content === 'string') {
+                                  return count + block.content.length;
+                                }
+                                return count;
+                              }, 0);
+                            }
+                            return 0;
+                          })()}
                         </p>
                       </div>
 
                       <div className="p-3 bg-gray-50 rounded">
                         <p className="text-xs text-gray-500">Estimated Read Time</p>
                         <p className="text-lg font-medium">
-                          {Math.max(1, Math.ceil((formData.content?.blocks?.reduce((count, block) => {
-                            if (block.content && typeof block.content === 'string') {
-                              return count + block.content.split(/\s+/).length;
+                          {Math.max(1, Math.ceil((() => {
+                            let wordCount = 0;
+                            if (typeof formData.content === 'string') {
+                              const tempDiv = document.createElement('div');
+                              tempDiv.innerHTML = formData.content;
+                              const text = tempDiv.textContent || tempDiv.innerText || '';
+                              wordCount = text.trim().split(/\s+/).filter(word => word.length > 0).length;
+                            } else if (formData.content?.blocks) {
+                              wordCount = formData.content.blocks.reduce((count, block) => {
+                                if (block.content && typeof block.content === 'string') {
+                                  return count + block.content.split(/\s+/).length;
+                                }
+                                return count;
+                              }, 0);
                             }
-                            return count;
-                          }, 0) || 0) / 200))} min
+                            return wordCount;
+                          })() / 200))} min
                         </p>
                       </div>
                     </div>
@@ -1376,17 +1425,18 @@ export default function BlogPage() {
                 </Button>
               </div>
             </form>
+            </div>
           </div>
         </div>
       )}
 
-      {/* Detail Modal */}
+      {/* Detail Modal - Full Width */}
       {showDetailModal && selectedPost && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-2 sm:p-4">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-6xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
-            {/* Modal Header */}
-            <div className="sticky top-0 bg-white border-b z-10">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-6 gap-3">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50">
+          <div className="bg-white w-full h-full overflow-hidden flex flex-col">
+            {/* Sticky Modal Header */}
+            <div className="sticky top-0 bg-white border-b shadow-sm z-20 flex-shrink-0">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between px-4 sm:px-6 py-3 sm:py-4 gap-2 bg-gradient-to-r from-blue-50 to-indigo-50">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
                   <h2 className="text-xl sm:text-2xl font-bold">{selectedPost.title}</h2>
                   <Badge className={getStatusColor(selectedPost.status)}>
@@ -1418,9 +1468,10 @@ export default function BlogPage() {
               </div>
             </div>
 
-            {/* Modal Content */}
-            <div className="p-4 sm:p-6">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Scrollable Modal Content */}
+            <div className="flex-1 overflow-y-auto">
+              <div className="p-4 sm:p-6 max-w-7xl mx-auto">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Main Content Area */}
                 <div className="col-span-2 space-y-6">
                   {/* Featured Image */}
@@ -1443,58 +1494,86 @@ export default function BlogPage() {
                   )}
 
                   {/* Content */}
-                  <div className="prose max-w-none">
+                  <div className="w-full">
                     <h3 className="text-lg font-semibold mb-4">Content</h3>
-                    {selectedPost.content && selectedPost.content.blocks ? (
-                      <div className="space-y-4">
-                        {selectedPost.content.blocks.map((block, index) => {
-                          switch (block.type) {
-                            case 'heading':
-                              return (
-                                <h3 key={index} className="text-xl font-semibold">
-                                  {block.content}
-                                </h3>
-                              );
-                            case 'paragraph':
-                              return (
-                                <p key={index} className="text-gray-700 leading-relaxed">
-                                  {block.content}
-                                </p>
-                              );
-                            case 'list':
-                              return (
-                                <ul key={index} className="list-disc pl-5 space-y-1">
-                                  {block.items?.map((item, i) => (
-                                    <li key={i} className="text-gray-700">{item}</li>
-                                  ))}
-                                </ul>
-                              );
-                            case 'quote':
-                              return (
-                                <blockquote key={index} className="border-l-4 border-gray-300 pl-4 italic text-gray-600">
-                                  {block.content}
-                                </blockquote>
-                              );
-                            case 'code':
-                              return (
-                                <pre key={index} className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto">
-                                  <code>{block.content}</code>
-                                </pre>
-                              );
-                            case 'image':
-                              return (
-                                <img
-                                  key={index}
-                                  src={block.url}
-                                  alt={block.caption || ''}
-                                  className="w-full rounded-lg"
-                                />
-                              );
-                            default:
-                              return null;
-                          }
-                        })}
-                      </div>
+                    {selectedPost.content ? (
+                      typeof selectedPost.content === 'string' ? (
+                        <div
+                          className="modal-content-display prose prose-lg max-w-none
+                            prose-headings:font-bold prose-headings:text-gray-900
+                            prose-h1:text-4xl prose-h1:mt-6 prose-h1:mb-4
+                            prose-h2:text-3xl prose-h2:mt-5 prose-h2:mb-3
+                            prose-h3:text-2xl prose-h3:mt-4 prose-h3:mb-2
+                            prose-p:text-base prose-p:text-gray-700 prose-p:my-3
+                            prose-ul:list-disc prose-ul:pl-6 prose-ul:my-3
+                            prose-ol:list-decimal prose-ol:pl-6 prose-ol:my-3
+                            prose-li:my-1 prose-li:text-gray-700
+                            prose-strong:font-bold prose-strong:text-gray-900
+                            prose-a:text-blue-600 prose-a:underline hover:prose-a:text-blue-800
+                            prose-blockquote:border-l-4 prose-blockquote:border-gray-300
+                            prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-gray-600
+                            prose-code:bg-gray-100 prose-code:text-gray-800 prose-code:px-1
+                            prose-code:py-0.5 prose-code:rounded prose-code:text-sm
+                            prose-pre:bg-gray-900 prose-pre:text-gray-100 prose-pre:p-4
+                            prose-pre:rounded-lg prose-pre:overflow-x-auto
+                            prose-img:rounded-lg prose-img:max-w-full prose-img:h-auto
+                            prose-hr:border-gray-300 prose-hr:my-8"
+                          dangerouslySetInnerHTML={{ __html: selectedPost.content }}
+                        />
+                      ) : selectedPost.content.blocks ? (
+                        // Legacy support for block-based content
+                        <div className="space-y-4">
+                          {selectedPost.content.blocks.map((block, index) => {
+                            switch (block.type) {
+                              case 'heading':
+                                return (
+                                  <h3 key={index} className="text-xl font-semibold">
+                                    {block.content}
+                                  </h3>
+                                );
+                              case 'paragraph':
+                                return (
+                                  <p key={index} className="text-gray-700 leading-relaxed">
+                                    {block.content}
+                                  </p>
+                                );
+                              case 'list':
+                                return (
+                                  <ul key={index} className="list-disc pl-5 space-y-1">
+                                    {block.items?.map((item, i) => (
+                                      <li key={i} className="text-gray-700">{item}</li>
+                                    ))}
+                                  </ul>
+                                );
+                              case 'quote':
+                                return (
+                                  <blockquote key={index} className="border-l-4 border-gray-300 pl-4 italic text-gray-600">
+                                    {block.content}
+                                  </blockquote>
+                                );
+                              case 'code':
+                                return (
+                                  <pre key={index} className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto">
+                                    <code>{block.content}</code>
+                                  </pre>
+                                );
+                              case 'image':
+                                return (
+                                  <img
+                                    key={index}
+                                    src={block.url}
+                                    alt={block.caption || ''}
+                                    className="w-full rounded-lg"
+                                  />
+                                );
+                              default:
+                                return null;
+                            }
+                          })}
+                        </div>
+                      ) : (
+                        <p className="text-gray-500 italic">No content available</p>
+                      )
                     ) : (
                       <p className="text-gray-500 italic">No content available</p>
                     )}
@@ -1673,6 +1752,7 @@ export default function BlogPage() {
               </div>
             </div>
           </div>
+        </div>
         </div>
       )}
 
