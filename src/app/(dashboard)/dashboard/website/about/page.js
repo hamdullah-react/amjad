@@ -231,6 +231,34 @@ export default function AboutPage() {
     })
   }
 
+  // Add vision point
+  const addVisionPoint = () => {
+    setFormData({
+      ...formData,
+      vision: {
+        ...formData.vision,
+        points: [...formData.vision.points, ""]
+      }
+    })
+  }
+
+  const updateVisionPoint = (idx, value) => {
+    const updated = [...formData.vision.points]
+    updated[idx] = value
+    setFormData({
+      ...formData,
+      vision: { ...formData.vision, points: updated }
+    })
+  }
+
+  const deleteVisionPoint = (idx) => {
+    const updated = formData.vision.points.filter((_, i) => i !== idx)
+    setFormData({
+      ...formData,
+      vision: { ...formData.vision, points: updated }
+    })
+  }
+
   // Stats display component - FIXED: Add null check
   const StatsDisplay = () => {
     if (!about || !about.data) return null
@@ -685,6 +713,28 @@ export default function AboutPage() {
                   }
                   placeholder="Your vision statement..."
                 />
+                <div className="mt-2">
+                  <Label>Vision Points</Label>
+                  {formData.vision.points?.map((point, idx) => (
+                    <div key={idx} className="flex gap-2 mt-2">
+                      <Input
+                        value={point}
+                        onChange={(e) => updateVisionPoint(idx, e.target.value)}
+                        placeholder="Vision point..."
+                      />
+                      <Button
+                        variant="destructive"
+                        size="icon"
+                        onClick={() => deleteVisionPoint(idx)}
+                      >
+                        <Trash className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  ))}
+                  <Button variant="outline" size="sm" onClick={addVisionPoint} className="mt-2">
+                    <Plus className="w-4 h-4 mr-2" /> Add Point
+                  </Button>
+                </div>
               </div>
 
               {/* Core Values */}

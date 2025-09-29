@@ -83,7 +83,7 @@ const WelcomeSection = () => {
                   Why Choose Marhaba?
                 </h3>
 
-                <div className="space-y-6">
+                <div className="space-y-6 h-[42vh] overflow-y-auto">
                   {content.features.map((feature, index) => {
                     const IconComponent = ICON_MAP[feature.icon] || CheckCircle;
                     const iconColor = index % 2 === 0 ? 'blue' : 'orange';
