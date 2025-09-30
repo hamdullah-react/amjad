@@ -55,6 +55,7 @@ model HeroSlider {
 
 model Service {
   id          String    @id @default(cuid())
+    slug          String    @unique
   title       String
   description String
   shortDesc   String?
@@ -75,6 +76,7 @@ model Service {
 
 model ServiceArea {
   id            String    @id @default(cuid())
+    slug          String    @unique
   city          String
   emirate       String
   area          String?
@@ -210,6 +212,7 @@ model Gallery {
 
 model WhyChooseUs {
   id          String   @id @default(cuid())
+    slug          String    @unique
   title       String
   description String
   icon        String

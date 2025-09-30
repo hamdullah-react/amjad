@@ -25,8 +25,19 @@ import {
   Star,
   Filter,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Link
 } from 'lucide-react';
+
+// Helper function to generate slug from title
+const generateSlug = (text) => {
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '') // Remove special characters
+    .replace(/[\s_-]+/g, '-') // Replace spaces and underscores with hyphens
+    .replace(/^-+|-+$/g, ''); // Remove leading/trailing hyphens
+}
 
 export default function ServiceAreasPage() {
   const [serviceAreas, setServiceAreas] = useState([]);
@@ -49,11 +60,13 @@ export default function ServiceAreasPage() {
   const [expandedRow, setExpandedRow] = useState(null);
   const [newCoverage, setNewCoverage] = useState('');
   const [newPostalCode, setNewPostalCode] = useState('');
+  const [isManualSlug, setIsManualSlug] = useState(false);
 
   const [formData, setFormData] = useState({
     city: '',
     emirate: '',
     area: '',
+    slug: '',
     description: '',
     coverage: [],
     postalCodes: [],
@@ -82,10 +95,24 @@ export default function ServiceAreasPage() {
     '1 Week'
   ];
 
+  // Auto-generate slug when city/area changes
+  useEffect(() => {
+    if ((formData.city || formData.area) && !isManualSlug) {
+      const slugText = formData.area ? `${formData.city}-${formData.area}` : formData.city;
+      const generatedSlug = generateSlug(slugText);
+      setFormData(prev => ({ ...prev, slug: generatedSlug }));
+    }
+  }, [formData.city, formData.area, isManualSlug]);
+
+  // Reset manual slug flag when editing area changes
+  useEffect(() => {
+    setIsManualSlug(false);
+  }, [editingArea]);
+
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       fetchServiceAreas(true);
-    }, 300); // Debounce search
+    }, 300);
 
     return () => clearTimeout(timeoutId);
   }, [searchTerm, emirateFilter, statusFilter]);
@@ -121,6 +148,7 @@ export default function ServiceAreasPage() {
       city: '',
       emirate: '',
       area: '',
+      slug: '',
       description: '',
       coverage: [],
       postalCodes: [],
@@ -133,6 +161,7 @@ export default function ServiceAreasPage() {
     setEditingArea(null);
     setNewCoverage('');
     setNewPostalCode('');
+    setIsManualSlug(false);
   };
 
   const openModal = (area = null) => {
@@ -142,6 +171,7 @@ export default function ServiceAreasPage() {
         city: area.city || '',
         emirate: area.emirate || '',
         area: area.area || '',
+        slug: area.slug || '',
         description: area.description || '',
         coverage: area.coverage || [],
         postalCodes: area.postalCodes || [],
@@ -194,6 +224,27 @@ export default function ServiceAreasPage() {
       ...formData,
       postalCodes: formData.postalCodes.filter((_, i) => i !== index)
     });
+  };
+
+  const handleSlugChange = (e) => {
+    const value = e.target.value;
+    setFormData(prev => ({ ...prev, slug: value }));
+    
+    // If user manually edits the slug, mark it as manual
+    const slugText = formData.area ? `${formData.city}-${formData.area}` : formData.city;
+    if (value !== generateSlug(slugText)) {
+      setIsManualSlug(true);
+    }
+  };
+
+  const handleCityChange = (e) => {
+    const value = e.target.value;
+    setFormData(prev => ({ ...prev, city: value }));
+  };
+
+  const handleAreaChange = (e) => {
+    const value = e.target.value;
+    setFormData(prev => ({ ...prev, area: value }));
   };
 
   const handleSubmit = async (e) => {
@@ -250,7 +301,8 @@ export default function ServiceAreasPage() {
       if (searchTerm &&
           !area.city.toLowerCase().includes(searchTerm.toLowerCase()) &&
           !area.emirate.toLowerCase().includes(searchTerm.toLowerCase()) &&
-          !area.area?.toLowerCase().includes(searchTerm.toLowerCase())) {
+          !area.area?.toLowerCase().includes(searchTerm.toLowerCase()) &&
+          !area.slug?.toLowerCase().includes(searchTerm.toLowerCase())) {
         return false;
       }
       return true;
@@ -431,6 +483,7 @@ export default function ServiceAreasPage() {
             <thead className="bg-muted/50 border-b">
               <tr>
                 <th className="text-left p-4 font-medium text-foreground">Location</th>
+                <th className="text-left p-4 font-medium text-foreground">Slug</th>
                 <th className="text-left p-4 font-medium text-foreground">Coverage</th>
                 <th className="text-left p-4 font-medium text-foreground">Delivery</th>
                 <th className="text-left p-4 font-medium text-foreground">Extra Charges</th>
@@ -445,6 +498,9 @@ export default function ServiceAreasPage() {
                     <td className="p-4">
                       <Skeleton className="h-5 w-32 mb-2" />
                       <Skeleton className="h-4 w-24" />
+                    </td>
+                    <td className="p-4">
+                      <Skeleton className="h-4 w-20" />
                     </td>
                     <td className="p-4">
                       <Skeleton className="h-6 w-20" />
@@ -501,6 +557,14 @@ export default function ServiceAreasPage() {
                             )}
                           </button>
                         </div>
+                      </td>
+                      <td className="p-4">
+                        {area.slug && (
+                          <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                            <Link className="h-3 w-3" />
+                            /areas/{area.slug}
+                          </div>
+                        )}
                       </td>
                       <td className="p-4">
                         <div className="flex items-center gap-2">
@@ -561,7 +625,7 @@ export default function ServiceAreasPage() {
                     </tr>
                     {expandedRow === area.id && (
                       <tr className="bg-muted/50">
-                        <td colSpan="6" className="p-4">
+                        <td colSpan="7" className="p-4">
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             {area.description && (
                               <div>
@@ -632,6 +696,12 @@ export default function ServiceAreasPage() {
                       )}
                     </div>
                     <p className="text-xs text-muted-foreground">{area.emirate}</p>
+                    {area.slug && (
+                      <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
+                        <Link className="h-3 w-3" />
+                        /areas/{area.slug}
+                      </div>
+                    )}
                   </div>
                   <Badge
                     variant={area.isActive ? "default" : "secondary"}
@@ -736,7 +806,7 @@ export default function ServiceAreasPage() {
                   <Input
                     id="city"
                     value={formData.city}
-                    onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                    onChange={handleCityChange}
                     placeholder="Enter city name"
                     required
                   />
@@ -748,9 +818,24 @@ export default function ServiceAreasPage() {
                 <Input
                   id="area"
                   value={formData.area}
-                  onChange={(e) => setFormData({ ...formData, area: e.target.value })}
+                  onChange={handleAreaChange}
                   placeholder="Specific area or district (optional)"
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="slug">Slug *</Label>
+                <Input
+                  id="slug"
+                  value={formData.slug}
+                  onChange={handleSlugChange}
+                  placeholder="area-slug"
+                  required
+                />
+                <p className="text-xs text-muted-foreground">
+                  URL-friendly version. Will be used in the area URL: /areas/your-slug
+                  {isManualSlug && <span className="text-amber-600 ml-1">(Manual edit)</span>}
+                </p>
               </div>
 
               <div className="space-y-2">

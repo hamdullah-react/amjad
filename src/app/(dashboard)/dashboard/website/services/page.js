@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import {
   Plus, Edit, Trash2, Eye, EyeOff, Save, X, Package,
-  DollarSign, ArrowUp, ArrowDown
+  DollarSign, ArrowUp, ArrowDown, Link, Calendar, Tag
 } from 'lucide-react'
 import {
   Dialog,
@@ -22,6 +22,7 @@ import { ImagePicker } from "@/components/ui/image-picker"
 
 const INITIAL_FORM_DATA = {
   title: '',
+  slug: '',
   description: '',
   shortDesc: '',
   icon: '',
@@ -32,6 +33,22 @@ const INITIAL_FORM_DATA = {
   isActive: true
 }
 
+// Helper function to generate slug from title
+const generateSlug = (title) => {
+  return title
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/[\s_-]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+// Helper function to truncate text
+const truncateText = (text, maxLength = 50) => {
+  if (!text) return '';
+  return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+}
+
 const StatCard = ({ title, value, className = '' }) => (
   <div className="bg-card rounded-lg shadow p-4">
     <div className="text-sm text-muted-foreground">{title}</div>
@@ -39,9 +56,165 @@ const StatCard = ({ title, value, className = '' }) => (
   </div>
 )
 
-const ServiceRow = ({ service, index, totalServices, onToggleActive, onEdit, onDelete, onOrderChange, processing }) => {
+const ServiceDetailModal = ({ service, isOpen, onClose }) => {
+  if (!service) return null;
+
   return (
-    <tr className="hover:bg-muted/50">
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Package className="w-5 h-5" />
+            {service.title}
+          </DialogTitle>
+          <DialogDescription>
+            Complete service details and information
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-6">
+          {/* Header Section */}
+          <div className="flex flex-col md:flex-row gap-6">
+            {/* Image */}
+            <div className="flex-shrink-0">
+              <div className="w-64 h-48 rounded-lg overflow-hidden bg-muted">
+                {service.imageUrl ? (
+                  <img
+                    src={service.imageUrl}
+                    alt={service.title}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="256" height="192"%3E%3Crect width="256" height="192" fill="%23e5e7eb"/%3E%3Ctext x="50%25" y="50%25" font-size="18" fill="%236b7280" font-family="sans-serif" text-anchor="middle" dominant-baseline="middle"%3ENo Image%3C/text%3E%3C/svg%3E'
+                    }}
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <Package className="w-16 h-16 text-muted-foreground" />
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Basic Info */}
+            <div className="flex-1 space-y-4">
+              <div>
+                <h3 className="text-lg font-semibold text-foreground mb-2">Basic Information</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">Slug</label>
+                    <p className="text-sm text-foreground flex items-center gap-1 mt-1">
+                      <Link className="w-4 h-4" />
+                      /services/{service.slug}
+                    </p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">Display Order</label>
+                    <p className="text-sm text-foreground mt-1">{service.order}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">Status</label>
+                    <div className="mt-1">
+                      {service.isActive ? (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary">
+                          <Eye className="w-3 h-3" />
+                          Active
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-muted text-muted-foreground">
+                          <EyeOff className="w-3 h-3" />
+                          Inactive
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  {service.price && (
+                    <div>
+                      <label className="text-sm font-medium text-muted-foreground">Price</label>
+                      <p className="text-sm text-foreground flex items-center gap-1 mt-1">
+                        <DollarSign className="w-4 h-4" />
+                        {service.price}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {service.shortDesc && (
+                <div>
+                  <label className="text-sm font-medium text-muted-foreground">Short Description</label>
+                  <p className="text-sm text-foreground mt-1">{service.shortDesc}</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Description */}
+          <div>
+            <h3 className="text-lg font-semibold text-foreground mb-3">Description</h3>
+            <div className="bg-muted/30 rounded-lg p-4">
+              <p className="text-sm text-foreground leading-relaxed whitespace-pre-line">
+                {service.description}
+              </p>
+            </div>
+          </div>
+
+          {/* Features */}
+          {service.features && service.features.length > 0 && (
+            <div>
+              <h3 className="text-lg font-semibold text-foreground mb-3">Features</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {service.features.map((feature, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center gap-2 bg-muted/50 px-3 py-2 rounded"
+                  >
+                    <Tag className="w-4 h-4 text-primary" />
+                    <span className="text-sm text-foreground">{feature}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Additional Info */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t">
+            <div className="text-center">
+              <label className="text-sm font-medium text-muted-foreground">Total Features</label>
+              <p className="text-2xl font-bold text-foreground mt-1">
+                {service.features?.length || 0}
+              </p>
+            </div>
+            <div className="text-center">
+              <label className="text-sm font-medium text-muted-foreground">Icon</label>
+              <p className="text-sm text-foreground mt-1">
+                {service.icon || 'No icon'}
+              </p>
+            </div>
+            <div className="text-center">
+              <label className="text-sm font-medium text-muted-foreground">Has Image</label>
+              <p className="text-sm text-foreground mt-1">
+                {service.imageUrl ? 'Yes' : 'No'}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex justify-end gap-3 pt-4">
+          <Button variant="outline" onClick={onClose}>
+            Close
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+const ServiceRow = ({ service, index, totalServices, onToggleActive, onEdit, onDelete, onOrderChange, processing, onView }) => {
+  return (
+    <tr 
+      className="hover:bg-muted/50 cursor-pointer transition-colors"
+      onClick={() => onView(service)}
+    >
       <td className="px-6 py-4 whitespace-nowrap">
         <span className="text-sm text-muted-foreground">{service.order}</span>
       </td>
@@ -66,13 +239,23 @@ const ServiceRow = ({ service, index, totalServices, onToggleActive, onEdit, onD
       <td className="px-6 py-4">
         <div>
           <p className="text-sm font-medium text-foreground">{service.title}</p>
+          {service.slug && (
+            <p className="text-xs text-muted-foreground flex items-center gap-1">
+              <Link className="w-3 h-3" />
+              /services/{service.slug}
+            </p>
+          )}
           {service.shortDesc && (
-            <p className="text-xs text-muted-foreground">{service.shortDesc}</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              {truncateText(service.shortDesc, 60)}
+            </p>
           )}
         </div>
       </td>
       <td className="px-6 py-4">
-        <p className="text-sm text-muted-foreground max-w-xs truncate">{service.description}</p>
+        <p className="text-sm text-muted-foreground max-w-xs">
+          {truncateText(service.description, 80)}
+        </p>
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
         {service.price ? (
@@ -89,7 +272,7 @@ const ServiceRow = ({ service, index, totalServices, onToggleActive, onEdit, onD
           <div className="flex flex-wrap gap-1">
             {service.features.slice(0, 2).map((feature, i) => (
               <span key={i} className="px-2 py-1 bg-muted text-muted-foreground text-xs rounded">
-                {feature.substring(0, 20)}...
+                {truncateText(feature, 15)}
               </span>
             ))}
             {service.features.length > 2 && (
@@ -115,7 +298,7 @@ const ServiceRow = ({ service, index, totalServices, onToggleActive, onEdit, onD
           </span>
         )}
       </td>
-      <td className="px-6 py-4 whitespace-nowrap">
+      <td className="px-6 py-4 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center gap-2">
           <button
             onClick={() => onOrderChange(service, 'up')}
@@ -160,7 +343,20 @@ const ServiceRow = ({ service, index, totalServices, onToggleActive, onEdit, onD
   )
 }
 
-const ServiceForm = ({ formData, setFormData, isImagePickerOpen, setIsImagePickerOpen, newFeature, setNewFeature }) => {
+const ServiceForm = ({ formData, setFormData, isImagePickerOpen, setIsImagePickerOpen, newFeature, setNewFeature, editingService }) => {
+  const [isManualSlug, setIsManualSlug] = useState(false)
+
+  useEffect(() => {
+    if (formData.title && !isManualSlug) {
+      const generatedSlug = generateSlug(formData.title)
+      setFormData(prev => ({ ...prev, slug: generatedSlug }))
+    }
+  }, [formData.title, isManualSlug, setFormData])
+
+  useEffect(() => {
+    setIsManualSlug(false)
+  }, [editingService])
+
   const handleImageSelect = useCallback((imageUrl) => {
     setFormData(prev => ({ ...prev, imageUrl }))
     setIsImagePickerOpen(false)
@@ -183,6 +379,20 @@ const ServiceForm = ({ formData, setFormData, isImagePickerOpen, setIsImagePicke
     }))
   }
 
+  const handleSlugChange = (e) => {
+    const value = e.target.value
+    setFormData(prev => ({ ...prev, slug: value }))
+    
+    if (value !== generateSlug(formData.title)) {
+      setIsManualSlug(true)
+    }
+  }
+
+  const handleTitleChange = (e) => {
+    const value = e.target.value
+    setFormData(prev => ({ ...prev, title: value }))
+  }
+
   return (
     <>
       <div className="space-y-4 py-4">
@@ -192,7 +402,7 @@ const ServiceForm = ({ formData, setFormData, isImagePickerOpen, setIsImagePicke
             <Input
               id="title"
               value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              onChange={handleTitleChange}
               placeholder="Enter service title"
             />
           </div>
@@ -202,10 +412,24 @@ const ServiceForm = ({ formData, setFormData, isImagePickerOpen, setIsImagePicke
               id="order"
               type="number"
               value={formData.order}
-              onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) })}
+              onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
               min="1"
             />
           </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="slug">Slug *</Label>
+          <Input
+            id="slug"
+            value={formData.slug}
+            onChange={handleSlugChange}
+            placeholder="service-slug"
+          />
+          <p className="text-xs text-muted-foreground">
+            URL-friendly version of the title. Will be used in the service URL: /services/your-slug
+            {isManualSlug && <span className="text-amber-600 ml-1">(Manual edit)</span>}
+          </p>
         </div>
 
         <div className="space-y-2">
@@ -349,6 +573,8 @@ export default function ServicesContentPage() {
   const [processing, setProcessing] = useState(false)
   const [processingMessage, setProcessingMessage] = useState('')
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
+  const [selectedService, setSelectedService] = useState(null)
   const [editingService, setEditingService] = useState(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
@@ -356,7 +582,6 @@ export default function ServicesContentPage() {
   const [newFeature, setNewFeature] = useState('')
   const [formData, setFormData] = useState(INITIAL_FORM_DATA)
 
-  // Statistics
   const stats = useMemo(() => ({
     total: services.length,
     active: services.filter(s => s.isActive).length,
@@ -364,7 +589,6 @@ export default function ServicesContentPage() {
     withPrice: services.filter(s => s.price).length
   }), [services])
 
-  // Fetch services from API
   const fetchServices = async () => {
     try {
       setLoading(true)
@@ -384,25 +608,22 @@ export default function ServicesContentPage() {
     }
   }
 
-  // Load services on component mount
   useEffect(() => {
     fetchServices()
   }, [])
 
-  // Filter services based on search term and status
   useEffect(() => {
     let filtered = services
 
-    // Apply search filter
     if (searchTerm) {
       filtered = filtered.filter(service =>
         service.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        service.slug.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (service.description && service.description.toLowerCase().includes(searchTerm.toLowerCase())) ||
         (service.shortDesc && service.shortDesc.toLowerCase().includes(searchTerm.toLowerCase()))
       )
     }
 
-    // Apply status filter
     if (statusFilter !== 'all') {
       filtered = filtered.filter(service =>
         statusFilter === 'active' ? service.isActive : !service.isActive
@@ -411,6 +632,11 @@ export default function ServicesContentPage() {
 
     setFilteredServices(filtered)
   }, [services, searchTerm, statusFilter])
+
+  const handleView = (service) => {
+    setSelectedService(service)
+    setIsDetailModalOpen(true)
+  }
 
   const handleAdd = () => {
     setEditingService(null)
@@ -425,6 +651,7 @@ export default function ServicesContentPage() {
     setEditingService(service)
     setFormData({
       title: service.title,
+      slug: service.slug,
       description: service.description,
       shortDesc: service.shortDesc || '',
       icon: service.icon || '',
@@ -456,6 +683,12 @@ export default function ServicesContentPage() {
         body: JSON.stringify(formData)
       })
 
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error('Server error:', errorText)
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
       const result = await response.json()
 
       if (result.success) {
@@ -464,11 +697,14 @@ export default function ServicesContentPage() {
         setFormData(INITIAL_FORM_DATA)
         setNewFeature('')
         await fetchServices()
+        alert(editingService ? 'Service updated successfully!' : 'Service created successfully!')
       } else {
         console.error('Failed to save service:', result.message)
+        alert(result.message || 'Failed to save service')
       }
     } catch (error) {
       console.error('Error saving service:', error)
+      alert(`Error saving service: ${error.message}. Please check the console for details.`)
     } finally {
       setProcessing(false)
       setProcessingMessage('')
@@ -545,7 +781,6 @@ export default function ServicesContentPage() {
       setProcessing(true)
       setProcessingMessage('Updating order...')
 
-      // Swap orders
       await Promise.all([
         fetch(`/api/services/${service.id}`, {
           method: 'PUT',
@@ -688,6 +923,7 @@ export default function ServicesContentPage() {
                     onEdit={handleEdit}
                     onDelete={handleDelete}
                     onOrderChange={handleOrderChange}
+                    onView={handleView}
                     processing={processing}
                   />
                 ))}
@@ -709,6 +945,13 @@ export default function ServicesContentPage() {
         </div>
       )}
 
+      {/* Service Detail Modal */}
+      <ServiceDetailModal
+        service={selectedService}
+        isOpen={isDetailModalOpen}
+        onClose={() => setIsDetailModalOpen(false)}
+      />
+
       {/* Add/Edit Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="max-w-[90%] max-h-[90vh] overflow-y-auto">
@@ -726,6 +969,7 @@ export default function ServicesContentPage() {
             setIsImagePickerOpen={setIsImagePickerOpen}
             newFeature={newFeature}
             setNewFeature={setNewFeature}
+            editingService={editingService}
           />
 
           <div className="flex justify-end gap-3">
@@ -734,7 +978,7 @@ export default function ServicesContentPage() {
             </Button>
             <Button
               onClick={handleSubmit}
-              disabled={processing || !formData.title || !formData.description}
+              disabled={processing || !formData.title || !formData.description || !formData.slug}
               className="bg-primary hover:bg-primary/90 text-primary-foreground"
             >
               <Save className="w-4 h-4 mr-2" />

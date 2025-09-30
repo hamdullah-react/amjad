@@ -6,7 +6,7 @@ import  OurServices  from '@/myComponents/OurServices/OurServices'
 import WhyChooseUs from '@/myComponents/WhyChooseUs/WhyChooseUs'
 import WelcomeSection from '@/myComponents/WelcomeSection/WelcomeSection'
 import BlogSection from '@/myComponents/BlogSection/BlogSection'
-import { blogPosts } from '@/data/blogData'
+
 
 
 export default function Home() {
@@ -93,7 +93,7 @@ export default function Home() {
       </section>
       
       {/* Blog Section */}
-      <BlogSection posts={blogPosts} />
+      <BlogSection  />
       
       {/* CTA Section */}
       <section className="py-20 bg-gray-50">

@@ -1,11 +1,11 @@
 "use client"
 
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import NavBarSkeleton from '@/components/layout/NavBarSkeleton'
 import { useContact } from '@/contexts/contact-context'
-import { Menu, Search, X, MapPin, Phone, Mail, Facebook, Twitter, Youtube, Instagram, Home, Users, Settings, MapIcon, BookOpen, MessageCircle, ChevronDown, Truck, Shield, Clock, Award, Linkedin } from 'lucide-react'
+import { Menu, Search, X, MapPin, Phone, Mail, Facebook, Twitter, Youtube, Instagram, Home, Users, BookOpen, MessageCircle, Truck, Linkedin } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -19,30 +19,8 @@ import {
 const navigationItems = [
   { name: 'Home', href: '/', icon: Home },
   { name: 'About', href: '/about', icon: Users },
-  {
-    name: 'Services',
-    href: '/services',
-    icon: Truck,
-    hasDropdown: true,
-    dropdownItems: [
-      { name: 'Furniture Moving', href: '/services#furniture', icon: Truck },
-      { name: 'Packing Services', href: '/services#packing', icon: Shield },
-      { name: 'Storage Solutions', href: '/services#storage', icon: Clock },
-      { name: 'Office Relocation', href: '/services#office', icon: Award },
-    ]
-  },
-  {
-    name: 'Service Areas',
-    href: '/services-area',
-    icon: MapIcon,
-    hasDropdown: true,
-    dropdownItems: [
-      { name: 'Dubai', href: '/services-area#dubai', icon: MapPin },
-      { name: 'Abu Dhabi', href: '/services-area#abudhabi', icon: MapPin },
-      { name: 'Sharjah', href: '/services-area#sharjah', icon: MapPin },
-      { name: 'Northern Emirates', href: '/services-area#northern', icon: MapPin },
-    ]
-  },
+  { name: 'Services', href: '/services', icon: Truck },
+  { name: 'Service Areas', href: '/services-area', icon: MapPin },
   { name: 'Blog', href: '/blog', icon: BookOpen },
   { name: 'Contact', href: '/contact', icon: MessageCircle },
 ]
@@ -50,13 +28,8 @@ const navigationItems = [
 export const NaveBar = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const [isOpen, setIsOpen] = useState(false)
-  const [activeDropdown, setActiveDropdown] = useState(null)
-  const [mobileDropdowns, setMobileDropdowns] = useState({})
   const [isScrolled, setIsScrolled] = useState(false)
   const { contactInfo, loading: isLoadingContact } = useContact()
-  const navRef = useRef(null)
-
-  console.log("contactInfo",contactInfo)
 
   // Handle scroll effect
   useEffect(() => {
@@ -67,30 +40,9 @@ export const NaveBar = () => {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (navRef.current && !navRef.current.contains(event.target)) {
-        setActiveDropdown(null)
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [])
-
   const handleSearch = (e) => {
     e.preventDefault()
     console.log('Searching for:', searchQuery)
-  }
-
-  const toggleMobileDropdown = (itemName) => {
-    setMobileDropdowns(prev => ({
-      ...prev,
-      [itemName]: !prev[itemName]
-    }))
   }
 
   if (isLoadingContact) {
@@ -158,7 +110,7 @@ export const NaveBar = () => {
       </div>
 
       {/* Main Navigation */}
-      <nav ref={navRef} className={`sticky top-0 z-50 bg-white transition-all duration-300 ${isScrolled ? 'shadow-lg' : 'shadow-md'}`}>
+      <nav className={`sticky top-0 z-50 bg-white transition-all duration-300 ${isScrolled ? 'shadow-lg' : 'shadow-md'}`}>
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex items-center justify-between h-16">
 
@@ -177,52 +129,6 @@ export const NaveBar = () => {
             <div className="hidden lg:flex items-center space-x-1">
               {navigationItems.map((item) => {
                 const IconComponent = item.icon;
-
-                if (item.hasDropdown) {
-                  return (
-                    <div key={item.name} className="relative">
-                      <button
-                        className=" py-2 px-1 rounded-lg text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 font-medium text-sm flex items-center space-x-2 group"
-                        onMouseEnter={() => setActiveDropdown(item.name)}
-                        onMouseLeave={() => setActiveDropdown(null)}
-                      >
-                        <IconComponent className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                        <span>{item.name}</span>
-                        <ChevronDown className={`w-3 h-3 transition-transform ${activeDropdown === item.name ? 'rotate-180' : ''}`} />
-                      </button>
-
-                      {/* Dropdown Menu */}
-                      <div
-                        className={`absolute top-full left-5 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 py-2 transition-all duration-200 transform origin-top ${
-                          activeDropdown === item.name ? 'opacity-100 scale-100 visible' : 'opacity-0 scale-95 invisible'
-                        }`}
-                        onMouseEnter={() => setActiveDropdown(item.name)}
-                        onMouseLeave={() => setActiveDropdown(null)}
-                      >
-                        <div className={`${item.dropdownItems.length > 3 ? 'max-h-[165px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100' : ''}`}>
-                          {item.dropdownItems.map((dropdownItem, index) => {
-                            const DropdownIcon = dropdownItem.icon;
-                            return (
-                              <Link
-                                key={dropdownItem.name}
-                                href={dropdownItem.href}
-                                className="flex items-center space-x-3 px-4 py-2.5 text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-colors group"
-                              >
-                                {DropdownIcon && <DropdownIcon className="w-4 h-4 text-blue-500 group-hover:scale-110 transition-transform" />}
-                                <span className="text-sm">{dropdownItem.name}</span>
-                              </Link>
-                            );
-                          })}
-                        </div>
-                        {item.dropdownItems.length > 3 && (
-                          <div className="border-t border-gray-100 mt-1 pt-1 px-4 pb-1">
-                            <p className="text-xs text-gray-400 text-center">Scroll for more</p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  );
-                }
 
                 return (
                   <Link
@@ -251,8 +157,6 @@ export const NaveBar = () => {
                   </div>
                 </form>
               </div>
-
-        
             </div>
 
             {/* Mobile Menu Button */}
@@ -276,60 +180,10 @@ export const NaveBar = () => {
                     </SheetTitle>
                   </div>
 
-        
-
                   {/* Mobile Navigation Links */}
                   <div className="py-4">
                     {navigationItems.map((item) => {
                       const IconComponent = item.icon;
-
-                      if (item.hasDropdown) {
-                        return (
-                          <div key={item.name} className="border-b border-gray-100">
-                            <button
-                              className="flex items-center justify-between w-full px-6 py-3 text-gray-700 hover:bg-gray-50 transition-colors"
-                              onClick={() => toggleMobileDropdown(item.name)}
-                            >
-                              <div className="flex items-center space-x-3">
-                                <IconComponent className="w-5 h-5 text-blue-600" />
-                                <span className="font-medium">{item.name}</span>
-                              </div>
-                              <ChevronDown
-                                className={`w-4 h-4 transition-transform text-gray-400 ${
-                                  mobileDropdowns[item.name] ? 'rotate-180' : ''
-                                }`}
-                              />
-                            </button>
-
-                            {/* Mobile Dropdown Items */}
-                            {mobileDropdowns[item.name] && (
-                              <div className="bg-gray-50 py-2">
-                                <div className={`${item.dropdownItems.length > 3 ? 'max-h-[132px] overflow-y-auto' : ''}`}>
-                                  {item.dropdownItems.map((dropdownItem) => {
-                                    const DropdownIcon = dropdownItem.icon;
-                                    return (
-                                      <Link
-                                        key={dropdownItem.name}
-                                        href={dropdownItem.href}
-                                        className="flex items-center space-x-3 px-10 py-2.5 text-gray-600 hover:text-blue-600 hover:bg-white transition-colors"
-                                        onClick={() => setIsOpen(false)}
-                                      >
-                                        {DropdownIcon && <DropdownIcon className="w-4 h-4 text-blue-500" />}
-                                        <span className="text-sm">{dropdownItem.name}</span>
-                                      </Link>
-                                    );
-                                  })}
-                                </div>
-                                {item.dropdownItems.length > 3 && (
-                                  <div className="px-10 pt-1">
-                                    <p className="text-xs text-gray-400">Scroll for more</p>
-                                  </div>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                        );
-                      }
 
                       return (
                         <Link
@@ -345,7 +199,6 @@ export const NaveBar = () => {
                     })}
                   </div>
 
-          
                   {/* Mobile Contact Info */}
                   <div className="p-4 bg-gray-50 border-t">
                     <p className="text-xs text-gray-500 mb-2">Need Help?</p>

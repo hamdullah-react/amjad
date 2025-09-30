@@ -119,6 +119,7 @@ export async function POST(request) {
         deliveryTime: body.deliveryTime || null,
         extraCharges: body.extraCharges ? parseFloat(body.extraCharges) : null,
         order: body.order || 0,
+        slug: body.slug || null
       }
     });
 

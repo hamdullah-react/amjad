@@ -50,6 +50,7 @@
     "react": "19.1.0",
     "react-bootstrap": "^2.10.10",
     "react-dom": "19.1.0",
+    "react-hook-form": "^7.63.0",
     "react-whatsapp": "^0.3.0",
     "resend": "^6.1.0",
     "swiper": "^11.2.10",

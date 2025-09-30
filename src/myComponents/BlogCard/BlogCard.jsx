@@ -4,12 +4,13 @@ import Image from 'next/image';
 import { Calendar, User, ArrowRight } from 'lucide-react';
 
 const BlogCard = ({ post, className = '' }) => {
+  // console.log("post",post)
   return (
     <div className={`bg-white rounded-md shadow-sm overflow-hidden transition-transform hover:shadow-md hover:-translate-y-1 ${className}`}>
       {/* Blog Image */}
       <div className="relative h-40 sm:h-32 md:h-36 lg:h-40 w-full">
         <Image
-          src={post.image}
+          src={post?.featuredImage || '/default-blog.jpg'}
           alt={post.title}
           fill
           className="object-cover"
@@ -22,7 +23,9 @@ const BlogCard = ({ post, className = '' }) => {
         <div className="flex items-center text-xs text-gray-500 space-x-2">
           <div className="flex items-center space-x-1">
             <Calendar className="h-3 w-3" />
-            <span className="text-[8px] sm:text-xs">{post.date}</span>
+            <span className="text-[8px] sm:text-xs">
+              {new Date(post.createdAt).toLocaleDateString()}
+            </span>
           </div>
           <div className="flex items-center space-x-1">
             <User className="h-3 w-3" />

@@ -368,7 +368,7 @@ export default function AboutPage() {
           )}
           <Button 
             onClick={() => setIsModalOpen(true)} 
-            className="bg-blue-600 hover:bg-blue-700"
+        
             disabled={processing || deleting}
           >
             <Edit className="w-4 h-4 mr-2" />
@@ -826,7 +826,7 @@ export default function AboutPage() {
             <Button variant="outline" onClick={() => setIsModalOpen(false)}>
               <X className="w-4 h-4 mr-2" /> Cancel
             </Button>
-            <Button onClick={handleSubmit} disabled={processing || deleting} className="bg-blue-600 hover:bg-blue-700">
+            <Button onClick={handleSubmit} disabled={processing || deleting} >
               {processing ? (
                 <Loader2 className="w-4 h-4 animate-spin mr-2" />
               ) : (

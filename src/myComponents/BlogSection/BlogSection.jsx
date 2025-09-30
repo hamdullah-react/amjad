@@ -1,10 +1,14 @@
+"use client";
 import React from 'react';
 import BlogCard from '../BlogCard/BlogCard';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
+import { useBlog } from '@/contexts/BlogContext';
 
-const BlogSection = ({ posts, showAll = false }) => {
+const BlogSection = ({ showAll = false }) => {
   // If showAll is false, limit to 6 posts for home page
+    const { posts, loading, error } = useBlog();
+
   const displayPosts = showAll ? posts : posts.slice(0, 8);
   
   return (

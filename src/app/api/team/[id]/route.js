@@ -60,8 +60,11 @@ const sanitizeTeamMemberData = (data) => ({
   imageUrl: data.imageUrl?.trim() || '',
   bio: data.bio?.trim() || '',
   socialLinks: {
-    linkedin: data.linkedin?.trim() || '',
-    twitter: data.twitter?.trim() || ''
+    linkedin: data.socialLinks?.linkedin?.trim() || data.linkedin?.trim() || '',
+    twitter: data.socialLinks?.twitter?.trim() || data.twitter?.trim() || '',
+    facebook: data.socialLinks?.facebook?.trim() || data.facebook?.trim() || '',
+    instagram: data.socialLinks?.instagram?.trim() || data.instagram?.trim() || '',
+    tiktok: data.socialLinks?.tiktok?.trim() || data.tiktok?.trim() || ''
   },
   order: typeof data.order === 'number' ? data.order : 0,
   isActive: data.isActive !== undefined ? data.isActive : true

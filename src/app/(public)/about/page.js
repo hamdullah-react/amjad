@@ -4,13 +4,80 @@ import { CheckCircle2, Clock, Truck, Users, Award, Target, Heart, Star, Trending
 import { useAbout } from '@/contexts/AboutContext'
 import PageHeader from '@/myComponents/PageHeader/PageHeader'
 
+import { 
+  StatsSkeleton, 
+  StorySkeleton, 
+  MissionVisionSkeleton, 
+  ValuesSkeleton
+} from './AboutSkeletons'
+import TeamSection from '@/myComponents/TeamSection/TeamSection'
+
 export default function AboutPage() {
   const { aboutData, loading, error } = useAbout()
+  console.log("object", aboutData)
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      <div>
+        {/* Page Header Banner */}
+        <PageHeader
+          title="About Us"
+          subtitle="Loading..."
+          backgroundImage="/images/IMG-20250910-WA0016.jpg"
+          breadcrumbs={[
+            { label: 'About', href: null }
+          ]}
+        />
+
+        {/* Stats Section Skeleton */}
+        <section className="relative bg-gradient-to-br from-blue-50 via-white to-orange-50 py-12">
+          <div className="absolute inset-0 bg-white/40"></div>
+          <div className="max-w-6xl mx-auto px-4">
+            <StatsSkeleton />
+          </div>
+        </section>
+
+        {/* Main Content Skeleton */}
+        <section className="py-16">
+          <div className="max-w-6xl mx-auto px-4 space-y-20">
+            
+            {/* Story Section Skeleton */}
+            <div>
+              <div className="text-center mb-8">
+                <div className="w-24 h-1 bg-gray-200 mx-auto mb-3"></div>
+                <div className="h-8 w-48 bg-gray-200 rounded mx-auto"></div>
+              </div>
+              <StorySkeleton />
+            </div>
+
+            {/* Mission & Vision Skeleton */}
+            <div>
+              <MissionVisionSkeleton />
+            </div>
+
+            {/* Core Values Skeleton */}
+            <div>
+              <div className="text-center mb-12">
+                <div className="w-24 h-1 bg-gray-200 mx-auto mb-3"></div>
+                <div className="h-10 w-64 bg-gray-200 rounded mx-auto"></div>
+              </div>
+              <ValuesSkeleton />
+            </div>
+
+            {/* Team Section - Always visible, no skeleton needed */}
+            <TeamSection />
+
+            {/* CTA Skeleton */}
+            <div className="bg-gray-200 rounded-3xl p-12">
+              <div className="h-10 w-96 bg-gray-300 rounded mx-auto mb-4"></div>
+              <div className="h-6 w-80 bg-gray-300 rounded mx-auto mb-8"></div>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <div className="h-12 w-32 bg-gray-300 rounded-lg"></div>
+                <div className="h-12 w-32 bg-gray-300 rounded-lg"></div>
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
     )
   }
@@ -142,7 +209,7 @@ export default function AboutPage() {
                   <div className="space-y-4">
                     <div className="relative h-48 rounded-2xl overflow-hidden shadow-xl">
                       <Image
-                        src={data.images?.story || "/images/IMG-20250910-WA0020.jpg"}
+                        src={data.images?.vision || "/images/IMG-20250910-WA0020.jpg"}
                         alt="Marhaba Team"
                         fill
                         style={{objectFit: "cover"}}
@@ -151,7 +218,7 @@ export default function AboutPage() {
                     </div>
                     <div className="relative h-56 rounded-2xl overflow-hidden shadow-xl">
                       <Image
-                        src="/images/IMG-20250910-WA0021.jpg"
+                        src={data.images?.story || "/images/IMG-20250910-WA0021.jpg"}
                         alt="Moving Service"
                         fill
                         style={{objectFit: "cover"}}
@@ -162,7 +229,7 @@ export default function AboutPage() {
                   <div className="space-y-4 pt-8">
                     <div className="relative h-56 rounded-2xl overflow-hidden shadow-xl">
                       <Image
-                        src="/images/IMG-20250910-WA0022.jpg"
+                        src={data.images?.mission || "/images/IMG-20250910-WA0022.jpg"}
                         alt="Professional Packing"
                         fill
                         style={{objectFit: "cover"}}
@@ -171,7 +238,7 @@ export default function AboutPage() {
                     </div>
                     <div className="relative h-48 rounded-2xl overflow-hidden shadow-xl">
                       <Image
-                        src="/images/IMG-20250910-WA0023.jpg"
+                        src={data.images?.team || "/images/IMG-20250910-WA0023.jpg"}
                         alt="Happy Customers"
                         fill
                         style={{objectFit: "cover"}}
@@ -262,26 +329,8 @@ export default function AboutPage() {
             </div>
           </div>
 
-          {/* Team Section */}
-          {data.images?.team && (
-            <div className="mb-20">
-              <div className="text-center mb-12">
-                <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                  Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-orange-600">Team</span>
-                </h2>
-                <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-orange-500 mx-auto"></div>
-              </div>
-              <div className="relative h-96 rounded-3xl overflow-hidden shadow-2xl">
-                <Image
-                  src={data.images.team}
-                  alt="Our Team"
-                  fill
-                  style={{objectFit: "cover"}}
-                  className="hover:scale-105 transition-transform duration-500"
-                />
-              </div>
-            </div>
-          )}
+          {/* Team Section - Separate Component */}
+          <TeamSection />
 
           {/* CTA Section */}
           <div className="mt-20 text-center bg-gradient-to-r from-blue-600 to-orange-600 rounded-3xl p-12 text-white">

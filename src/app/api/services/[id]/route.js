@@ -1,6 +1,42 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
+// Helper function to generate slug from title
+function generateSlug(title) {
+  return title
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/[\s_-]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+// Helper function to make slug unique
+async function makeSlugUnique(slug, excludeId = null) {
+  let uniqueSlug = slug;
+  let counter = 1;
+  
+  while (true) {
+    const where = { slug: uniqueSlug };
+    if (excludeId) {
+      where.NOT = { id: excludeId };
+    }
+    
+    const existingService = await prisma.service.findFirst({
+      where
+    });
+    
+    if (!existingService) {
+      break;
+    }
+    
+    uniqueSlug = `${slug}-${counter}`;
+    counter++;
+  }
+  
+  return uniqueSlug;
+}
+
 // GET single service by ID
 export async function GET(request, { params }) {
   try {
@@ -41,9 +77,27 @@ export async function PUT(request, { params }) {
     // Remove id from body if present
     const { id: _, ...updateData } = body;
 
-    // Convert price to Decimal if present
+    // Convert price to float if present
     if (updateData.price !== undefined) {
       updateData.price = updateData.price ? parseFloat(updateData.price) : null;
+    }
+
+    // Handle slug update
+    if (updateData.slug !== undefined || updateData.title !== undefined) {
+      let finalSlug;
+      
+      if (updateData.slug) {
+        // Use provided slug but ensure it's unique
+        finalSlug = await makeSlugUnique(generateSlug(updateData.slug), id);
+      } else if (updateData.title) {
+        // Auto-generate slug from title if title changed
+        const baseSlug = generateSlug(updateData.title);
+        finalSlug = await makeSlugUnique(baseSlug, id);
+      }
+      
+      if (finalSlug) {
+        updateData.slug = finalSlug;
+      }
     }
 
     const updatedService = await prisma.service.update({
@@ -63,6 +117,13 @@ export async function PUT(request, { params }) {
       return NextResponse.json(
         { success: false, message: 'Service not found' },
         { status: 404 }
+      );
+    }
+
+    if (error.code === 'P2002') {
+      return NextResponse.json(
+        { success: false, message: 'A service with this slug already exists' },
+        { status: 400 }
       );
     }
 
