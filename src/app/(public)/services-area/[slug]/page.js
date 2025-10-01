@@ -38,30 +38,50 @@ async function getServiceAreaBySlug(slug) {
 }
 
 // Generate static params
+// Generate static params
 export async function generateStaticParams() {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/service-areas`, {
-      cache: 'no-store'
+    // Use the same domain during build time
+    const baseUrl = process.env.NODE_ENV === 'production' 
+      ? process.env.NEXT_PUBLIC_API_URL 
+      : 'http://localhost:3000';
+    
+    const response = await fetch(`${baseUrl}/api/service-areas`, {
+      cache: 'no-store',
+      // Add headers to avoid potential issues
+      headers: {
+        'Content-Type': 'application/json',
+      }
     });
     
     if (!response.ok) {
+      console.log('API response not OK, status:', response.status);
       return [];
     }
 
     const result = await response.json();
-
-    console.log("gaggaagga", result.data[0].slug);
     
-    if (result.success) {
-      return result.data
-        .filter(area => area.isActive)
-        .map((area) => ({
-          slug: area.slug,
-        }));
+    console.log("API Response:", result);
+    
+    if (result.success && result.data && Array.isArray(result.data)) {
+      const validAreas = result.data.filter(area => {
+        const isValid = area && area.slug && typeof area.slug === 'string' && area.isActive !== false;
+        console.log(`Area ${area.slug} valid:`, isValid);
+        return isValid;
+      });
+      
+      console.log("Valid areas for static generation:", validAreas.map(a => a.slug));
+      
+      return validAreas.map((area) => ({
+        slug: area.slug,
+      }));
     }
     
+    console.log("No valid data found in response");
     return [];
   } catch (error) {
+    console.error('Error generating static params:', error);
+    // Return empty array instead of throwing error
     return [];
   }
 }
