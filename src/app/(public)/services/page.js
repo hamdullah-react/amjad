@@ -5,6 +5,7 @@ import PageHeader from '@/myComponents/PageHeader/PageHeader'
 import { Truck, Package, Home, Users, Shield, Clock, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import ServiceCardSkeleton from './ServiceCardSkeleton'
+import CTASection from '@/myComponents/CTASection/CTASection'
 
 // Fallback icon mapping for services
 const iconMap = {
@@ -153,19 +154,9 @@ export default function ServicesPage() {
 )}
           
           {/* Call to Action Section - Always show */}
-          <div className="mt-16 text-center bg-gradient-to-r from-blue-50 to-orange-50 rounded-2xl p-8 md:p-12">
-            <h2 className="text-2xl md:text-3xl font-bold mb-4 text-gray-900">Ready to Move?</h2>
-            <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
-              Get a free quote today and experience stress-free furniture moving with Marhaba
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 md:px-8 py-3 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl">
-                Get Free Quote
-              </button>
-              <button className="border-2 border-orange-500 text-orange-600 px-6 md:px-8 py-3 rounded-lg hover:bg-orange-500 hover:text-white transition-all duration-300 font-semibold">
-                Call: +971568011076
-              </button>
-            </div>
+          <div className="mt-16 text-center bg-gradient-to-r from-blue-50 to-orange-50 rounded-2xl ">
+           
+        <CTASection variant="services" />
           </div>
         </div>
       </section>

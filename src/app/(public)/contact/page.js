@@ -13,6 +13,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
+import FAQSection from '@/myComponents/FAQSection/FAQSection'
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -458,37 +459,12 @@ export default function ContactPage() {
 
           {/* FAQ Section */}
           <div className="mt-20">
-            <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Frequently Asked <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-orange-600">Questions</span>
-            </h2>
-            <p className="text-gray-600 text-lg">Quick answers to common questions</p>
+         
+
+          <FAQSection/>
+           
           </div>
 
-            <div className="max-w-3xl mx-auto">
-              <Accordion type="single" collapsible className="space-y-4">
-                {faqs.map((faq, index) => (
-                  <AccordionItem
-                    key={index}
-                    value={`item-${index}`}
-                    className="bg-white rounded-xl shadow-lg border border-gray-100 px-6 py-2"
-                  >
-                    <AccordionTrigger className="text-left hover:no-underline">
-                      <div className="flex items-center">
-                        <div className="w-10 h-10 bg-gradient-to-r from-blue-100 to-orange-100 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
-                          <span className="text-blue-600 font-bold">?</span>
-                        </div>
-                        <span className="font-bold text-lg text-gray-800">{faq.question}</span>
-                      </div>
-                    </AccordionTrigger>
-                    <AccordionContent className="text-gray-600 leading-relaxed pt-2 pl-14">
-                      {faq.answer}
-                    </AccordionContent>
-                  </AccordionItem>
-                ))}
-              </Accordion>
-            </div>
-          </div>
         </div>
       </section>
     </>

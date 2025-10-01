@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Calendar, User, ArrowLeft, Clock, Tag, Eye, Heart, MessageCircle } from 'lucide-react';
 import PageHeader from '@/myComponents/PageHeader/PageHeader';
+import CTASection from '@/myComponents/CTASection/CTASection';
 
 // Get API URL from environment variables
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
@@ -350,19 +351,7 @@ const BlogDetailPage = async ({ params }) => {
       {/* Call to Action */}
       <section className="border-t bg-white py-12">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
-            Enjoyed this article?
-          </h2>
-          <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
-            Discover more insightful content in our blog collection.
-          </p>
-          <Link
-            href="/blog"
-            className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Explore More Posts
-            <ArrowLeft className="ml-2 h-4 w-4 rotate-180" />
-          </Link>
+           <CTASection variant="blog" />
         </div>
       </section>
     </div>

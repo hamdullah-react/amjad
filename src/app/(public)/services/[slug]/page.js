@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import PageHeader from '@/myComponents/PageHeader/PageHeader';
 import { Calendar, Clock, DollarSign, CheckCircle, Phone, MessageCircle } from 'lucide-react';
+import CTASection from '@/myComponents/CTASection/CTASection';
 
 // Fetch service by slug
 async function getServiceBySlug(slug) {
@@ -230,27 +231,9 @@ export default async function ServiceDetailPage({ params }) {
           </div>
 
           {/* Related Services CTA */}
-          <div className="mt-16 text-center bg-gradient-to-r from-blue-50 to-orange-50 rounded-2xl p-8 md:p-12">
-            <h2 className="text-2xl md:text-3xl font-bold mb-4 text-gray-900">
-              Need Other Services?
-            </h2>
-            <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
-              We offer a complete range of furniture moving and packing services to meet all your needs
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a 
-                href="/services"
-                className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-8 py-3 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl"
-              >
-                View All Services
-              </a>
-              <a 
-                href="/contact"
-                className="border-2 border-orange-500 text-orange-600 px-8 py-3 rounded-lg hover:bg-orange-500 hover:text-white transition-all duration-300 font-semibold"
-              >
-                Contact Us
-              </a>
-            </div>
+          <div className="mt-16 text-center bg-gradient-to-r from-blue-50 to-orange-50 rounded-2xl">
+
+            <CTASection variant="services-dynamic" />
           </div>
         </div>
       </section>

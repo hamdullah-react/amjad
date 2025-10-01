@@ -5,6 +5,7 @@ import PageHeader from '@/myComponents/PageHeader/PageHeader'
 import { MapPin, Clock, Phone, Truck, AlertCircle, RefreshCw } from 'lucide-react'
 import { useDataFetching } from '@/contexts/service-areas-context'
 import Link from 'next/link'
+import CTASection from '@/myComponents/CTASection/CTASection'
 
 // Skeleton Loader Component
 const ServiceAreaSkeleton = () => {
@@ -287,21 +288,11 @@ export default function ServicesAreaPage() {
         
           {/* Call to Action */}
           <div className="mt-12 text-center">
-            <h2 className="text-3xl font-bold mb-4 text-gray-900">Need Service in Your Area?</h2>
-            <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
-              Contact us to check availability in your location or schedule a custom moving service.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-8 py-3 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl">
-                Check Availability
-              </button>
-              <a 
-                href="tel:+971568011076"
-                className="border-2 border-orange-500 text-orange-600 px-8 py-3 rounded-lg hover:bg-orange-500 hover:text-white transition-all duration-300 font-semibold text-center"
-              >
-                Call: +971568011076
-              </a>
-            </div>
+            <CTASection 
+              variant="service-areas" 
+              title="Need Service in Another Area?" 
+              subtitle="Contact us today to find out if we cover your location or to request a new service area"
+            />
           </div>
         </div>
       </section>

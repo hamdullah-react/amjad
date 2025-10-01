@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import NavBarSkeleton from '@/components/layout/NavBarSkeleton'
 import { useContact } from '@/contexts/contact-context'
 import { Menu, Search, X, MapPin, Phone, Mail, Facebook, Twitter, Youtube, Instagram, Home, Users, BookOpen, MessageCircle, Truck, Linkedin } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -45,79 +44,112 @@ export const NaveBar = () => {
     console.log('Searching for:', searchQuery)
   }
 
-  if (isLoadingContact) {
-    return <NavBarSkeleton />
-  }
-
   return (
     <>
-      {/* Top Info Bar */}
+      {/* Top Info Bar - Dynamic Content with Loading State */}
       <div className="bg-gradient-to-r from-blue-600 to-orange-600 text-white">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex justify-between items-center py-2 text-xs">
             {/* Left - Contact Info */}
             <div className="flex items-center space-x-4">
-              {contactInfo?.phone && (
-                <a href={`tel:${contactInfo.phone.replace(/[^0-9+]/g, '')}`} className="flex items-center space-x-1 hover:text-blue-100 transition-colors">
-                  <Phone className="w-3 h-3" />
-                  <span className="hidden sm:inline">{contactInfo.phone}</span>
-                  <span className="sm:hidden">Call</span>
-                </a>
-              )}
-              {contactInfo?.email && (
-                <a href={`mailto:${contactInfo.email}`} className="hidden md:flex items-center space-x-1 hover:text-blue-100 transition-colors">
-                  <Mail className="w-3 h-3" />
-                  <span>{contactInfo.email}</span>
-                </a>
-              )}
-              <div className="flex items-center space-x-1">
-                <MapPin className="w-3 h-3" />
-                <span>{[contactInfo?.city, contactInfo?.emirate].filter(Boolean).join(', ') || 'Dubai, UAE'}</span>
-              </div>
+              {isLoadingContact ? (
+                // Loading state for contact info
+                <>
+                  <div className="flex items-center space-x-1">
+                    <div className="w-3 h-3 bg-white/30 rounded animate-pulse"></div>
+                    <div className="w-20 h-3 bg-white/30 rounded animate-pulse hidden sm:block"></div>
+                    <div className="w-8 h-3 bg-white/30 rounded animate-pulse sm:hidden"></div>
+                  </div>
+                  <div className="hidden md:flex items-center space-x-1">
+                    <div className="w-3 h-3 bg-white/30 rounded animate-pulse"></div>
+                    <div className="w-24 h-3 bg-white/30 rounded animate-pulse"></div>
+                  </div>
+                  <div className="flex items-center space-x-1">
+                    <div className="w-3 h-3 bg-white/30 rounded animate-pulse"></div>
+                    <div className="w-16 h-3 bg-white/30 rounded animate-pulse"></div>
+                  </div>
+                </>
+              ) : contactInfo ? (
+                // Dynamic content when loaded
+                <>
+                  {contactInfo.phone && (
+                    <a href={`tel:${contactInfo.phone.replace(/[^0-9+]/g, '')}`} className="flex items-center space-x-1 hover:text-blue-100 transition-colors">
+                      <Phone className="w-3 h-3" />
+                      <span className="hidden sm:inline">{contactInfo.phone}</span>
+                      <span className="sm:hidden">Call</span>
+                    </a>
+                  )}
+                  {contactInfo.email && (
+                    <a href={`mailto:${contactInfo.email}`} className="hidden md:flex items-center space-x-1 hover:text-blue-100 transition-colors">
+                      <Mail className="w-3 h-3" />
+                      <span>{contactInfo.email}</span>
+                    </a>
+                  )}
+                  {(contactInfo.city || contactInfo.emirate) && (
+                    <div className="flex items-center space-x-1">
+                      <MapPin className="w-3 h-3" />
+                      <span>{[contactInfo.city, contactInfo.emirate].filter(Boolean).join(', ')}</span>
+                    </div>
+                  )}
+                </>
+              ) : null}
             </div>
 
             {/* Right - Social Icons */}
             <div className="flex items-center space-x-2">
-              <span className="hidden sm:inline mr-2 text-white/80">Follow us:</span>
-              {contactInfo?.socialLinks?.facebook && (
-                <a href={contactInfo.socialLinks.facebook} target="_blank" rel="noopener noreferrer" className="w-7 h-7 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-all">
-                  <Facebook className="w-3.5 h-3.5" />
-                </a>
-              )}
-              {contactInfo?.socialLinks?.twitter && (
-                <a href={contactInfo.socialLinks.twitter} target="_blank" rel="noopener noreferrer" className="w-7 h-7 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-all">
-                  <Twitter className="w-3.5 h-3.5" />
-                </a>
-              )}
-              {contactInfo?.socialLinks?.youtube && (
-                <a href={contactInfo.socialLinks.youtube} target="_blank" rel="noopener noreferrer" className="w-7 h-7 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-all">
-                  <Youtube className="w-3.5 h-3.5" />
-                </a>
-              )}
-              {contactInfo?.socialLinks?.instagram && (
-                <a href={contactInfo.socialLinks.instagram} target="_blank" rel="noopener noreferrer" className="w-7 h-7 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-all">
-                  <Instagram className="w-3.5 h-3.5" />
-                </a>
-              )}
-              {contactInfo?.socialLinks?.linkedin && (
-                <a href={contactInfo.socialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="w-7 h-7 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-all">
-                  <Linkedin className="w-3.5 h-3.5" />
-                </a>
-              )}
+              {isLoadingContact ? (
+                // Loading state for social icons
+                <>
+                  <div className="hidden sm:block w-12 h-3 bg-white/30 rounded animate-pulse mr-2"></div>
+                  {[1, 2, 3, 4, 5].map((item) => (
+                    <div key={item} className="w-7 h-7 bg-white/30 rounded-full animate-pulse"></div>
+                  ))}
+                </>
+              ) : contactInfo ? (
+                // Dynamic content when loaded
+                <>
+                  <span className="hidden sm:inline mr-2 text-white/80">Follow us:</span>
+                  {contactInfo.socialLinks?.facebook && (
+                    <a href={contactInfo.socialLinks.facebook} target="_blank" rel="noopener noreferrer" className="w-7 h-7 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-all">
+                      <Facebook className="w-3.5 h-3.5" />
+                    </a>
+                  )}
+                  {contactInfo.socialLinks?.twitter && (
+                    <a href={contactInfo.socialLinks.twitter} target="_blank" rel="noopener noreferrer" className="w-7 h-7 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-all">
+                      <Twitter className="w-3.5 h-3.5" />
+                    </a>
+                  )}
+                  {contactInfo.socialLinks?.youtube && (
+                    <a href={contactInfo.socialLinks.youtube} target="_blank" rel="noopener noreferrer" className="w-7 h-7 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-all">
+                      <Youtube className="w-3.5 h-3.5" />
+                    </a>
+                  )}
+                  {contactInfo.socialLinks?.instagram && (
+                    <a href={contactInfo.socialLinks.instagram} target="_blank" rel="noopener noreferrer" className="w-7 h-7 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-all">
+                      <Instagram className="w-3.5 h-3.5" />
+                    </a>
+                  )}
+                  {contactInfo.socialLinks?.linkedin && (
+                    <a href={contactInfo.socialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="w-7 h-7 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-all">
+                      <Linkedin className="w-3.5 h-3.5" />
+                    </a>
+                  )}
+                </>
+              ) : null}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Main Navigation */}
+      {/* Main Navigation - Static Content (Always Shows) */}
       <nav className={`sticky top-0 z-50 bg-white transition-all duration-300 ${isScrolled ? 'shadow-lg' : 'shadow-md'}`}>
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex items-center justify-between h-16">
 
-            {/* Logo */}
+            {/* Logo - Static with dynamic fallback */}
             <Link href="/" className="flex items-center space-x-2 group">
               <Image
-                src={contactInfo?.logoUrl|| "/images/logo.png"}
+                src={contactInfo?.logoUrl || "/images/logo.png"}
                 alt={contactInfo?.companyName || "Marhaba Furniture Movers"}
                 width={140}
                 height={50}
@@ -125,7 +157,7 @@ export const NaveBar = () => {
               />
             </Link>
 
-            {/* Desktop Navigation */}
+            {/* Desktop Navigation - Static Content */}
             <div className="hidden lg:flex items-center space-x-1">
               {navigationItems.map((item) => {
                 const IconComponent = item.icon;
@@ -142,7 +174,7 @@ export const NaveBar = () => {
                 );
               })}
 
-              {/* Search Bar */}
+              {/* Search Bar - Static Content */}
               <div className="ml-4 relative">
                 <form onSubmit={handleSearch}>
                   <div className="relative">
@@ -159,7 +191,7 @@ export const NaveBar = () => {
               </div>
             </div>
 
-            {/* Mobile Menu Button */}
+            {/* Mobile Menu Button - Static Content */}
             <div className="lg:hidden">
               <Sheet open={isOpen} onOpenChange={setIsOpen}>
                 <SheetTrigger asChild>
@@ -171,7 +203,7 @@ export const NaveBar = () => {
                   <div className="bg-gradient-to-br from-blue-600 to-orange-600 p-6">
                     <SheetTitle>
                       <Image
-                        src={contactInfo?.logos?.primary || "/images/logo.png"}
+                        src={contactInfo?.logoUrl || "/images/logo.png"}
                         alt={contactInfo?.companyName || "Marhaba Furniture Movers"}
                         width={140}
                         height={50}
@@ -180,7 +212,7 @@ export const NaveBar = () => {
                     </SheetTitle>
                   </div>
 
-                  {/* Mobile Navigation Links */}
+                  {/* Mobile Navigation Links - Static Content */}
                   <div className="py-4">
                     {navigationItems.map((item) => {
                       const IconComponent = item.icon;
@@ -199,20 +231,20 @@ export const NaveBar = () => {
                     })}
                   </div>
 
-                  {/* Mobile Contact Info */}
+                  {/* Mobile Contact Info - Dynamic with Loading */}
                   <div className="p-4 bg-gray-50 border-t">
                     <p className="text-xs text-gray-500 mb-2">Need Help?</p>
-                    {contactInfo?.phone ? (
+                    {isLoadingContact ? (
+                      <div className="flex items-center space-x-2">
+                        <div className="w-4 h-4 bg-gray-300 rounded animate-pulse"></div>
+                        <div className="w-24 h-4 bg-gray-300 rounded animate-pulse"></div>
+                      </div>
+                    ) : contactInfo?.phone ? (
                       <a href={`tel:${contactInfo.phone.replace(/[^0-9+]/g, '')}`} className="flex items-center space-x-2 text-blue-600 font-semibold">
                         <Phone className="w-4 h-4" />
                         <span>{contactInfo.phone}</span>
                       </a>
-                    ) : (
-                      <a href="tel:+971568011076" className="flex items-center space-x-2 text-blue-600 font-semibold">
-                        <Phone className="w-4 h-4" />
-                        <span>+971 568 011 076</span>
-                      </a>
-                    )}
+                    ) : null}
                   </div>
                 </SheetContent>
               </Sheet>

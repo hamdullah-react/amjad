@@ -212,7 +212,7 @@ model Gallery {
 
 model WhyChooseUs {
   id          String   @id @default(cuid())
-    slug          String    @unique
+  slug          String    @unique
   title       String
   description String
   icon        String

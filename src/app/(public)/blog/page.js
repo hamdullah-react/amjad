@@ -20,6 +20,7 @@ export default function BlogPage() {
         {/* Display all blog posts */}
         <BlogSection posts={blogPosts} showAll={true} />
       </div>
+      
     </div>
   );
 }

@@ -57,7 +57,7 @@ export async function PUT(request, { params }) {
     }
 
     return NextResponse.json(
-      { success: false, message: 'Failed to update item' },
+      { success: false, message: 'Failed to update item: ' + error.message },
       { status: 500 }
     );
   }
@@ -87,7 +87,7 @@ export async function DELETE(request, { params }) {
     }
 
     return NextResponse.json(
-      { success: false, message: 'Failed to delete item' },
+      { success: false, message: 'Failed to delete item: ' + error.message },
       { status: 500 }
     );
   }

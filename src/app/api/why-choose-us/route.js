@@ -40,20 +40,36 @@ export async function POST(request) {
 
     const {
       title,
+      slug,
       description,
       icon,
       color,
       order,
-      isActive
+      isActive = true
     } = body;
+
+    // Validate required fields
+    if (!title || !description) {
+      return NextResponse.json(
+        { success: false, message: 'Title and description are required' },
+        { status: 400 }
+      );
+    }
+
+    // Get max order to set default
+    const maxOrderItem = await prisma.whyChooseUs.findFirst({
+      orderBy: { order: 'desc' }
+    });
+    const defaultOrder = maxOrderItem ? maxOrderItem.order + 1 : 1;
 
     const item = await prisma.whyChooseUs.create({
       data: {
         title,
+        slug,
         description,
-        icon,
-        color: color || 'blue',
-        order: order || 0,
+        icon: icon || 'award',
+        color: color || 'primary',
+        order: order || defaultOrder,
         isActive: isActive !== false
       }
     });
@@ -66,7 +82,7 @@ export async function POST(request) {
   } catch (error) {
     console.error('Error creating why choose us item:', error);
     return NextResponse.json(
-      { success: false, message: 'Failed to create item' },
+      { success: false, message: 'Failed to create item' + error.message },
       { status: 500 }
     );
   }

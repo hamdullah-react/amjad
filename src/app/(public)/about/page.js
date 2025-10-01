@@ -11,6 +11,7 @@ import {
   ValuesSkeleton
 } from './AboutSkeletons'
 import TeamSection from '@/myComponents/TeamSection/TeamSection'
+import CTASection from '@/myComponents/CTASection/CTASection'
 
 export default function AboutPage() {
   const { aboutData, loading, error } = useAbout()
@@ -333,20 +334,9 @@ export default function AboutPage() {
           <TeamSection />
 
           {/* CTA Section */}
-          <div className="mt-20 text-center bg-gradient-to-r from-blue-600 to-orange-600 rounded-3xl p-12 text-white">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to Experience the Marhaba Difference?</h2>
-            <p className="text-xl mb-8 text-white/90 max-w-2xl mx-auto">
-              Join thousands of satisfied customers who trust us with their furniture moving needs.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="bg-white text-blue-600 px-8 py-4 rounded-lg hover:bg-gray-100 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl">
-                Get Free Quote
-              </button>
-              <button className="border-2 border-white text-white px-8 py-4 rounded-lg hover:bg-white/10 transition-all duration-300 font-semibold">
-                Call: +971 568 011 076
-              </button>
-            </div>
-          </div>
+   
+
+          <CTASection variant="about" />
         </div>
       </section>
     </div>

@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import {
   Plus, Edit, Trash2, Eye, EyeOff, Save, X,
   ArrowUp, ArrowDown, Award, Shield, Clock,
-  Users, Truck, CheckCircle
+  Users, Truck, CheckCircle, Link
 } from 'lucide-react'
 import {
   Dialog,
@@ -22,9 +22,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 const INITIAL_FORM_DATA = {
   title: '',
+  slug: '',
   description: '',
   icon: '',
-  color: 'blue',
+  color: 'primary',
   order: 0,
   isActive: true
 }
@@ -69,6 +70,7 @@ const WhyChooseUsRow = ({ item, index, totalItems, onToggleActive, onEdit, onDel
       <td className="px-6 py-4">
         <div>
           <p className="text-sm font-medium text-foreground">{item.title}</p>
+          <p className="text-xs text-muted-foreground mt-1">{item.slug}</p>
         </div>
       </td>
       <td className="px-6 py-4">
@@ -137,9 +139,39 @@ const WhyChooseUsRow = ({ item, index, totalItems, onToggleActive, onEdit, onDel
   )
 }
 
-const WhyChooseUsForm = ({ formData, setFormData }) => {
+const WhyChooseUsForm = ({ formData, setFormData, isEditing }) => {
   const SelectedIcon = ICON_SUGGESTIONS.find(i => i.value === formData.icon)?.icon || Award
   const selectedColor = COLORS.find(c => c.value === formData.color)?.class || 'bg-primary'
+
+  // Generate slug from title
+  const generateSlug = (title) => {
+    return title
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, '') // Remove special characters
+      .replace(/[\s_-]+/g, '-') // Replace spaces and underscores with hyphens
+      .replace(/^-+|-+$/g, ''); // Remove leading/trailing hyphens
+  };
+
+  // Auto-generate slug when title changes for both new and edit items
+  useEffect(() => {
+    if (formData.title) {
+      const generatedSlug = generateSlug(formData.title);
+      setFormData(prev => ({ ...prev, slug: generatedSlug }));
+    }
+  }, [formData.title, setFormData]);
+
+  const handleTitleChange = (e) => {
+    const newTitle = e.target.value;
+    setFormData(prev => ({ ...prev, title: newTitle }));
+  };
+
+  const handleSlugChange = (e) => {
+    const newSlug = e.target.value;
+    // Always format the slug as user types
+    const formattedSlug = generateSlug(newSlug);
+    setFormData(prev => ({ ...prev, slug: formattedSlug }));
+  };
 
   return (
     <div className="space-y-4 py-4">
@@ -149,7 +181,7 @@ const WhyChooseUsForm = ({ formData, setFormData }) => {
           <Input
             id="title"
             value={formData.title}
-            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+            onChange={handleTitleChange}
             placeholder="Enter title"
           />
         </div>
@@ -159,10 +191,27 @@ const WhyChooseUsForm = ({ formData, setFormData }) => {
             id="order"
             type="number"
             value={formData.order}
-            onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) })}
-            min="1"
+            onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
+            min="0"
           />
         </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="slug" className="flex items-center gap-2">
+          <Link className="w-4 h-4" />
+          Slug *
+        </Label>
+        <Input
+          id="slug"
+          value={formData.slug}
+          onChange={handleSlugChange}
+          placeholder="URL-friendly slug"
+          className="font-mono text-sm"
+        />
+        <p className="text-xs text-muted-foreground">
+          Slug is auto-generated from title and updates as you type
+        </p>
       </div>
 
       <div className="space-y-2">
@@ -228,9 +277,12 @@ const WhyChooseUsForm = ({ formData, setFormData }) => {
             <div className={`w-16 h-16 rounded-lg ${selectedColor} flex items-center justify-center flex-shrink-0`}>
               <SelectedIcon className="w-8 h-8 text-white" />
             </div>
-            <div>
+            <div className="flex-1">
               <h4 className="font-semibold text-lg">{formData.title || 'Title Preview'}</h4>
-              <p className="text-muted-foreground mt-1">{formData.description || 'Description preview will appear here'}</p>
+              {formData.slug && (
+                <p className="text-sm text-muted-foreground font-mono mt-1">/{formData.slug}</p>
+              )}
+              <p className="text-muted-foreground mt-2">{formData.description || 'Description preview will appear here'}</p>
             </div>
           </div>
         </div>
@@ -301,7 +353,8 @@ export default function WhyChooseUsPage() {
     if (searchTerm) {
       filtered = filtered.filter(item =>
         item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.description.toLowerCase().includes(searchTerm.toLowerCase())
+        item.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.slug.toLowerCase().includes(searchTerm.toLowerCase())
       )
     }
 
@@ -319,7 +372,7 @@ export default function WhyChooseUsPage() {
     setEditingItem(null)
     setFormData({
       ...INITIAL_FORM_DATA,
-      order: items.length + 1
+      order: items.length > 0 ? Math.max(...items.map(i => i.order)) + 1 : 1
     })
     setIsModalOpen(true)
   }
@@ -328,9 +381,10 @@ export default function WhyChooseUsPage() {
     setEditingItem(item)
     setFormData({
       title: item.title,
+      slug: item.slug,
       description: item.description,
       icon: item.icon || '',
-      color: item.color || 'blue',
+      color: item.color || 'primary',
       order: item.order,
       isActive: item.isActive
     })
@@ -341,6 +395,24 @@ export default function WhyChooseUsPage() {
     try {
       setProcessing(true)
       setProcessingMessage(editingItem ? 'Updating item...' : 'Creating item...')
+
+      // Validate required fields
+      if (!formData.title.trim() || !formData.description.trim() || !formData.slug.trim()) {
+        alert('Title, slug, and description are required')
+        return
+      }
+
+      // Generate final slug (ensure it's properly formatted)
+      const generateSlug = (text) => {
+        return text
+          .toLowerCase()
+          .trim()
+          .replace(/[^\w\s-]/g, '')
+          .replace(/[\s_-]+/g, '-')
+          .replace(/^-+|-+$/g, '');
+      };
+
+      const finalSlug = generateSlug(formData.slug);
 
       const url = editingItem
         ? `/api/why-choose-us/${editingItem.id}`
@@ -353,7 +425,16 @@ export default function WhyChooseUsPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify({
+          ...formData,
+          title: formData.title.trim(),
+          description: formData.description.trim(),
+          slug: finalSlug,
+          icon: formData.icon || 'award',
+          color: formData.color || 'primary',
+          order: formData.order || (items.length > 0 ? Math.max(...items.map(i => i.order)) + 1 : 1),
+          isActive: formData.isActive !== false
+        })
       })
 
       const result = await response.json()
@@ -365,9 +446,11 @@ export default function WhyChooseUsPage() {
         await fetchItems()
       } else {
         console.error('Failed to save item:', result.message)
+        alert(`Failed to save: ${result.message}`)
       }
     } catch (error) {
       console.error('Error saving item:', error)
+      alert('Error saving item: ' + error.message)
     } finally {
       setProcessing(false)
       setProcessingMessage('')
@@ -480,7 +563,7 @@ export default function WhyChooseUsPage() {
 
   return (
     <div className="p-6">
-      <div className="mb-8">
+      <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold text-foreground">Why Choose Us</h1>
           <p className="text-muted-foreground mt-2">Manage your unique selling points and benefits</p>
@@ -503,11 +586,11 @@ export default function WhyChooseUsPage() {
       </div>
 
       {/* Filters */}
-      <div className="bg-card rounded-lg shadow p-4 border">
+      <div className="bg-card rounded-lg shadow p-4 border mb-6">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1">
             <Input
-              placeholder="Search items..."
+              placeholder="Search by title, description, or slug..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full"
@@ -541,67 +624,67 @@ export default function WhyChooseUsPage() {
           </div>
         </div>
         <div className="overflow-x-auto">
-        {loading ? (
-          <div className="p-12 text-center">
-            <div className="text-muted-foreground">Loading items...</div>
-          </div>
-        ) : filteredItems.length === 0 ? (
-          <div className="p-12 text-center">
-            <Award className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-            <p className="text-foreground text-lg">No items found</p>
-            <p className="text-muted-foreground mt-2">
-              {searchTerm || statusFilter !== 'all'
-                ? 'Try adjusting your search or filters'
-                : 'Click "Add Item" to create your first item'}
-            </p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-muted/50 border-b">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                    Order
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                    Icon
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                    Title
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                    Description
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                    Color
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-card divide-y divide-border">
-                {filteredItems.map((item, index) => (
-                  <WhyChooseUsRow
-                    key={item.id}
-                    item={item}
-                    index={index}
-                    totalItems={filteredItems.length}
-                    onToggleActive={handleToggleStatus}
-                    onEdit={handleEdit}
-                    onDelete={handleDelete}
-                    onOrderChange={handleOrderChange}
-                    processing={processing}
-                  />
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+          {loading ? (
+            <div className="p-12 text-center">
+              <div className="text-muted-foreground">Loading items...</div>
+            </div>
+          ) : filteredItems.length === 0 ? (
+            <div className="p-12 text-center">
+              <Award className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+              <p className="text-foreground text-lg">No items found</p>
+              <p className="text-muted-foreground mt-2">
+                {searchTerm || statusFilter !== 'all'
+                  ? 'Try adjusting your search or filters'
+                  : 'Click "Add Item" to create your first item'}
+              </p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-muted/50 border-b">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      Order
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      Icon
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      Title & Slug
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      Description
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      Color
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-card divide-y divide-border">
+                  {filteredItems.map((item, index) => (
+                    <WhyChooseUsRow
+                      key={item.id}
+                      item={item}
+                      index={index}
+                      totalItems={filteredItems.length}
+                      onToggleActive={handleToggleStatus}
+                      onEdit={handleEdit}
+                      onDelete={handleDelete}
+                      onOrderChange={handleOrderChange}
+                      processing={processing}
+                    />
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Processing Overlay */}
@@ -618,7 +701,7 @@ export default function WhyChooseUsPage() {
 
       {/* Add/Edit Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-[90%] max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editingItem ? 'Edit Item' : 'Add New Item'}</DialogTitle>
             <DialogDescription>
@@ -629,15 +712,16 @@ export default function WhyChooseUsPage() {
           <WhyChooseUsForm
             formData={formData}
             setFormData={setFormData}
+            isEditing={!!editingItem}
           />
 
-          <div className="flex justify-end gap-3">
+          <div className="flex justify-end gap-3 pt-4">
             <Button variant="outline" onClick={handleCloseModal}>
               Cancel
             </Button>
             <Button
               onClick={handleSubmit}
-              disabled={processing || !formData.title || !formData.description}
+              disabled={processing || !formData.title || !formData.description || !formData.slug}
               className="bg-primary hover:bg-primary/90 text-primary-foreground"
             >
               <Save className="w-4 h-4 mr-2" />

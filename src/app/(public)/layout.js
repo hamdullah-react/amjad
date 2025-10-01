@@ -11,6 +11,8 @@ import { TeamProvider } from "@/contexts/TeamContext";
 import { BlogProvider } from "@/contexts/BlogContext";
 import { ServicesProvider } from "@/contexts/ServicesContext";
 import { ServiceAreasProvider } from "@/contexts/service-areas-context";
+import { WhyChooseUsProvider } from "@/contexts/WhyChooseUsContext";
+import { FAQProvider } from "@/contexts/FAQContext";
 
 export default function PublicLayout({ children }) {
   return (
@@ -22,10 +24,14 @@ export default function PublicLayout({ children }) {
 <BlogProvider>
 <ServicesProvider>
 <ServiceAreasProvider>
+<WhyChooseUsProvider>
+ <FAQProvider>
 
           <NaveBar />
           {children}
           <Footer />
+ </FAQProvider>
+</WhyChooseUsProvider>
 </ServiceAreasProvider>
 </ServicesProvider>
 </BlogProvider>
