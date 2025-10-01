@@ -35,7 +35,7 @@ async function getBlogPost(slug) {
 // Generate static params
 export async function generateStaticParams() {
   try {
-    const response = await fetch(`${API_URL}/api/blog`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/blog`, {
       cache: 'no-store'
     });
     
@@ -45,14 +45,23 @@ export async function generateStaticParams() {
 
     const result = await response.json();
     
-    if (result.success) {
-      return result.data.map((post) => ({
-        slug: post.slug,
-      }));
+    if (result.success && result.data && Array.isArray(result.data)) {
+      return result.data
+        .filter(post => 
+          post && 
+          post.slug && 
+          typeof post.slug === 'string' &&
+          (post.published !== false) && // Optional: filter published posts
+          (post.status === 'published' || !post.status) // Optional: filter by status
+        )
+        .map((post) => ({
+          slug: post.slug,
+        }));
     }
     
     return [];
   } catch (error) {
+    console.error('Error generating static params for blog:', error);
     return [];
   }
 }
