@@ -26,29 +26,40 @@ async function getServiceBySlug(slug) {
   }
 }
 
-// Generate static params
+// Generate static params - CORRECTED
 export async function generateStaticParams() {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/services`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/service-areas`, {
       cache: 'no-store'
     });
     
     if (!response.ok) {
+      console.log('API response not OK');
       return [];
     }
 
     const result = await response.json();
     
-    if (result.success) {
-      return result.data
-        .filter(service => service.isActive)
-        .map((service) => ({
-          slug: service.slug,
-        }));
+    console.log("API Response for service areas:", result);
+    
+    if (result.success && result.data && Array.isArray(result.data)) {
+      const validAreas = result.data.filter(service => {
+        const isValid = service && service.slug && typeof service.slug === 'string' && service.isActive !== false;
+        console.log(`Service ${service.slug} valid:`, isValid);
+        return isValid;
+      });
+      
+      console.log("Valid service areas:", validAreas.map(s => s.slug));
+      
+      return validAreas.map((service) => ({
+        slug: service.slug,
+      }));
     }
     
+    console.log("No valid service areas found");
     return [];
   } catch (error) {
+    console.error('Error generating static params:', error);
     return [];
   }
 }
