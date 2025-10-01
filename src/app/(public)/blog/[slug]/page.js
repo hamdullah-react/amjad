@@ -45,15 +45,9 @@ export async function generateStaticParams() {
 
     const result = await response.json();
     
-    if (result.success && result.data && Array.isArray(result.data)) {
+    if (result.success) {
       return result.data
-        .filter(post => 
-          post && 
-          post.slug && 
-          typeof post.slug === 'string' &&
-          (post.published !== false) && // Optional: filter published posts
-          (post.status === 'published' || !post.status) // Optional: filter by status
-        )
+        .filter(post => post.slug && typeof post.slug === 'string')
         .map((post) => ({
           slug: post.slug,
         }));
@@ -61,14 +55,15 @@ export async function generateStaticParams() {
     
     return [];
   } catch (error) {
-    console.error('Error generating static params for blog:', error);
     return [];
   }
 }
 
 // Generate metadata for SEO
 export async function generateMetadata({ params }) {
-  const post = await getBlogPost(params.slug);
+   const { slug } = await params;
+  const post = await getBlogPost(slug);
+  
   
   if (!post) {
     return {
@@ -98,7 +93,9 @@ export async function generateMetadata({ params }) {
 }
 
 const BlogDetailPage = async ({ params }) => {
-  const post = await getBlogPost(params.slug);
+   const { slug } = await params;
+  const post = await getBlogPost(slug);
+  
 
   if (!post) {
     notFound();
