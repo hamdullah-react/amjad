@@ -155,7 +155,7 @@ export default function ServicesAreaPage() {
               // Show actual individual service areas from API
               individualAreas.map((area) => (
                 <Link 
-                  href={`/services-area/${area.slug}`} 
+                  href={`/services-area/${area.slug}`}
                   key={area.id}
                   className="bg-white border border-gray-200 rounded-xl p-4 md:p-5 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 block"
                 >

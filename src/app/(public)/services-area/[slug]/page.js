@@ -49,6 +49,8 @@ export async function generateStaticParams() {
     }
 
     const result = await response.json();
+
+    console.log("gaggaagga", result.data[0].slug);
     
     if (result.success) {
       return result.data
@@ -66,7 +68,9 @@ export async function generateStaticParams() {
 
 // Generate metadata
 export async function generateMetadata({ params }) {
-  const area = await getServiceAreaBySlug(params.slug);
+  // Await the params before using them
+  const { slug } = await params;
+  const area = await getServiceAreaBySlug(slug);
   
   if (!area) {
     return {
@@ -89,7 +93,9 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function ServiceAreaDetailPage({ params }) {
-  const area = await getServiceAreaBySlug(params.slug);
+    // Await the params before using them
+  const { slug } = await params;
+  const area = await getServiceAreaBySlug(slug);
 
   if (!area) {
     notFound();
