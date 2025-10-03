@@ -14,6 +14,9 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
+import { useDataFetching } from '@/contexts/service-areas-context'
+import { SearchModal } from '../search-modal/search-modal'
+
 
 const navigationItems = [
   { name: 'Home', href: '/', icon: Home },
@@ -28,7 +31,9 @@ export const NaveBar = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const [isOpen, setIsOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
+  const [showSearchModal, setShowSearchModal] = useState(false)
   const { contactInfo, loading: isLoadingContact } = useContact()
+  const { serviceAreas } = useDataFetching()
 
   // Handle scroll effect
   useEffect(() => {
@@ -39,9 +44,13 @@ export const NaveBar = () => {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  const handleSearch = (e) => {
+  const handleSearchFocus = () => {
+    setShowSearchModal(true)
+  }
+
+  const handleSearchSubmit = (e) => {
     e.preventDefault()
-    console.log('Searching for:', searchQuery)
+    setShowSearchModal(true)
   }
 
   return (
@@ -142,7 +151,7 @@ export const NaveBar = () => {
       </div>
 
       {/* Main Navigation - Static Content (Always Shows) */}
-      <nav className={`sticky top-0 z-50 bg-white transition-all duration-300 ${isScrolled ? 'shadow-lg' : 'shadow-md'}`}>
+      <nav className={`sticky top-0 z-40 bg-white transition-all duration-300 ${isScrolled ? 'shadow-lg' : 'shadow-md'}`}>
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex items-center justify-between h-16">
 
@@ -176,15 +185,17 @@ export const NaveBar = () => {
 
               {/* Search Bar - Static Content */}
               <div className="ml-4 relative">
-                <form onSubmit={handleSearch}>
+                <form onSubmit={handleSearchSubmit}>
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                     <Input
                       type="search"
-                      placeholder="Search..."
-                      className="pl-10 pr-4 py-2 w-48 text-sm border-gray-200 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                      placeholder="Search service areas..."
+                      className="pl-10 pr-4 py-2 w-48 text-sm border-gray-200 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all cursor-pointer"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
+                      onFocus={handleSearchFocus}
+                      readOnly
                     />
                   </div>
                 </form>
@@ -231,6 +242,20 @@ export const NaveBar = () => {
                     })}
                   </div>
 
+                  {/* Mobile Search */}
+                  <div className="p-4 border-t border-gray-100">
+                    <button
+                      onClick={() => {
+                        setIsOpen(false);
+                        setShowSearchModal(true);
+                      }}
+                      className="flex items-center space-x-3 w-full p-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                    >
+                      <Search className="w-5 h-5 text-gray-400" />
+                      <span className="text-gray-600">Search service areas...</span>
+                    </button>
+                  </div>
+
                   {/* Mobile Contact Info - Dynamic with Loading */}
                   <div className="p-4 bg-gray-50 border-t">
                     <p className="text-xs text-gray-500 mb-2">Need Help?</p>
@@ -252,6 +277,14 @@ export const NaveBar = () => {
           </div>
         </div>
       </nav>
+
+      {/* Search Modal */}
+      <SearchModal
+        isOpen={showSearchModal}
+        onClose={() => setShowSearchModal(false)}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+      />
     </>
   )
 }
