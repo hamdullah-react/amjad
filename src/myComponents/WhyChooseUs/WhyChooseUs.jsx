@@ -99,10 +99,10 @@ const WhyChooseUs = ({ limit = null, showHeader = true }) => {
                 </div>
                 
                 {/* Content */}
-                <h3 className="text-[8px] sm:text-sm md:text-lg font-bold text-gray-800 mb-3 group-hover:text-blue-600 transition-colors duration-300">
+                <h3 className="line-clamp-2  font-bold text-gray-800 mb-3 group-hover:text-blue-600 transition-colors duration-300">
                   {reason.title}
                 </h3>
-                <p className="text-[8px] sm:text-sm text-gray-600 leading-relaxed">
+                <p className="line-clamp-2  text-gray-600 leading-relaxed">
                   {reason.description}
                 </p>
                 

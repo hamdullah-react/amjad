@@ -77,16 +77,28 @@ export default function ServiceAreasPage() {
     order: 0
   });
 
-  const emirates = [
-    'Abu Dhabi',
-    'Dubai',
-    'Sharjah',
-    'Ajman',
-    'Ras Al Khaimah',
-    'Fujairah',
-    'Umm Al Quwain'
-  ];
-
+const emirates = [
+  "Deira",
+  "Bur Dubai",
+  "Downtown Dubai",
+  "Business Bay",
+  "Dubai Marina",
+  "Jumeirah",
+  "Palm Jumeirah",
+  "Dubai Creek Harbour",
+  "Dubai Hills Estate",
+  "Arabian Ranches",
+  "Al Barsha",
+  "Al Quoz",
+  "Al Karama",
+  "Al Nahda",
+  "Al Hamriya",
+  "Jumeirah Lake Towers (JLT)",
+  "Dubai Sports City",
+  "Dubai Silicon Oasis",
+  "Motor City",
+  "International City"
+];
   const deliveryTimes = [
     'Same Day',
     'Next Day',

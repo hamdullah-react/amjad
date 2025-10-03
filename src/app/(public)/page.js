@@ -11,23 +11,7 @@ import CTASection from '@/myComponents/CTASection/CTASection'
 
 
 export default function Home() {
-  const features = [
-    {
-      icon: Zap,
-      title: "Fast & Reliable",
-      description: "Lightning-fast performance with 99.9% uptime guarantee"
-    },
-    {
-      icon: Users,
-      title: "Expert Team",
-      description: "Experienced professionals dedicated to your success"
-    },
-    {
-      icon: Globe,
-      title: "Global Reach",
-      description: "Serving clients worldwide with 24/7 support"
-    }
-  ]
+
 
   const stats = [
     { number: "500+", label: "Happy Clients" },
