@@ -9,6 +9,8 @@ import { useHeroSlider } from '@/contexts/hero-slider-context'
 import HeaderSkeleton from '@/components/layout/HeaderSkeleton'
 import { ArrowRight, Truck, Package, Shield, Clock, Users } from 'lucide-react'
 import Link from 'next/link'
+import { motion } from 'framer-motion'
+import { fadeInUp, staggerContainer, zoomIn, fadeInDown } from '@/lib/animations'
 
 // Import Swiper styles
 import 'swiper/css'
@@ -83,55 +85,80 @@ export const Header = () => {
               {/* Content Overlay */}
               <div className="relative z-10 h-full flex items-center">
                 <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-                  <div className="max-w-4xl mx-auto text-center text-white">
+                  <motion.div
+                    className="max-w-4xl mx-auto text-center text-white"
+                    variants={staggerContainer}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, amount: 0.3 }}
+                  >
                     {/* Icon */}
-                    <div className="mb-6 flex justify-center">
+                    <motion.div
+                      className="mb-6 flex justify-center"
+                      variants={zoomIn}
+                    >
                       <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
                         <IconComponent className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
                       </div>
-                    </div>
-                    
-                    {/* Subtitle */}
-                    <p className="text-sm sm:text-base md:text-lg font-medium text-yellow-300 mb-2 uppercase tracking-wider">
-                      {slide.subtitle}
-                    </p>
-                    
-                    {/* Title */}
-                    <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 leading-tight">
-                      {slide.title}
-                    </h1>
-                    
-                    {/* Description */}
-                    <p className="text-base sm:text-lg md:text-xl mb-6 sm:mb-8 max-w-2xl mx-auto leading-relaxed text-gray-100">
-                      {slide.description}
-                    </p>
-                    
+                    </motion.div>
 
-                    
+                    {/* Subtitle */}
+                    <motion.p
+                      className="text-sm sm:text-base md:text-lg font-medium text-yellow-300 mb-2 uppercase tracking-wider"
+                      variants={fadeInDown}
+                    >
+                      {slide.subtitle}
+                    </motion.p>
+
+                    {/* Title */}
+                    <motion.h1
+                      className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 leading-tight"
+                      variants={fadeInUp}
+                    >
+                      {slide.title}
+                    </motion.h1>
+
+                    {/* Description */}
+                    <motion.p
+                      className="text-base sm:text-lg md:text-xl mb-6 sm:mb-8 max-w-2xl mx-auto leading-relaxed text-gray-100"
+                      variants={fadeInUp}
+                    >
+                      {slide.description}
+                    </motion.p>
+
+
+
                     {/* CTA Buttons */}
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                    <motion.div
+                      className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+                      variants={fadeInUp}
+                    >
                       {slide.buttonText && (
                         <Link href={slide.buttonUrl || '/contact'}>
-                          <Button
-                            size="lg"
-                            className="bg-gradient-to-r from-[#544a7d] to-[#ff9a44] hover:from-[#483e6a] hover:to-[#f08b35] text-white font-semibold px-8 py-3 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg"
-                          >
-                            {slide.buttonText}
-                            <ArrowRight className="ml-2 h-5 w-5" />
-                          </Button>
+                          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                            <Button
+                              size="lg"
+                              className="bg-gradient-to-r from-[#544a7d] to-[#ff9a44] hover:from-[#483e6a] hover:to-[#f08b35] text-white font-semibold px-8 py-3 rounded-full transition-all duration-300 shadow-lg"
+                            >
+                              {slide.buttonText}
+                              <ArrowRight className="ml-2 h-5 w-5" />
+                            </Button>
+                          </motion.div>
                         </Link>
                       )}
                       <Link href="/about">
-                        <Button
-                          variant="outline"
-                          size="lg"
-                          className="border-2 border-white text-white hover:bg-white hover:text-purple-600 font-semibold px-8 py-3 rounded-full transition-all duration-300 bg-transparent"
-                        >
-                          Learn More
-                        </Button>
+                        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                          <Button
+                            variant="outline"
+                            size="lg"
+                            className="border-2 border-white text-white hover:bg-white hover:text-purple-600 font-semibold px-8 py-3 rounded-full transition-all duration-300 bg-transparent"
+                          >
+                            Learn More
+                          </Button>
+                        </motion.div>
                       </Link>
-                    </div>
-                  </div>
+                    </motion.div>
+                  </motion.div>
                 </div>
               </div>
             </SwiperSlide>

@@ -21,17 +21,25 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ImagePicker } from "@/components/ui/image-picker"
 
 const INITIAL_FORM_DATA = {
-  title: '',
-  slug: '',
-  description: '',
-  shortDesc: '',
-  icon: '',
-  imageUrl: '',
-  price: '',
-  features: [],
-  order: 0,
+  title: 'Home Moving Service',
+  slug: 'home-moving-service',
+  description: `We provide professional home moving services including packing, loading, transportation, and unpacking. Our expert movers ensure your furniture and belongings are safely delivered to your new location — on time and with care.`,
+  shortDesc: 'Safe and affordable home moving service for apartments and villas.',
+  icon: '/icons/home-moving.svg', // replace with your actual icon path
+  imageUrl: '/images/services/home-moving.jpg',
+  price: '499', // SAR or any currency
+  features: [
+    'Professional packing materials',
+    'Disassembly and reassembly of furniture',
+    'Secure transportation with GPS tracking',
+    'Unloading and unpacking at destination',
+    'Optional cleaning and setup services'
+  ],
+  order: 1,
   isActive: true
-}
+};
+
+
 
 // Helper function to generate slug from title
 const generateSlug = (title) => {

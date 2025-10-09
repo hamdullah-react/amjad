@@ -1,3 +1,5 @@
+'use client'
+
 import Link from 'next/link'
 import { ArrowRight, CheckCircle, Star, Users, Globe, Zap, Phone } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -7,6 +9,8 @@ import WhyChooseUs from '@/myComponents/WhyChooseUs/WhyChooseUs'
 import WelcomeSection from '@/myComponents/WelcomeSection/WelcomeSection'
 import BlogSection from '@/myComponents/BlogSection/BlogSection'
 import CTASection from '@/myComponents/CTASection/CTASection'
+import { motion } from 'framer-motion'
+import { fadeInUp, staggerContainer } from '@/lib/animations'
 
 
 
@@ -36,18 +40,30 @@ export default function Home() {
       {/* Why Choose Us Section */}
       <WhyChooseUs limit={3} showHeader={true} />
       
-     
+
       {/* Stats Section */}
-      <section className="py-20 bg-gradient-to-r from-blue-600 to-orange-600">
+      <section className="py-20 bg-gradient-to-r from-blue-600 to-orange-600 overflow-hidden">
         <div className="max-w-6xl mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          <motion.div
+            className="grid grid-cols-2 md:grid-cols-4 gap-8"
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.3 }}
+          >
             {stats.map((stat, index) => (
-              <div key={index} className="text-center text-white">
+              <motion.div
+                key={index}
+                className="text-center text-white"
+                variants={fadeInUp}
+                whileHover={{ scale: 1.1, y: -10 }}
+                transition={{ type: "spring", stiffness: 300 }}
+              >
                 <div className="text-4xl md:text-5xl font-bold mb-2">{stat.number}</div>
                 <div className="text-lg opacity-90">{stat.label}</div>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
       

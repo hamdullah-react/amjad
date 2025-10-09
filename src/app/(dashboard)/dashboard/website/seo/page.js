@@ -238,8 +238,8 @@ export default function SEOPage() {
 
       {/* Tabs */}
       <div className="mb-6">
-        <Tabs defaultValue="global" className="w-full">
-          <TabsList className="grid w-full grid-cols-8">
+        <Tabs defaultValue="global" className="w-full ">
+          <TabsList className="flex w-full overflow-x-auto whitespace-nowrap scrollbar-hide">
           <TabsTrigger value="global" className="flex items-center gap-1">
             <Search className="h-3 w-3" />
             Global
