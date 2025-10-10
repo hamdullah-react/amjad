@@ -7,33 +7,7 @@ import PageHeader from '@/myComponents/PageHeader/PageHeader';
 import CTASection from '@/myComponents/CTASection/CTASection';
 import prisma from '@/lib/prisma';
 
-// Get API URL from environment variables
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-
-// Fetch blog post from your API
-async function getBlogPost(slug) {
-  try {
-    const response = await fetch(`${API_URL}/api/blog/slug/${slug}`, {
-      cache: 'no-store'
-    });
-
-    if (!response.ok) {
-      return null;
-    }
-
-    const result = await response.json();
-    
-    if (result.success) {
-      return result.data;
-    } else {
-      return null;
-    }
-  } catch (error) {
-    console.error('Error fetching blog post:', error);
-    return null;
-  }
-}
-
+export const revalidate = 30;
 
 export async function generateStaticParams() {
   try {
@@ -46,43 +20,54 @@ export async function generateStaticParams() {
     return [];
   }
 }
+
 // Generate metadata for SEO
 export async function generateMetadata({ params }) {
-   const { slug } = await params;
-  const post = await getBlogPost(slug);
-  
-  
-  if (!post) {
+  try {
+    const { slug } = await params;
+    const post = await prisma.blogPost.findUnique({
+      where: { slug },
+    });
+    
+    if (!post) {
+      return {
+        title: 'Blog Post Not Found',
+      };
+    }
+
     return {
-      title: 'Blog Post Not Found',
+      title: post.metaTitle || post.title,
+      description: post.metaDescription || post.excerpt || post.content?.substring(0, 160),
+      keywords: post.metaKeywords?.join(', ') || '',
+      openGraph: {
+        title: post.ogTitle || post.metaTitle || post.title,
+        description: post.ogDescription || post.metaDescription || post.excerpt,
+        images: post.ogImage || post.featuredImage ? [post.ogImage || post.featuredImage] : [],
+        type: 'article',
+        publishedTime: post.publishedAt,
+        authors: [post.author],
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: post.twitterTitle || post.ogTitle || post.title,
+        description: post.twitterDescription || post.ogDescription || post.excerpt,
+        images: post.twitterImage || post.ogImage || post.featuredImage ? [post.twitterImage || post.ogImage || post.featuredImage] : [],
+      },
+    };
+  } catch (error) {
+    return {
+      title: 'Blog Post',
     };
   }
-
-  return {
-    title: post.metaTitle || post.title,
-    description: post.metaDescription || post.excerpt || post.content?.substring(0, 160),
-    keywords: post.metaKeywords?.join(', ') || '',
-    openGraph: {
-      title: post.ogTitle || post.metaTitle || post.title,
-      description: post.ogDescription || post.metaDescription || post.excerpt,
-      images: post.ogImage || post.featuredImage ? [post.ogImage || post.featuredImage] : [],
-      type: 'article',
-      publishedTime: post.publishedAt,
-      authors: [post.author],
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: post.twitterTitle || post.ogTitle || post.title,
-      description: post.twitterDescription || post.ogDescription || post.excerpt,
-      images: post.twitterImage || post.ogImage || post.featuredImage ? [post.twitterImage || post.ogImage || post.featuredImage] : [],
-    },
-  };
 }
 
 const BlogDetailPage = async ({ params }) => {
-   const { slug } = await params;
-  const post = await getBlogPost(slug);
+  const { slug } = await params;
   
+  // Use Prisma directly instead of fetch
+  const post = await prisma.blogPost.findUnique({
+    where: { slug },
+  });
 
   if (!post) {
     notFound();

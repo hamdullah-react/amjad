@@ -6,6 +6,7 @@ import { useWelcome } from '@/contexts/welcome-context';
 import WelcomeSkeleton from '@/components/welcome/WelcomeSkeleton';
 import { motion } from 'framer-motion';
 import { fadeInLeft, fadeInRight, fadeInUp, staggerContainer, scaleUp } from '@/lib/animations';
+import Link from 'next/link';
 
 const ICON_MAP = {
   CheckCircle: CheckCircle,
@@ -92,7 +93,7 @@ const WelcomeSection = () => {
                   className="flex flex-col sm:flex-row gap-4 pt-4"
                   variants={fadeInLeft}
                 >
-                  <a href={content.buttonUrl || '#'}>
+                  <Link href={content.buttonUrl}>
                     <motion.button
                       className="bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold px-8 py-4 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl"
                       whileHover={{ scale: 1.05, y: -3 }}
@@ -100,7 +101,7 @@ const WelcomeSection = () => {
                     >
                       {content.buttonText}
                     </motion.button>
-                  </a>
+                  </Link>
                 </motion.div>
               )}
             </motion.div>

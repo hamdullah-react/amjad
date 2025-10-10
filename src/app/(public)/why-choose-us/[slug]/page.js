@@ -5,33 +5,8 @@ import PageHeader from '@/myComponents/PageHeader/PageHeader';
 import CTASection from '@/myComponents/CTASection/CTASection';
 import prisma from '@/lib/prisma';
 
-// Fetch specific why choose us item by slug
-async function getWhyChooseUsBySlug(slug) {
-  try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/why-choose-us/slug/${slug}`, {
-      cache: 'no-store'
-    });
-
-    if (!response.ok) {
-      return null;
-    }
-
-    const result = await response.json();
-    
-    if (result.success) {
-      return result.data;
-    } else {
-      return null;
-    }
-  } catch (error) {
-    console.error('Error fetching why choose us item:', error);
-    return null;
-  }
-}
-
 // Generate static params
-
-
+export const revalidate = 30;
 export async function generateStaticParams() {
   try {
     const items = await prisma.whyChooseUs.findMany();
@@ -46,24 +21,32 @@ export async function generateStaticParams() {
 
 // Generate metadata
 export async function generateMetadata({ params }) {
-  const { slug } = await params;
-  const item = await getWhyChooseUsBySlug(slug);
-  
-  if (!item) {
+  try {
+    const { slug } = await params;
+    const item = await prisma.whyChooseUs.findUnique({
+      where: { slug },
+    });
+    
+    if (!item) {
+      return {
+        title: 'Why Choose Us Item Not Found',
+      };
+    }
+
     return {
-      title: 'Why Choose Us Item Not Found',
+      title: `${item.title} | Why Choose Us`,
+      description: item.description,
+      openGraph: {
+        title: item.title,
+        description: item.description,
+        type: 'website',
+      },
+    };
+  } catch (error) {
+    return {
+      title: 'Why Choose Us',
     };
   }
-
-  return {
-    title: `${item.title} | Why Choose Us`,
-    description: item.description,
-    openGraph: {
-      title: item.title,
-      description: item.description,
-      type: 'website',
-    },
-  };
 }
 
 // Icon mapping
@@ -87,7 +70,11 @@ const COLOR_MAP = {
 
 export default async function WhyChooseUsDetailPage({ params }) {
   const { slug } = await params;
-  const item = await getWhyChooseUsBySlug(slug);
+  
+  // Use Prisma directly instead of fetch
+  const item = await prisma.whyChooseUs.findUnique({
+    where: { slug },
+  });
 
   if (!item) {
     notFound();
@@ -212,8 +199,7 @@ export default async function WhyChooseUsDetailPage({ params }) {
 
         {/* Related Items Section */}
         <div className="mt-12">
-        
-         <CTASection variant="why-choose-us-dynamic" />
+          <CTASection variant="why-choose-us-dynamic" />
         </div>
       </main>
     </div>

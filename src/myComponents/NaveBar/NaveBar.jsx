@@ -17,7 +17,7 @@ import {
 import { useDataFetching } from '@/contexts/service-areas-context'
 import { SearchModal } from '../search-modal/search-modal'
 
-
+// Navigation items
 const navigationItems = [
   { name: 'Home', href: '/', icon: Home },
   { name: 'About', href: '/about', icon: Users },
@@ -25,6 +25,69 @@ const navigationItems = [
   { name: 'Service Areas', href: '/services-area', icon: MapPin },
   { name: 'Blog', href: '/blog', icon: BookOpen },
   { name: 'Contact', href: '/contact', icon: MessageCircle },
+]
+
+// Social media platforms configuration
+const socialPlatforms = [
+  {
+    key: 'facebook',
+    icon: Facebook,
+    label: 'Facebook'
+  },
+  {
+    key: 'twitter',
+    icon: Twitter,
+    label: 'Twitter'
+  },
+  {
+    key: 'youtube',
+    icon: Youtube,
+    label: 'YouTube'
+  },
+  {
+    key: 'instagram',
+    icon: Instagram,
+    label: 'Instagram'
+  },
+  {
+    key: 'linkedin',
+    icon: Linkedin,
+    label: 'LinkedIn'
+  }
+]
+
+// Contact link configurations
+const contactLinks = [
+  {
+    type: 'phone',
+    icon: Phone,
+    prefix: 'tel:',
+    formatter: (value) => value.replace(/[^0-9+]/g, ''),
+    display: {
+      desktop: (value) => value,
+      mobile: 'Call'
+    }
+  },
+  {
+    type: 'email',
+    icon: Mail,
+    prefix: 'mailto:',
+    formatter: (value) => value,
+    display: {
+      desktop: (value) => value,
+      mobile: null
+    }
+  },
+  {
+    type: 'location',
+    icon: MapPin,
+    prefix: '',
+    formatter: (contactInfo) => [contactInfo.city, contactInfo.emirate].filter(Boolean).join(', '),
+    display: {
+      desktop: (value) => value,
+      mobile: (value) => value
+    }
+  }
 ]
 
 export const NaveBar = () => {
@@ -51,6 +114,42 @@ export const NaveBar = () => {
   const handleSearchSubmit = (e) => {
     e.preventDefault()
     setShowSearchModal(true)
+  }
+
+  // Get contact link URL
+  const getContactLinkUrl = (linkConfig) => {
+    if (linkConfig.type === 'location') {
+      return null // Location is not a clickable link
+    }
+    
+    const value = contactInfo[linkConfig.type]
+    if (!value) return null
+    
+    return `${linkConfig.prefix}${linkConfig.formatter(value)}`
+  }
+
+  // Get contact link display text
+  const getContactDisplayText = (linkConfig) => {
+    if (linkConfig.type === 'location') {
+      return linkConfig.formatter(contactInfo)
+    }
+    
+    const value = contactInfo[linkConfig.type]
+    if (!value) return null
+    
+    return linkConfig.display.desktop(value)
+  }
+
+  // Get mobile contact display text
+  const getMobileContactDisplayText = (linkConfig) => {
+    if (linkConfig.type === 'location') {
+      return linkConfig.formatter(contactInfo)
+    }
+    
+    const value = contactInfo[linkConfig.type]
+    if (!value) return null
+    
+    return linkConfig.display.mobile || value
   }
 
   return (
@@ -81,25 +180,41 @@ export const NaveBar = () => {
               ) : contactInfo ? (
                 // Dynamic content when loaded
                 <>
-                  {contactInfo.phone && (
-                    <a href={`tel:${contactInfo.phone.replace(/[^0-9+]/g, '')}`} className="flex items-center space-x-1 hover:text-blue-100 transition-colors">
-                      <Phone className="w-3 h-3" />
-                      <span className="hidden sm:inline">{contactInfo.phone}</span>
-                      <span className="sm:hidden">Call</span>
-                    </a>
-                  )}
-                  {contactInfo.email && (
-                    <a href={`mailto:${contactInfo.email}`} className="hidden md:flex items-center space-x-1 hover:text-blue-100 transition-colors">
-                      <Mail className="w-3 h-3" />
-                      <span>{contactInfo.email}</span>
-                    </a>
-                  )}
-                  {(contactInfo.city || contactInfo.emirate) && (
-                    <div className="flex items-center space-x-1">
-                      <MapPin className="w-3 h-3" />
-                      <span>{[contactInfo.city, contactInfo.emirate].filter(Boolean).join(', ')}</span>
-                    </div>
-                  )}
+                  {contactLinks.map((linkConfig) => {
+                    const IconComponent = linkConfig.icon
+                    const url = getContactLinkUrl(linkConfig)
+                    const displayText = getContactDisplayText(linkConfig)
+                    const mobileDisplayText = getMobileContactDisplayText(linkConfig)
+
+                    if (!displayText && !mobileDisplayText) return null
+
+                    // For location (non-clickable)
+                    if (linkConfig.type === 'location') {
+                      return (
+                        <div key={linkConfig.type} className="flex items-center space-x-1">
+                          <IconComponent className="w-3 h-3" />
+                          <span>{displayText}</span>
+                        </div>
+                      )
+                    }
+
+                    // For phone and email (clickable links)
+                    return (
+                      <Link
+                        key={linkConfig.type}
+                        href={url}
+                        className={`flex items-center space-x-1 hover:text-blue-100 transition-colors ${
+                          linkConfig.type === 'email' ? 'hidden md:flex' : 'flex'
+                        }`}
+                      >
+                        <IconComponent className="w-3 h-3" />
+                        <span className="hidden sm:inline">{displayText}</span>
+                        {linkConfig.type === 'phone' && (
+                          <span className="sm:hidden">{mobileDisplayText}</span>
+                        )}
+                      </Link>
+                    )
+                  })}
                 </>
               ) : null}
             </div>
@@ -118,31 +233,25 @@ export const NaveBar = () => {
                 // Dynamic content when loaded
                 <>
                   <span className="hidden sm:inline mr-2 text-white/80">Follow us:</span>
-                  {contactInfo.socialLinks?.facebook && (
-                    <a href={contactInfo.socialLinks.facebook} target="_blank" rel="noopener noreferrer" className="w-7 h-7 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-all">
-                      <Facebook className="w-3.5 h-3.5" />
-                    </a>
-                  )}
-                  {contactInfo.socialLinks?.twitter && (
-                    <a href={contactInfo.socialLinks.twitter} target="_blank" rel="noopener noreferrer" className="w-7 h-7 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-all">
-                      <Twitter className="w-3.5 h-3.5" />
-                    </a>
-                  )}
-                  {contactInfo.socialLinks?.youtube && (
-                    <a href={contactInfo.socialLinks.youtube} target="_blank" rel="noopener noreferrer" className="w-7 h-7 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-all">
-                      <Youtube className="w-3.5 h-3.5" />
-                    </a>
-                  )}
-                  {contactInfo.socialLinks?.instagram && (
-                    <a href={contactInfo.socialLinks.instagram} target="_blank" rel="noopener noreferrer" className="w-7 h-7 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-all">
-                      <Instagram className="w-3.5 h-3.5" />
-                    </a>
-                  )}
-                  {contactInfo.socialLinks?.linkedin && (
-                    <a href={contactInfo.socialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="w-7 h-7 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-all">
-                      <Linkedin className="w-3.5 h-3.5" />
-                    </a>
-                  )}
+                  {socialPlatforms.map((platform) => {
+                    const IconComponent = platform.icon
+                    const socialUrl = contactInfo.socialLinks?.[platform.key]
+                    
+                    if (!socialUrl) return null
+
+                    return (
+                      <Link
+                        key={platform.key}
+                        href={socialUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-7 h-7 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-all"
+                        title={platform.label}
+                      >
+                        <IconComponent className="w-3.5 h-3.5" />
+                      </Link>
+                    )
+                  })}
                 </>
               ) : null}
             </div>
@@ -169,7 +278,7 @@ export const NaveBar = () => {
             {/* Desktop Navigation - Static Content */}
             <div className="hidden lg:flex items-center space-x-1">
               {navigationItems.map((item) => {
-                const IconComponent = item.icon;
+                const IconComponent = item.icon
 
                 return (
                   <Link
@@ -180,7 +289,7 @@ export const NaveBar = () => {
                     <IconComponent className="w-4 h-4 group-hover:scale-110 transition-transform" />
                     <span>{item.name}</span>
                   </Link>
-                );
+                )
               })}
 
               {/* Search Bar - Static Content */}
@@ -226,7 +335,7 @@ export const NaveBar = () => {
                   {/* Mobile Navigation Links - Static Content */}
                   <div className="py-4">
                     {navigationItems.map((item) => {
-                      const IconComponent = item.icon;
+                      const IconComponent = item.icon
 
                       return (
                         <Link
@@ -238,7 +347,7 @@ export const NaveBar = () => {
                           <IconComponent className="w-5 h-5 text-blue-600" />
                           <span className="font-medium">{item.name}</span>
                         </Link>
-                      );
+                      )
                     })}
                   </div>
 
@@ -246,8 +355,8 @@ export const NaveBar = () => {
                   <div className="p-4 border-t border-gray-100">
                     <button
                       onClick={() => {
-                        setIsOpen(false);
-                        setShowSearchModal(true);
+                        setIsOpen(false)
+                        setShowSearchModal(true)
                       }}
                       className="flex items-center space-x-3 w-full p-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                     >
@@ -265,10 +374,13 @@ export const NaveBar = () => {
                         <div className="w-24 h-4 bg-gray-300 rounded animate-pulse"></div>
                       </div>
                     ) : contactInfo?.phone ? (
-                      <a href={`tel:${contactInfo.phone.replace(/[^0-9+]/g, '')}`} className="flex items-center space-x-2 text-blue-600 font-semibold">
+                      <Link
+                        href={`tel:${contactInfo.phone.replace(/[^0-9+]/g, '')}`}
+                        className="flex items-center space-x-2 text-blue-600 font-semibold"
+                      >
                         <Phone className="w-4 h-4" />
                         <span>{contactInfo.phone}</span>
-                      </a>
+                      </Link>
                     ) : null}
                   </div>
                 </SheetContent>

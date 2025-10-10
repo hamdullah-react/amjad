@@ -1,7 +1,7 @@
 // src/app/layout.js
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { getSEOSettings, generateStructuredData } from "@/lib/seo";
+import prisma from '@/lib/prisma';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,6 +13,139 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// Get SEO settings directly from database
+async function getSEOSettings() {
+  try {
+    const seoSettings = await prisma.companySettings.findUnique({
+      where: { key: 'seo_settings' }
+    });
+
+    if (!seoSettings) {
+      // Return default SEO settings if not set
+      return {
+        // Global SEO
+        siteTitle: 'Marhaba Movers & Packers',
+        titleSeparator: '|',
+        siteDescription: '',
+        keywords: [],
+        author: '',
+        robots: 'index, follow',
+        googleVerification: '',
+        bingVerification: '',
+
+        // Open Graph
+        ogTitle: '',
+        ogDescription: '',
+        ogImage: '',
+        ogType: 'website',
+        ogUrl: '',
+
+        // Twitter Card
+        twitterCard: 'summary_large_image',
+        twitterSite: '',
+        twitterCreator: '',
+        twitterTitle: '',
+        twitterDescription: '',
+        twitterImage: '',
+
+        // Schema Markup
+        schemaType: 'LocalBusiness',
+        schemaBusinessName: '',
+        schemaBusinessType: 'MovingCompany',
+        schemaPriceRange: '$$',
+        schemaLogo: '',
+        schemaImage: '',
+        schemaAddress: '',
+        schemaPhone: '',
+        schemaEmail: '',
+        schemaOpeningHours: [],
+        schemaGeoLatitude: '',
+        schemaGeoLongitude: '',
+        schemaRating: '',
+        schemaReviewCount: '',
+
+        // Sitemap
+        sitemapEnabled: true,
+        sitemapChangeFrequency: 'weekly',
+        sitemapPriority: '0.8',
+        excludedPages: [],
+
+        // Analytics & Tracking
+        googleAnalyticsId: '',
+        googleTagManagerId: '',
+        facebookPixelId: '',
+        hotjarId: '',
+        clarityProjectId: '',
+
+        // Advanced
+        canonicalUrl: '',
+        alternateLanguages: [],
+        structuredDataEnabled: true,
+        richSnippetsEnabled: true,
+        breadcrumbsEnabled: true,
+        faqSchemaEnabled: true,
+        localBusinessSchemaEnabled: true,
+        customHeadScripts: '',
+        customBodyScripts: ''
+      };
+    }
+
+    return seoSettings.value;
+  } catch (error) {
+    console.error('Error fetching SEO settings:', error);
+    return null;
+  }
+}
+
+// Generate structured data
+function generateStructuredData(seoSettings) {
+  if (!seoSettings || !seoSettings.structuredDataEnabled) return null;
+
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": seoSettings.schemaType || "LocalBusiness",
+    "name": seoSettings.schemaBusinessName || seoSettings.siteTitle,
+    "description": seoSettings.siteDescription,
+    "url": seoSettings.canonicalUrl || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000',
+  };
+
+  // Add optional fields if they exist
+  if (seoSettings.schemaLogo) {
+    structuredData.logo = seoSettings.schemaLogo;
+  }
+  if (seoSettings.schemaImage) {
+    structuredData.image = seoSettings.schemaImage;
+  }
+  if (seoSettings.schemaPhone) {
+    structuredData.telephone = seoSettings.schemaPhone;
+  }
+  if (seoSettings.schemaEmail) {
+    structuredData.email = seoSettings.schemaEmail;
+  }
+  if (seoSettings.schemaAddress) {
+    structuredData.address = {
+      "@type": "PostalAddress",
+      "streetAddress": seoSettings.schemaAddress
+    };
+  }
+  if (seoSettings.schemaGeoLatitude && seoSettings.schemaGeoLongitude) {
+    structuredData.geo = {
+      "@type": "GeoCoordinates",
+      "latitude": seoSettings.schemaGeoLatitude,
+      "longitude": seoSettings.schemaGeoLongitude
+    };
+  }
+  if (seoSettings.schemaRating && seoSettings.schemaReviewCount) {
+    structuredData.aggregateRating = {
+      "@type": "AggregateRating",
+      "ratingValue": seoSettings.schemaRating,
+      "reviewCount": seoSettings.schemaReviewCount
+    };
+  }
+
+  return structuredData;
+}
+
 // Generate metadata dynamically
 export async function generateMetadata() {
   try {
@@ -22,13 +155,13 @@ export async function generateMetadata() {
     const metadataBase = new URL(seoSettings.canonicalUrl || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000');
     
     const metadata = {
-      metadataBase, // Add this line to fix the warning
+      metadataBase,
       title: {
         default: seoSettings.siteTitle,
         template: `%s ${seoSettings.titleSeparator} ${seoSettings.siteTitle}`
       },
       description: seoSettings.siteDescription,
-      keywords: seoSettings.keywords,
+      keywords: seoSettings.keywords?.join(', ') || '',
       authors: [{ name: seoSettings.author }],
       creator: seoSettings.author,
       publisher: seoSettings.author,
@@ -101,7 +234,7 @@ export async function generateMetadata() {
     // Return minimal metadata if SEO settings can't be fetched
     console.error('Error generating metadata:', error);
     return {
-      metadataBase: new URL(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'), // Add this
+      metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
       title: 'Marhaba Movers & Packers',
       description: 'Professional moving services',
       icons: {

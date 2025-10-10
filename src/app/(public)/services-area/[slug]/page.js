@@ -15,33 +15,9 @@ import {
 import CTASection from '@/myComponents/CTASection/CTASection';
 import prisma from '@/lib/prisma';
 
-// Fetch service area by slug
-async function getServiceAreaBySlug(slug) {
-  try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/service-areas/slug/${slug}`, {
-      cache: 'no-store'
-    });
-
-    if (!response.ok) {
-      return null;
-    }
-
-    const result = await response.json();
-    
-    if (result.success) {
-      return result.data;
-    } else {
-      return null;
-    }
-  } catch (error) {
-    console.error('Error fetching service area:', error);
-    return null;
-  }
-}
-
 // Generate static params
-// Generate static param
 
+export const revalidate = 30;
 export async function generateStaticParams() {
   try {
     const serviceAreas = await prisma.serviceArea.findMany();
@@ -56,34 +32,44 @@ export async function generateStaticParams() {
 
 // Generate metadata
 export async function generateMetadata({ params }) {
-  // Await the params before using them
-  const { slug } = await params;
-  const area = await getServiceAreaBySlug(slug);
-  
-  if (!area) {
+  try {
+    const { slug } = await params;
+    const area = await prisma.serviceArea.findUnique({
+      where: { slug },
+    });
+    
+    if (!area) {
+      return {
+        title: 'Service Area Not Found',
+      };
+    }
+
+    const title = `${area.city}${area.area ? ` - ${area.area}` : ''}, ${area.emirate} | Marhaba Moving Services`;
+    const description = area.description || `Professional furniture moving services in ${area.city}${area.area ? `, ${area.area}` : ''}, ${area.emirate}.`;
+
     return {
-      title: 'Service Area Not Found',
-    };
-  }
-
-  const title = `${area.city}${area.area ? ` - ${area.area}` : ''}, ${area.emirate} | Marhaba Moving Services`;
-  const description = area.description || `Professional furniture moving services in ${area.city}${area.area ? `, ${area.area}` : ''}, ${area.emirate}.`;
-
-  return {
-    title,
-    description: description.substring(0, 160),
-    openGraph: {
       title,
       description: description.substring(0, 160),
-      type: 'website',
-    },
-  };
+      openGraph: {
+        title,
+        description: description.substring(0, 160),
+        type: 'website',
+      },
+    };
+  } catch (error) {
+    return {
+      title: 'Service Area',
+    };
+  }
 }
 
 export default async function ServiceAreaDetailPage({ params }) {
-    // Await the params before using them
   const { slug } = await params;
-  const area = await getServiceAreaBySlug(slug);
+  
+  // Use Prisma directly instead of fetch
+  const area = await prisma.serviceArea.findUnique({
+    where: { slug },
+  });
 
   if (!area) {
     notFound();
@@ -327,7 +313,6 @@ export default async function ServiceAreaDetailPage({ params }) {
 
           {/* Related Areas CTA */}
           <div className="mt-16 text-center bg-gradient-to-r from-blue-50 to-orange-50 rounded-2xl ">
-           
             <CTASection variant="service-areas-dynamic" />
           </div>
         </div>

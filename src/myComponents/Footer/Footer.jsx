@@ -22,6 +22,68 @@ import {
   Linkedin,
 } from "lucide-react";
 
+// Social media platforms configuration
+const socialPlatforms = [
+  {
+    key: 'facebook',
+    icon: Facebook,
+    label: 'Facebook',
+    hoverColor: 'hover:bg-blue-600'
+  },
+  {
+    key: 'twitter',
+    icon: Twitter,
+    label: 'Twitter',
+    hoverColor: 'hover:bg-blue-400'
+  },
+  {
+    key: 'instagram',
+    icon: Instagram,
+    label: 'Instagram',
+    hoverColor: 'hover:bg-gradient-to-br hover:from-purple-600 hover:to-pink-600'
+  },
+  {
+    key: 'youtube',
+    icon: Youtube,
+    label: 'YouTube',
+    hoverColor: 'hover:bg-red-600'
+  },
+  {
+    key: 'linkedin',
+    icon: Linkedin,
+    label: 'LinkedIn',
+    hoverColor: 'hover:bg-blue-500'
+  }
+];
+
+// Services links configuration
+const servicesLinks = [
+  { name: "Residential Moving", href: "/services#residential" },
+  { name: "Commercial Moving", href: "/services#commercial" },
+  { name: "Furniture Packing", href: "/services#packing" },
+  { name: "Storage Solutions", href: "/services#storage" },
+  { name: "International Moving", href: "/services#international" },
+  { name: "Furniture Assembly", href: "/services#assembly" },
+];
+
+// Quick links configuration
+const quickLinks = [
+  { name: "About Us", href: "/about" },
+  { name: "Service Areas", href: "/services-area" },
+  { name: "Pricing", href: "/services" },
+  { name: "Blog & Tips", href: "/blog" },
+  { name: "Contact Us", href: "/contact" },
+  { name: "Get Free Quote", href: "/contact" },
+];
+
+// Bottom links configuration
+const bottomLinks = [
+  { name: "Terms & Conditions", href: "/terms" },
+  { name: "Privacy Policy", href: "/privacy" },
+  { name: "Sitemap", href: "/sitemap" },
+  { name: "We're Hiring!", href: "/careers", highlight: true },
+];
+
 const Footer = () => {
   const currentYear = new Date().getFullYear();
   const { contactInfo, loading } = useContact();
@@ -103,56 +165,25 @@ const Footer = () => {
 
             {/* Social Media */}
             <div className="flex gap-3">
-              {contactInfo?.socialLinks?.facebook && (
-                <a
-                  href={contactInfo.socialLinks.facebook}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-10 h-10 bg-gray-800 hover:bg-blue-600 rounded-lg flex items-center justify-center transition-all duration-300 group"
-                >
-                  <Facebook className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                </a>
-              )}
-              {contactInfo?.socialLinks?.twitter && (
-                <a
-                  href={contactInfo.socialLinks.twitter}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-10 h-10 bg-gray-800 hover:bg-blue-400 rounded-lg flex items-center justify-center transition-all duration-300 group"
-                >
-                  <Twitter className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                </a>
-              )}
-              {contactInfo?.socialLinks?.instagram && (
-                <a
-                  href={contactInfo.socialLinks.instagram}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-10 h-10 bg-gray-800 hover:bg-gradient-to-br hover:from-purple-600 hover:to-pink-600 rounded-lg flex items-center justify-center transition-all duration-300 group"
-                >
-                  <Instagram className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                </a>
-              )}
-              {contactInfo?.socialLinks?.youtube && (
-                <a
-                  href={contactInfo.socialLinks.youtube}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-10 h-10 bg-gray-800 hover:bg-red-600 rounded-lg flex items-center justify-center transition-all duration-300 group"
-                >
-                  <Youtube className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                </a>
-              )}
-              {contactInfo?.socialLinks?.linkedin && (
-                <a
-                  href={contactInfo.socialLinks.linkedin}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-10 h-10 bg-gray-800 hover:bg-blue-500 rounded-lg flex items-center justify-center transition-all duration-300 group"
-                >
-                  <Linkedin className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                </a>
-              )}
+              {socialPlatforms.map((platform) => {
+                const IconComponent = platform.icon;
+                const socialUrl = contactInfo?.socialLinks?.[platform.key];
+                
+                if (!socialUrl) return null;
+
+                return (
+                  <Link
+                    key={platform.key}
+                    href={socialUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`w-10 h-10 bg-gray-800 ${platform.hoverColor} rounded-lg flex items-center justify-center transition-all duration-300 group`}
+                    title={platform.label}
+                  >
+                    <IconComponent className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                  </Link>
+                );
+              })}
             </div>
           </div>
 
@@ -163,17 +194,7 @@ const Footer = () => {
               Our Services
             </h4>
             <ul className="space-y-3">
-              {[
-                { name: "Residential Moving", href: "/services#residential" },
-                { name: "Commercial Moving", href: "/services#commercial" },
-                { name: "Furniture Packing", href: "/services#packing" },
-                { name: "Storage Solutions", href: "/services#storage" },
-                {
-                  name: "International Moving",
-                  href: "/services#international",
-                },
-                { name: "Furniture Assembly", href: "/services#assembly" },
-              ].map((item) => (
+              {servicesLinks.map((item) => (
                 <li key={item.name}>
                   <Link
                     href={item.href}
@@ -191,14 +212,7 @@ const Footer = () => {
           <div>
             <h4 className="text-lg font-bold text-white mb-6">Quick Links</h4>
             <ul className="space-y-3">
-              {[
-                { name: "About Us", href: "/about" },
-                { name: "Service Areas", href: "/services-area" },
-                { name: "Pricing", href: "/services#pricing" },
-                { name: "Blog & Tips", href: "/blog" },
-                { name: "Contact Us", href: "/contact" },
-                { name: "Get Free Quote", href: "/contact#quote" },
-              ].map((item) => (
+              {quickLinks.map((item) => (
                 <li key={item.name}>
                   <Link
                     href={item.href}
@@ -248,30 +262,30 @@ const Footer = () => {
                   <p className="text-white font-medium text-sm mb-1">Call Us</p>
                   {contactInfo?.phone && (
                     <>
-                      <a
+                      <Link
                         href={`tel:${contactInfo.phone.replace(/[^0-9+]/g, "")}`}
                         className="text-gray-400 hover:text-orange-400 transition-colors text-sm"
                       >
                         {contactInfo.phone}
-                      </a>
+                      </Link>
                       <br />
                     </>
                   )}
                   {contactInfo?.alternatePhone && (
-                    <a
+                    <Link
                       href={`tel:${contactInfo.alternatePhone.replace(/[^0-9+]/g, "")}`}
                       className="text-gray-400 hover:text-orange-400 transition-colors text-sm"
                     >
                       {contactInfo.alternatePhone}
-                    </a>
+                    </Link>
                   )}
                   {!contactInfo?.phone && !contactInfo?.alternatePhone && (
-                    <a
+                    <Link
                       href="tel:+971568011076"
                       className="text-gray-400 hover:text-orange-400 transition-colors text-sm"
                     >
                       +971 568 011 076
-                    </a>
+                    </Link>
                   )}
                 </div>
               </div>
@@ -286,27 +300,27 @@ const Footer = () => {
                     Email Us
                   </p>
                   {contactInfo?.email ? (
-                    <a
+                    <Link
                       href={`mailto:${contactInfo.email}`}
                       className="text-gray-400 hover:text-blue-400 transition-colors text-sm"
                     >
                       {contactInfo.email}
-                    </a>
+                    </Link>
                   ) : (
                     <>
-                      <a
+                      <Link
                         href="mailto:info@marhabamovers.ae"
                         className="text-gray-400 hover:text-blue-400 transition-colors text-sm"
                       >
                         info@marhabamovers.ae
-                      </a>
+                      </Link>
                       <br />
-                      <a
+                      <Link
                         href="mailto:support@marhabamovers.ae"
                         className="text-gray-400 hover:text-blue-400 transition-colors text-sm"
                       >
                         support@marhabamovers.ae
-                      </a>
+                      </Link>
                     </>
                   )}
                 </div>
@@ -359,30 +373,19 @@ const Footer = () => {
             </div>
 
             <div className="flex flex-wrap gap-6 text-sm">
-              <Link
-                href="/terms"
-                className="text-gray-500 hover:text-blue-400 transition-colors"
-              >
-                Terms & Conditions
-              </Link>
-              <Link
-                href="/privacy"
-                className="text-gray-500 hover:text-blue-400 transition-colors"
-              >
-                Privacy Policy
-              </Link>
-              <Link
-                href="/sitemap"
-                className="text-gray-500 hover:text-blue-400 transition-colors"
-              >
-                Sitemap
-              </Link>
-              <Link
-                href="/careers"
-                className="text-gray-500 hover:text-orange-400 transition-colors font-medium"
-              >
-                We're Hiring!
-              </Link>
+              {bottomLinks.map((link) => (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  className={`text-gray-500 transition-colors ${
+                    link.highlight 
+                      ? "hover:text-orange-400 font-medium" 
+                      : "hover:text-blue-400"
+                  }`}
+                >
+                  {link.name}
+                </Link>
+              ))}
             </div>
           </div>
         </div>

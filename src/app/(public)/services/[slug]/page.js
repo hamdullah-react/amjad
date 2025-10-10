@@ -4,34 +4,9 @@ import { Calendar, Clock, DollarSign, CheckCircle, Phone, MessageCircle } from '
 import CTASection from '@/myComponents/CTASection/CTASection';
 import prisma from '@/lib/prisma';
 
-// Fetch service by slug
-async function getServiceBySlug(slug) {
-  try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/services/slug/${slug}`, {
-      cache: 'no-store'
-    });
-
-    if (!response.ok) {
-      return null;
-    }
-
-    const result = await response.json();
-    
-    if (result.success) {
-      return result.data;
-    } else {
-      return null;
-    }
-  } catch (error) {
-    console.error('Error fetching service:', error);
-    return null;
-  }
-}
-
-// Generate static params - CORRECTED
-
-
-
+// Generate static params
+// Revalidate every hour (3600 seconds) - or choose your timeframe
+export const revalidate = 30;
 
 export async function generateStaticParams() {
   try {
@@ -47,32 +22,45 @@ export async function generateStaticParams() {
 
 // Generate metadata
 export async function generateMetadata({ params }) {
-  const service = await getServiceBySlug(params.slug);
-  
-  if (!service) {
+  try {
+    const service = await prisma.service.findUnique({
+      where: { slug: params.slug },
+    });
+    
+    if (!service) {
+      return {
+        title: 'Service Not Found',
+      };
+    }
+
     return {
-      title: 'Service Not Found',
+      title: `${service.title} - Marhaba Moving Services`,
+      description: service.shortDesc || service.description?.substring(0, 160),
+      openGraph: {
+        title: service.title,
+        description: service.shortDesc || service.description?.substring(0, 160),
+        images: service.imageUrl ? [service.imageUrl] : [],
+        type: 'website',
+      },
+    };
+  } catch (error) {
+    return {
+      title: 'Service',
     };
   }
-
-  return {
-    title: `${service.title} - Marhaba Moving Services`,
-    description: service.shortDesc || service.description?.substring(0, 160),
-    openGraph: {
-      title: service.title,
-      description: service.shortDesc || service.description?.substring(0, 160),
-      images: service.imageUrl ? [service.imageUrl] : [],
-      type: 'website',
-    },
-  };
 }
 
 export default async function ServiceDetailPage({ params }) {
-  const service = await getServiceBySlug(params.slug);
+  // Use Prisma directly instead of fetch
+  const service = await prisma.service.findUnique({
+    where: { slug: params.slug },
+  });
 
   if (!service) {
     notFound();
   }
+
+  // console.log("object", service);
 
   const formatPrice = (price) => {
     if (!price) return 'Contact for pricing';
@@ -212,7 +200,6 @@ export default async function ServiceDetailPage({ params }) {
 
           {/* Related Services CTA */}
           <div className="mt-16 text-center bg-gradient-to-r from-blue-50 to-orange-50 rounded-2xl">
-
             <CTASection variant="services-dynamic" />
           </div>
         </div>
