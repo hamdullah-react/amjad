@@ -3,6 +3,7 @@ import { ArrowLeft, Calendar, Clock, Award, Shield, Users, Truck, CheckCircle, S
 import Link from 'next/link';
 import PageHeader from '@/myComponents/PageHeader/PageHeader';
 import CTASection from '@/myComponents/CTASection/CTASection';
+import prisma from '@/lib/prisma';
 
 // Fetch specific why choose us item by slug
 async function getWhyChooseUsBySlug(slug) {
@@ -29,27 +30,15 @@ async function getWhyChooseUsBySlug(slug) {
 }
 
 // Generate static params
+
+
 export async function generateStaticParams() {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/why-choose-us`, {
-      cache: 'no-store'
-    });
+    const items = await prisma.whyChooseUs.findMany();
     
-    if (!response.ok) {
-      return [];
-    }
-
-    const result = await response.json();
-    
-    if (result.success && result.data && Array.isArray(result.data)) {
-      return result.data
-        .filter(item => item.slug && typeof item.slug === 'string' && item.isActive)
-        .map((item) => ({
-          slug: item.slug,
-        }));
-    }
-    
-    return [];
+    return items.map((item) => ({
+      slug: item.slug,
+    }));
   } catch (error) {
     return [];
   }

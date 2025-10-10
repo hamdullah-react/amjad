@@ -18,7 +18,11 @@ export async function generateMetadata() {
   try {
     const seoSettings = await getSEOSettings();
     
+    // Set metadataBase using your domain or fallback to localhost
+    const metadataBase = new URL(seoSettings.canonicalUrl || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000');
+    
     const metadata = {
+      metadataBase, // Add this line to fix the warning
       title: {
         default: seoSettings.siteTitle,
         template: `%s ${seoSettings.titleSeparator} ${seoSettings.siteTitle}`
@@ -97,6 +101,7 @@ export async function generateMetadata() {
     // Return minimal metadata if SEO settings can't be fetched
     console.error('Error generating metadata:', error);
     return {
+      metadataBase: new URL(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'), // Add this
       title: 'Marhaba Movers & Packers',
       description: 'Professional moving services',
       icons: {

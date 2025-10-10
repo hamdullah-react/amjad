@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import PageHeader from '@/myComponents/PageHeader/PageHeader';
 import { Calendar, Clock, DollarSign, CheckCircle, Phone, MessageCircle } from 'lucide-react';
 import CTASection from '@/myComponents/CTASection/CTASection';
+import prisma from '@/lib/prisma';
 
 // Fetch service by slug
 async function getServiceBySlug(slug) {
@@ -28,39 +29,18 @@ async function getServiceBySlug(slug) {
 }
 
 // Generate static params - CORRECTED
+
+
+
+
 export async function generateStaticParams() {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/service-areas`, {
-      cache: 'no-store'
-    });
+    const services = await prisma.service.findMany();
     
-    if (!response.ok) {
-      console.log('API response not OK');
-      return [];
-    }
-
-    const result = await response.json();
-    
-    // console.log("API Response for service areas:", result);
-    
-    if (result.success && result.data && Array.isArray(result.data)) {
-      const validAreas = result.data.filter(service => {
-        const isValid = service && service.slug && typeof service.slug === 'string' && service.isActive !== false;
-        console.log(`Service ${service.slug} valid:`, isValid);
-        return isValid;
-      });
-      
-      console.log("Valid service areas:", validAreas.map(s => s.slug));
-      
-      return validAreas.map((service) => ({
-        slug: service.slug,
-      }));
-    }
-    
-    console.log("No valid service areas found");
-    return [];
+    return services.map((service) => ({
+      slug: service.slug,
+    }));
   } catch (error) {
-    console.error('Error generating static params:', error);
     return [];
   }
 }

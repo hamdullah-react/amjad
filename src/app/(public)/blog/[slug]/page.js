@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Calendar, User, ArrowLeft, Clock, Tag, Eye, Heart, MessageCircle } from 'lucide-react';
 import PageHeader from '@/myComponents/PageHeader/PageHeader';
 import CTASection from '@/myComponents/CTASection/CTASection';
+import prisma from '@/lib/prisma';
 
 // Get API URL from environment variables
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
@@ -33,33 +34,18 @@ async function getBlogPost(slug) {
   }
 }
 
-// Generate static params
+
 export async function generateStaticParams() {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/blog`, {
-      cache: 'no-store'
-    });
+    const posts = await prisma.blogPost.findMany();
     
-    if (!response.ok) {
-      return [];
-    }
-
-    const result = await response.json();
-    
-    if (result.success) {
-      return result.data
-        .filter(post => post.slug && typeof post.slug === 'string')
-        .map((post) => ({
-          slug: post.slug,
-        }));
-    }
-    
-    return [];
+    return posts.map((post) => ({
+      slug: post.slug,
+    }));
   } catch (error) {
     return [];
   }
 }
-
 // Generate metadata for SEO
 export async function generateMetadata({ params }) {
    const { slug } = await params;

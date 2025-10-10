@@ -13,6 +13,7 @@ import {
   Star
 } from 'lucide-react';
 import CTASection from '@/myComponents/CTASection/CTASection';
+import prisma from '@/lib/prisma';
 
 // Fetch service area by slug
 async function getServiceAreaBySlug(slug) {
@@ -39,50 +40,16 @@ async function getServiceAreaBySlug(slug) {
 }
 
 // Generate static params
-// Generate static params
+// Generate static param
+
 export async function generateStaticParams() {
   try {
-    // Use the same domain during build time
-    const baseUrl = process.env.NODE_ENV === 'production' 
-      ? process.env.NEXT_PUBLIC_API_URL 
-      : 'http://localhost:3000';
+    const serviceAreas = await prisma.serviceArea.findMany();
     
-    const response = await fetch(`${baseUrl}/api/service-areas`, {
-      cache: 'no-store',
-      // Add headers to avoid potential issues
-      headers: {
-        'Content-Type': 'application/json',
-      }
-    });
-    
-    if (!response.ok) {
-      console.log('API response not OK, status:', response.status);
-      return [];
-    }
-
-    const result = await response.json();
-    
-    console.log("API Response:", result);
-    
-    if (result.success && result.data && Array.isArray(result.data)) {
-      const validAreas = result.data.filter(area => {
-        const isValid = area && area.slug && typeof area.slug === 'string' && area.isActive !== false;
-        console.log(`Area ${area.slug} valid:`, isValid);
-        return isValid;
-      });
-      
-      console.log("Valid areas for static generation:", validAreas.map(a => a.slug));
-      
-      return validAreas.map((area) => ({
-        slug: area.slug,
-      }));
-    }
-    
-    console.log("No valid data found in response");
-    return [];
+    return serviceAreas.map((area) => ({
+      slug: area.slug,
+    }));
   } catch (error) {
-    console.error('Error generating static params:', error);
-    // Return empty array instead of throwing error
     return [];
   }
 }
