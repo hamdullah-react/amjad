@@ -7,6 +7,8 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { motion } from 'framer-motion';
+import { fadeInUp, staggerContainer, scaleUp } from '@/lib/animations';
 
 const FAQSection = ({ 
   title = "Frequently Asked Questions",
@@ -52,8 +54,17 @@ const FAQSection = ({
 
   return (
     <div className={`mt-20 ${className}`}>
-      <div className="text-center mb-12">
-        <h2 className="text-3xl md:text-4xl font-bold mb-4">
+      <motion.div
+        className="text-center mb-12"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: false, amount: 0.3 }}
+        variants={staggerContainer}
+      >
+        <motion.h2
+          className="text-3xl md:text-4xl font-bold mb-4"
+          variants={fadeInUp}
+        >
           {title.includes('Questions') ? (
             <>
               Frequently Asked <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-orange-600">Questions</span>
@@ -61,33 +72,57 @@ const FAQSection = ({
           ) : (
             title
           )}
-        </h2>
-        <p className="text-gray-600 text-lg">{subtitle}</p>
-      </div>
+        </motion.h2>
+        <motion.p
+          className="text-gray-600 text-lg"
+          variants={fadeInUp}
+        >
+          {subtitle}
+        </motion.p>
+        <motion.div
+          className="w-24 h-1 bg-gradient-to-r from-blue-500 to-orange-500 mx-auto mt-4"
+          variants={scaleUp}
+        ></motion.div>
+      </motion.div>
 
-      <div className="max-w-3xl mx-auto">
+      <motion.div
+        className="max-w-3xl mx-auto"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: false, amount: 0.1 }}
+        variants={staggerContainer}
+      >
         <Accordion type="single" collapsible className="space-y-4">
           {faqs.map((faq, index) => (
-            <AccordionItem
+            <motion.div
               key={faq.id}
-              value={faq.id}
-              className="bg-white rounded-xl shadow-lg border border-gray-100 px-6 py-2"
+              variants={fadeInUp}
             >
-              <AccordionTrigger className="text-left hover:no-underline">
-                <div className="flex items-center">
-                  <div className="w-10 h-10 bg-gradient-to-r from-blue-100 to-orange-100 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
-                    <span className="text-blue-600 font-bold">?</span>
-                  </div>
-                  <span className="font-bold text-lg text-gray-800">{faq.question}</span>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="text-gray-600 leading-relaxed pt-2 pl-14">
-                {faq.answer}
-              </AccordionContent>
-            </AccordionItem>
+              <motion.div
+                whileHover={{ scale: 1.02, y: -5 }}
+                transition={{ type: "spring", stiffness: 300 }}
+              >
+                <AccordionItem
+                  value={faq.id}
+                  className="bg-white rounded-xl shadow-lg border border-gray-100 px-6 py-2"
+                >
+                  <AccordionTrigger className="text-left hover:no-underline">
+                    <div className="flex items-center">
+                      <div className="w-10 h-10 bg-gradient-to-r from-blue-100 to-orange-100 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
+                        <span className="text-blue-600 font-bold">?</span>
+                      </div>
+                      <span className="font-bold text-lg text-gray-800">{faq.question}</span>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="text-gray-600 leading-relaxed pt-2 pl-14">
+                    {faq.answer}
+                  </AccordionContent>
+                </AccordionItem>
+              </motion.div>
+            </motion.div>
           ))}
         </Accordion>
-      </div>
+      </motion.div>
     </div>
   );
 };

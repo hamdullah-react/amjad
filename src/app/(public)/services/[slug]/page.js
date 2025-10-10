@@ -41,7 +41,7 @@ export async function generateStaticParams() {
 
     const result = await response.json();
     
-    console.log("API Response for service areas:", result);
+    // console.log("API Response for service areas:", result);
     
     if (result.success && result.data && Array.isArray(result.data)) {
       const validAreas = result.data.filter(service => {

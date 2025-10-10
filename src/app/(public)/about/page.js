@@ -3,6 +3,8 @@ import Image from 'next/image'
 import { CheckCircle2, Clock, Truck, Users, Award, Target, Heart, Star, TrendingUp, Shield, Trophy, Eye, Calendar } from 'lucide-react'
 import { useAbout } from '@/contexts/AboutContext'
 import PageHeader from '@/myComponents/PageHeader/PageHeader'
+import { motion } from 'framer-motion'
+import { fadeInUp, fadeInLeft, fadeInRight, staggerContainer, scaleUp } from '@/lib/animations'
 
 import { 
   StatsSkeleton, 
@@ -145,14 +147,25 @@ export default function AboutPage() {
       />
 
       {/* Stats Section */}
-      <section className="relative bg-gradient-to-br from-blue-50 via-white to-orange-50 py-12">
+      <section className="relative bg-gradient-to-br from-blue-50 via-white to-orange-50 py-12 overflow-hidden">
         <div className="absolute inset-0 bg-white/40"></div>
         <div className="max-w-6xl mx-auto px-4">
-          <div className="relative grid grid-cols-2 md:grid-cols-4 gap-4">
+          <motion.div
+            className="relative grid grid-cols-2 md:grid-cols-4 gap-4"
+            variants={staggerContainer}
+            initial="hidden"
+            animate="visible"
+          >
             {stats.map((stat, index) => {
               const IconComponent = iconMap[stat.icon] || Users;
               return (
-                <div key={index} className="text-center group">
+                <motion.div
+                  key={index}
+                  className="text-center group"
+                  variants={fadeInUp}
+                  whileHover={{ scale: 1.05, y: -5 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                >
                   <div className="inline-block p-3 bg-gradient-to-r from-blue-500 to-orange-500 rounded-full mb-3 group-hover:scale-110 transition-transform">
                     <IconComponent className="w-6 h-6 text-white" />
                   </div>
@@ -160,10 +173,10 @@ export default function AboutPage() {
                     {stat.number}
                   </h3>
                   <p className="text-sm text-gray-600 font-medium">{stat.label}</p>
-                </div>
+                </motion.div>
               );
             })}
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -173,39 +186,74 @@ export default function AboutPage() {
 
           {/* Our Story Section */}
           <div className="mb-20">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl md:text-3xl font-bold mb-3">
+            <motion.div
+              className="text-center mb-8"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: false, amount: 0.3 }}
+              variants={staggerContainer}
+            >
+              <motion.h2
+                className="text-2xl md:text-3xl font-bold mb-3"
+                variants={fadeInUp}
+              >
                 Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-orange-600">Story</span>
-              </h2>
-              <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-orange-500 mx-auto"></div>
-            </div>
+              </motion.h2>
+              <motion.div
+                className="w-24 h-1 bg-gradient-to-r from-blue-500 to-orange-500 mx-auto"
+                variants={scaleUp}
+              ></motion.div>
+            </motion.div>
 
             <div className="grid lg:grid-cols-2 gap-12 items-center">
-              <div className="space-y-6">
+              <motion.div
+                className="space-y-6"
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: false, amount: 0.2 }}
+                variants={staggerContainer}
+              >
                 {data.story?.content?.split('\n\n').map((paragraph, index) => (
-                  <p key={index} className="text-gray-600 leading-relaxed">
+                  <motion.p
+                    key={index}
+                    className="text-gray-600 leading-relaxed"
+                    variants={fadeInLeft}
+                  >
                     {paragraph}
-                  </p>
+                  </motion.p>
                 ))}
 
                 {/* Timeline */}
-                <div className="mt-8">
+                <motion.div className="mt-8" variants={fadeInLeft}>
                   <h3 className="font-bold text-xl mb-6 text-gray-800">Our Journey</h3>
                   <div className="space-y-4">
                     {data.journey?.map((milestone, index) => (
-                      <div key={index} className="flex items-start">
+                      <motion.div
+                        key={index}
+                        className="flex items-start"
+                        initial={{ opacity: 0, x: -20 }} 
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: false }}
+                        transition={{ delay: index * 0.1 }}
+                      >
                         <div className="w-20 font-bold text-blue-600">{milestone.year}</div>
                         <div className="flex-1">
                           <div className="w-3 h-3 bg-gradient-to-r from-blue-500 to-orange-500 rounded-full mt-1.5 mr-4 float-left"></div>
                           <p className="text-gray-600">{milestone.detail}</p>
                         </div>
-                      </div>
+                      </motion.div>
                     ))}
                   </div>
-                </div>
-              </div>
+                </motion.div>
+              </motion.div>
 
-              <div className="relative">
+              <motion.div
+                className="relative"
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: false, amount: 0.2 }}
+                variants={fadeInRight}
+              >
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-4">
                     <div className="relative h-48 rounded-2xl overflow-hidden shadow-xl">
@@ -249,17 +297,34 @@ export default function AboutPage() {
                   </div>
                 </div>
                 {/* Floating Badge */}
-                <div className="absolute -top-4 -right-4 bg-gradient-to-r from-blue-600 to-orange-600 text-white px-6 py-3 rounded-full shadow-lg">
+                <motion.div
+                  className="absolute -top-4 -right-4 bg-gradient-to-r from-blue-600 to-orange-600 text-white px-6 py-3 rounded-full shadow-lg"
+                  initial={{ opacity: 0, scale: 0 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: false }}
+                  transition={{ delay: 0.5, type: "spring", stiffness: 200 }}
+                >
                   <span className="font-bold">{data.yearsExperience}+ Years</span>
-                </div>
-              </div>
+                </motion.div>
+              </motion.div>
             </div>
           </div>
 
           {/* Mission & Vision Section */}
-          <div className="mb-20">
+          <motion.div
+            className="mb-20"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: false, amount: 0.2 }}
+            variants={staggerContainer}
+          >
             <div className="grid md:grid-cols-2 gap-8">
-              <div className="relative group">
+              <motion.div
+                className="relative group"
+                variants={fadeInLeft}
+                whileHover={{ scale: 1.02, y: -5 }}
+                transition={{ type: "spring", stiffness: 300 }}
+              >
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-400 rounded-3xl opacity-90 group-hover:opacity-100 transition-opacity"></div>
                 <div className="relative bg-gradient-to-r from-blue-600 to-blue-400 p-8 md:p-10 rounded-3xl text-white">
                   <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-6">
@@ -278,9 +343,14 @@ export default function AboutPage() {
                     ))}
                   </ul>
                 </div>
-              </div>
+              </motion.div>
 
-              <div className="relative group">
+              <motion.div
+                className="relative group"
+                variants={fadeInRight}
+                whileHover={{ scale: 1.02, y: -5 }}
+                transition={{ type: "spring", stiffness: 300 }}
+              >
                 <div className="absolute inset-0 bg-gradient-to-r from-orange-600 to-orange-400 rounded-3xl opacity-90 group-hover:opacity-100 transition-opacity"></div>
                 <div className="relative bg-gradient-to-r from-orange-600 to-orange-400 p-8 md:p-10 rounded-3xl text-white">
                   <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-6">
@@ -299,35 +369,61 @@ export default function AboutPage() {
                     ))}
                   </ul>
                 </div>
-              </div>
+              </motion.div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Core Values Section */}
           <div className="mb-20">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            <motion.div
+              className="text-center mb-12"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: false, amount: 0.3 }}
+              variants={staggerContainer}
+            >
+              <motion.h2
+                className="text-3xl md:text-4xl font-bold mb-4"
+                variants={fadeInUp}
+              >
                 Our Core <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-orange-600">Values</span>
-              </h2>
-              <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-orange-500 mx-auto"></div>
-            </div>
+              </motion.h2>
+              <motion.div
+                className="w-24 h-1 bg-gradient-to-r from-blue-500 to-orange-500 mx-auto"
+                variants={scaleUp}
+              ></motion.div>
+            </motion.div>
 
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+            <motion.div
+              className="grid grid-cols-2 lg:grid-cols-4 gap-6"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: false, amount: 0.1 }}
+              variants={staggerContainer}
+            >
               {data.coreValues?.map((value, index) => {
                 const IconComponent = iconMap[value.icon] || Heart;
                 return (
-                  <div key={index} className="group">
-                    <div className="bg-white rounded-xl p-4 md:p-5 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 h-full">
+                  <motion.div
+                    key={index}
+                    className="group"
+                    variants={fadeInUp}
+                  >
+                    <motion.div
+                      className="bg-white rounded-xl p-4 md:p-5 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 h-full"
+                      whileHover={{ y: -10, scale: 1.02 }}
+                      transition={{ type: "spring", stiffness: 300 }}
+                    >
                       <div className="w-14 h-14 bg-gradient-to-r from-blue-100 to-orange-100 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                         <IconComponent className="w-7 h-7 text-blue-600" />
                       </div>
                       <h3 className="font-bold text-lg mb-2 text-gray-800">{value.title}</h3>
                       <p className="text-sm text-gray-600">{value.detail}</p>
-                    </div>
-                  </div>
+                    </motion.div>
+                  </motion.div>
                 );
               })}
-            </div>
+            </motion.div>
           </div>
 
           {/* Team Section - Separate Component */}

@@ -3,6 +3,8 @@
 import Image from 'next/image'
 import { Linkedin, Twitter, Facebook, Instagram, MessageCircle, User } from 'lucide-react'
 import { useTeam } from '@/contexts/TeamContext'
+import { motion } from 'framer-motion'
+import { fadeInUp, staggerContainer, scaleUp } from '@/lib/animations'
 
 // Fallback data in case API fails
 const fallbackTeamMembers = [
@@ -109,19 +111,48 @@ export default function TeamSection() {
 
   return (
     <div className="mb-20">
-      <div className="text-center mb-12">
-        <h2 className="text-3xl md:text-4xl font-bold mb-4">
+      <motion.div
+        className="text-center mb-12"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: false, amount: 0.3 }}
+        variants={staggerContainer}
+      >
+        <motion.h2
+          className="text-3xl md:text-4xl font-bold mb-4"
+          variants={fadeInUp}
+        >
           Meet Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-orange-600">Team</span>
-        </h2>
-        <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+        </motion.h2>
+        <motion.p
+          className="text-gray-600 text-lg max-w-2xl mx-auto"
+          variants={fadeInUp}
+        >
           Dedicated professionals committed to making your move seamless
-        </p>
-        <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-orange-500 mx-auto mt-4"></div>
-      </div>
+        </motion.p>
+        <motion.div
+          className="w-24 h-1 bg-gradient-to-r from-blue-500 to-orange-500 mx-auto mt-4"
+          variants={scaleUp}
+        ></motion.div>
+      </motion.div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <motion.div
+        className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: false, amount: 0.1 }}
+        variants={staggerContainer}
+      >
         {members.map((member, index) => (
-          <div key={member.id || index} className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100">
+          <motion.div
+            key={member.id || index}
+            variants={fadeInUp}
+          >
+            <motion.div
+              className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100"
+              whileHover={{ y: -10, scale: 1.02 }}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
             <div className="relative h-50">
               <Image
                 src={member.imageUrl || member.image || "/images/placeholder-team.jpg"}
@@ -143,6 +174,7 @@ export default function TeamSection() {
               <p className="text-sm text-gray-600 mb-4 leading-relaxed">
                 {member.bio || "Professional team member dedicated to excellence."}
               </p>
+              </div>
               
               {/* Social Icons at the bottom */}
               <div className="flex justify-center space-x-3 pt-2 border-t border-gray-100">
@@ -197,13 +229,19 @@ export default function TeamSection() {
                   </a>
                 )}
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
 
       {/* Team Stats */}
-      <div className="mt-12 bg-gradient-to-r from-blue-50 to-orange-50 rounded-2xl p-8 text-center">
+      <motion.div
+        className="mt-12 bg-gradient-to-r from-blue-50 to-orange-50 rounded-2xl p-8 text-center"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: false, amount: 0.3 }}
+        variants={staggerContainer}
+      >
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           {[
             { number: `${members.length}+`, label: "Team Members" },
@@ -211,17 +249,23 @@ export default function TeamSection() {
             { number: "10K+", label: "Projects Completed" },
             { number: "24/7", label: "Customer Support" }
           ].map((stat, index) => (
-            <div key={index} className="text-center">
+            <motion.div
+              key={index}
+              className="text-center"
+              variants={fadeInUp}
+              whileHover={{ scale: 1.05, y: -5 }}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
               <div className="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-orange-600">
                 {stat.number}
               </div>
               <div className="text-sm text-gray-600 font-medium mt-1">
                 {stat.label}
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
-      </div>
+      </motion.div>
     </div>
   )
 }

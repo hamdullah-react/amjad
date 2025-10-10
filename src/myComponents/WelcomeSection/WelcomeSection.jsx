@@ -110,7 +110,7 @@ const WelcomeSection = () => {
               className="space-y-6"
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true, amount: 0.3 }}
+              viewport={{ once: false, amount: 0.3 }}
               variants={staggerContainer}
             >
               <motion.div
@@ -133,7 +133,7 @@ const WelcomeSection = () => {
                         initial={{ opacity: 0, x: 20 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.1 }}
-                        viewport={{ once: true }}
+                        viewport={{ once: false }}
                         whileHover={{ x: 5 }}
                       >
                         <div className={`w-12 h-12 bg-${iconColor}-100 rounded-full flex items-center justify-center flex-shrink-0`}>
@@ -169,6 +169,7 @@ const WelcomeSection = () => {
                         className={`bg-gradient-to-r ${gradientClass} rounded-xl p-6 text-center text-white`}
                         whileHover={{ scale: 1.05, y: -5 }}
                         transition={{ type: "spring", stiffness: 300 }}
+                          viewport={{ once: false }}
                       >
                         <div className="text-3xl font-bold mb-2">{stat.value}</div>
                         <div className={`${textColorClass} text-sm`}>{stat.label}</div>

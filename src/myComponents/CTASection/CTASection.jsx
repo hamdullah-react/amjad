@@ -3,6 +3,8 @@ import React from 'react';
 import Link from 'next/link';
 import { ArrowRight, Phone, ArrowLeft } from 'lucide-react';
 import { useContact } from '@/contexts/contact-context';
+import { motion } from 'framer-motion';
+import { fadeInUp, staggerContainer } from '@/lib/animations';
 
 /**
  * Reusable CTA Section Component
@@ -152,10 +154,19 @@ const CTASection = ({
 
   // Different layout renderers
   const renderSectionLayout = () => (
-    <section className={`py-20 ${config.background} ${className}`}>
+    <section className={`py-20 ${config.background} ${className} overflow-hidden`}>
       <div className="container mx-auto px-4 text-center">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-4xl font-bold text-gray-900 mb-6">
+        <motion.div
+          className="max-w-4xl mx-auto"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: false, amount: 0.3 }}
+          variants={staggerContainer}
+        >
+          <motion.h2
+            className="text-4xl font-bold text-gray-900 mb-6"
+            variants={fadeInUp}
+          >
             {config.title.includes('Confidence?') ? (
               <>
                 Ready to Move with <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-orange-600">Confidence?</span>
@@ -163,45 +174,81 @@ const CTASection = ({
             ) : (
               config.title
             )}
-          </h2>
-          <p className="text-xl text-gray-600 mb-8 leading-relaxed">
+          </motion.h2>
+          <motion.p
+            className="text-xl text-gray-600 mb-8 leading-relaxed"
+            variants={fadeInUp}
+          >
             {config.subtitle}
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          </motion.p>
+          <motion.div
+            className="flex flex-col sm:flex-row gap-4 justify-center"
+            variants={fadeInUp}
+          >
             {config.buttons.primary && renderButton(config.buttons.primary, true)}
             {config.buttons.secondary && renderButton(config.buttons.secondary, false)}
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </div>
     </section>
   );
 
   const renderCenteredLayout = () => (
-    <div className={`${config.background} p-8 md:p-12 text-center ${className}`}>
-      <h2 className={`text-2xl md:text-3xl font-bold mb-4 ${config.background.includes('gradient') ? 'text-white' : 'text-gray-900'}`}>
+    <motion.div
+      className={`${config.background} p-8 md:p-12 text-center ${className}`}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: false, amount: 0.3 }}
+      variants={staggerContainer}
+    >
+      <motion.h2
+        className={`text-2xl md:text-3xl font-bold mb-4 ${config.background.includes('gradient') ? 'text-white' : 'text-gray-900'}`}
+        variants={fadeInUp}
+      >
         {config.title}
-      </h2>
-      <p className={`text-lg mb-8 max-w-2xl mx-auto ${
-        config.background.includes('gradient') ? 'text-white/90' : 'text-gray-600'
-      }`}>
+      </motion.h2>
+      <motion.p
+        className={`text-lg mb-8 max-w-2xl mx-auto ${
+          config.background.includes('gradient') ? 'text-white/90' : 'text-gray-600'
+        }`}
+        variants={fadeInUp}
+      >
         {config.subtitle}
-      </p>
-      <div className="flex flex-col sm:flex-row gap-4 justify-center">
+      </motion.p>
+      <motion.div
+        className="flex flex-col sm:flex-row gap-4 justify-center"
+        variants={fadeInUp}
+      >
         {config.buttons.primary && renderButton(config.buttons.primary, true)}
         {config.buttons.secondary && renderButton(config.buttons.secondary, false)}
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 
   const renderCenteredSimpleLayout = () => (
-    <div className={`text-center ${config.background} ${className}`}>
-      <h2 className="text-3xl font-bold text-gray-900 mb-4">
+    <motion.div
+      className={`text-center ${config.background} ${className}`}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: false, amount: 0.3 }}
+      variants={staggerContainer}
+    >
+      <motion.h2
+        className="text-3xl font-bold text-gray-900 mb-4"
+        variants={fadeInUp}
+      >
         {config.title}
-      </h2>
-      <p className="text-gray-600 mb-4 max-w-2xl mx-auto">
+      </motion.h2>
+      <motion.p
+        className="text-gray-600 mb-4 max-w-2xl mx-auto"
+        variants={fadeInUp}
+      >
         {config.subtitle}
-      </p>
-      <div className="flex justify-center">
+      </motion.p>
+      <motion.div
+        className="flex justify-center"
+        variants={fadeInUp}
+      >
         {config.buttons.primary && (
           <Link
             href={config.buttons.primary.href}
@@ -211,8 +258,8 @@ const CTASection = ({
             {config.buttons.primary.text}
           </Link>
         )}
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 
   // Show loading state if contact info is still loading

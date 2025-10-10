@@ -14,6 +14,8 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion"
 import FAQSection from '@/myComponents/FAQSection/FAQSection'
+import { motion } from 'framer-motion'
+import { fadeInUp, fadeInLeft, fadeInRight, staggerContainer, scaleUp } from '@/lib/animations'
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -212,28 +214,53 @@ export default function ContactPage() {
       />
 
       {/* Hero Section with Gradient */}
-      <section className="relative bg-gradient-to-br from-blue-50 via-white to-orange-50 py-16">
+      <section className="relative bg-gradient-to-br from-blue-50 via-white to-orange-50 py-16 overflow-hidden">
         <div className="absolute inset-0 bg-white/40"></div>
 
         <div className="max-w-6xl mx-auto px-4">
-          <div className="relative text-center max-w-3xl mx-auto mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+          <motion.div
+            className="relative text-center max-w-3xl mx-auto mb-12"
+            initial="hidden"
+            animate="visible"
+            whileInView="visible"
+            viewport={{ once: false, amount: 0.3 }}
+            variants={staggerContainer}
+          >
+            <motion.h2
+              className="text-3xl md:text-4xl font-bold mb-4"
+              variants={fadeInUp}
+            >
               Let's Start a <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-orange-600">Conversation</span>
-            </h2>
-            <p className="text-gray-600 text-lg">
+            </motion.h2>
+            <motion.p
+              className="text-gray-600 text-lg"
+              variants={fadeInUp}
+            >
               Whether you need a quote, have questions, or ready to book our services, we're just a message away.
-            </p>
-          </div>
+            </motion.p>
+          </motion.div>
 
           {/* Contact Cards */}
-          <div className=" relative grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-16">
+          <motion.div
+            className="relative grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-16"
+            initial="hidden"
+            animate="visible"
+            whileInView="visible"
+            viewport={{ once: false, amount: 0.1 }}
+            variants={staggerContainer}
+          >
             {getContactCards().map((item, index) => {
               const IconComponent = item.icon;
               return (
-                <div
+                <motion.div
                   key={index}
-                  className="group bg-white rounded-xl p-4 md:p-5 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100"
+                  variants={fadeInUp}
                 >
+                  <motion.div
+                    className="group bg-white rounded-xl p-4 md:p-5 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 h-full"
+                    whileHover={{ y: -10, scale: 1.02 }}
+                    transition={{ type: "spring", stiffness: 300 }}
+                  >
                   <div className={`w-12 h-12 md:w-14 md:h-14 rounded-full bg-gradient-to-r ${
                     item.color === 'blue'
                       ? 'from-blue-500 to-blue-600'
@@ -254,10 +281,11 @@ export default function ContactPage() {
                       Contact Now →
                     </a>
                   )}
-                </div>
+                  </motion.div>
+                </motion.div>
               );
             })}
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -267,7 +295,14 @@ export default function ContactPage() {
           <div className="grid lg:grid-cols-5 gap-12">
 
           {/* Contact Form - Left Side */}
-          <div className="lg:col-span-3">
+          <motion.div
+            className="lg:col-span-3"
+            initial="hidden"
+            animate="visible"
+            whileInView="visible"
+            viewport={{ once: false, amount: 0.2 }}
+            variants={fadeInLeft}
+          >
             <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-10 border border-gray-100">
               <div className="flex items-center mb-8">
                 <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-orange-500 rounded-full flex items-center justify-center mr-4">
@@ -411,10 +446,18 @@ export default function ContactPage() {
                 </Button>
               </form>
             </div>
-          </div>
+          </motion.div>
 
           {/* Map & Additional Info - Right Side */}
-          <div className="lg:col-span-2 space-y-8">
+          <motion.div
+            className="lg:col-span-2 space-y-8"
+            initial="hidden"
+            animate="visible"
+            whileInView="visible"
+            viewport={{ once: false, amount: 0.2 }}
+            variants={fadeInRight}
+          >
+            
             {/* Map Section */}
             <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
               <div className="p-6 bg-gradient-to-r from-blue-600 to-orange-600">
@@ -454,15 +497,12 @@ export default function ContactPage() {
                 </div>
               </div>
             </div>
-          </div>
+         </motion.div>
         </div>
 
           {/* FAQ Section */}
           <div className="mt-20">
-         
-
-          <FAQSection/>
-           
+            <FAQSection/>
           </div>
 
         </div>

@@ -6,6 +6,8 @@ import { Truck, Package, Home, Users, Shield, Clock, Loader2 } from 'lucide-reac
 import Link from 'next/link'
 import ServiceCardSkeleton from './ServiceCardSkeleton'
 import CTASection from '@/myComponents/CTASection/CTASection'
+import { motion } from 'framer-motion'
+import { fadeInUp, staggerContainer } from '@/lib/animations'
 
 // Fallback icon mapping for services
 const iconMap = {
@@ -91,13 +93,22 @@ export default function ServicesPage() {
       {!loading && !error && (
   <>
     {displayServices.length > 0 ? (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
+      <motion.div
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: false, amount: 0.1 }}
+        variants={staggerContainer}
+      >
         {displayServices.map((service, index) => (
-          <Link 
-            href={services && services[index]?.slug ? `/services/${services[index].slug}` : '#'}
-            key={services && services[index]?.id || index} 
-            className="h-[50vh] bg-white border border-gray-200 rounded-xl p-4 md:p-5 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 block overflow-hidden flex flex-col"
+          <motion.div
+            key={services && services[index]?.id || index}
+            variants={fadeInUp}
           >
+            <Link
+              href={services && services[index]?.slug ? `/services/${services[index].slug}` : '#'}
+              className="h-[50vh] bg-white border border-gray-200 rounded-xl p-4 md:p-5 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 block overflow-hidden flex flex-col"
+            >
             <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-r from-blue-500 to-orange-500 rounded-full flex items-center justify-center mb-3 flex-shrink-0">
               <service.icon className="w-5 h-5 md:w-6 md:h-6 text-white" />
             </div>
@@ -135,9 +146,10 @@ export default function ServicesPage() {
                 </p>
               </div>
             )}
-          </Link>
+            </Link>
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
     ) : (
       /* Empty State */
       <div className="text-center py-12">
@@ -154,10 +166,15 @@ export default function ServicesPage() {
 )}
           
           {/* Call to Action Section - Always show */}
-          <div className="mt-16 text-center bg-gradient-to-r from-blue-50 to-orange-50 rounded-2xl ">
-           
-        <CTASection variant="services" />
-          </div>
+          <motion.div
+            className="mt-16 text-center bg-gradient-to-r from-blue-50 to-orange-50 rounded-2xl"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: false, amount: 0.3 }}
+            transition={{ duration: 0.6 }}
+          >
+            <CTASection variant="services" />
+          </motion.div>
         </div>
       </section>
     </div>

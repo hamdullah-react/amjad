@@ -6,6 +6,8 @@ import { MapPin, Clock, Phone, Truck, AlertCircle, RefreshCw } from 'lucide-reac
 import { useDataFetching } from '@/contexts/service-areas-context'
 import Link from 'next/link'
 import CTASection from '@/myComponents/CTASection/CTASection'
+import { motion } from 'framer-motion'
+import { fadeInUp, staggerContainer } from '@/lib/animations'
 
 // Skeleton Loader Component
 const ServiceAreaSkeleton = () => {
@@ -146,7 +148,14 @@ export default function ServicesAreaPage() {
           )}
 
           {/* Service Areas Grid - Show individual service areas instead of grouped */}
-          <div className="grid lg:grid-cols-2 gap-8">
+          <motion.div
+            className="grid lg:grid-cols-2 gap-8"
+            initial="hidden"
+            animate="visible"
+            whileInView="visible"
+            viewport={{ once: false, amount: 0.1 }}
+            variants={staggerContainer}
+          >
             {loading ? (
               // Show skeleton loaders
               [...Array(4)].map((_, index) => (
@@ -155,11 +164,14 @@ export default function ServicesAreaPage() {
             ) : individualAreas.length > 0 ? (
               // Show actual individual service areas from API
               individualAreas.map((area) => (
-                <Link 
-                  href={`/services-area/${area.slug}`}
+                <motion.div
                   key={area.id}
-                  className="bg-white border border-gray-200 rounded-xl p-4 md:p-5 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 block"
+                  variants={fadeInUp}
                 >
+                  <Link
+                    href={`/services-area/${area.slug}`}
+                    className="bg-white border border-gray-200 rounded-xl p-4 md:p-5 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 block"
+                  >
                   <div className="flex items-start space-x-4">
                     <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-orange-500 rounded-full flex items-center justify-center flex-shrink-0">
                       {/* Get icon based on emirate */}
@@ -233,7 +245,8 @@ export default function ServicesAreaPage() {
                       </div>
                     </div>
                   </div>
-                </Link>
+                  </Link>
+                </motion.div>
               ))
             ) : (
               // No data state
@@ -245,55 +258,100 @@ export default function ServicesAreaPage() {
                 </div>
               )
             )}
-          </div>
+          </motion.div>
         
           {/* Statistics Section - Dynamic from API */}
-          <div className="mt-12 bg-gradient-to-r from-blue-50 to-orange-50 rounded-2xl p-8 border border-gray-200">
-            <h2 className="text-2xl font-bold text-center mb-4 text-gray-900">Our Service Coverage</h2>
-            <p className="text-gray-600 text-center mb-6">
+          <motion.div
+            className="mt-12 bg-gradient-to-r from-blue-50 to-orange-50 rounded-2xl p-8 border border-gray-200"
+            initial="hidden"
+            animate="visible"
+            whileInView="visible"
+            viewport={{ once: false, amount: 0.3 }}
+            variants={staggerContainer}
+          >
+            <motion.h2
+              className="text-2xl font-bold text-center mb-4 text-gray-900"
+              variants={fadeInUp}
+            >
+              Our Service Coverage
+            </motion.h2>
+            <motion.p
+              className="text-gray-600 text-center mb-6"
+              variants={fadeInUp}
+            >
               Comprehensive furniture moving services across the United Arab Emirates with local expertise in every emirate.
-            </p>
+            </motion.p>
 
             {loading ? (
               <StatsSkeleton />
             ) : (
-              <div className="grid md:grid-cols-4 gap-6 mt-8">
-                <div className="text-center">
+              <motion.div
+                className="grid md:grid-cols-4 gap-6 mt-8"
+                variants={staggerContainer}
+              >
+                <motion.div
+                  className="text-center"
+                  variants={fadeInUp}
+                  whileHover={{ scale: 1.05, y: -5 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                >
                   <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-orange-600 bg-clip-text text-transparent mb-2">
                     {calculatedStats.emirates}
                   </div>
                   <div className="text-sm text-gray-600">Emirates Covered</div>
-                </div>
-                <div className="text-center">
+                </motion.div>
+                <motion.div
+                  className="text-center"
+                  variants={fadeInUp}
+                  whileHover={{ scale: 1.05, y: -5 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                >
                   <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-orange-600 bg-clip-text text-transparent mb-2">
                     {calculatedStats.totalAreas}
                   </div>
                   <div className="text-sm text-gray-600">Areas Served</div>
-                </div>
-                <div className="text-center">
+                </motion.div>
+                <motion.div
+                  className="text-center"
+                  variants={fadeInUp}
+                  whileHover={{ scale: 1.05, y: -5 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                >
                   <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-orange-600 bg-clip-text text-transparent mb-2">
                     {calculatedStats.activeAreas}
                   </div>
                   <div className="text-sm text-gray-600">Active Locations</div>
-                </div>
-                <div className="text-center">
+                </motion.div>
+                <motion.div
+                  className="text-center"
+                  variants={fadeInUp}
+                  whileHover={{ scale: 1.05, y: -5 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                >
                   <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-orange-600 bg-clip-text text-transparent mb-2">
                     {calculatedStats.sameDayAreas}
                   </div>
                   <div className="text-sm text-gray-600">Same Day Service</div>
-                </div>
-              </div>
+                </motion.div>
+              </motion.div>
             )}
-          </div>
+          </motion.div>
         
           {/* Call to Action */}
-          <div className="mt-12 text-center">
-            <CTASection 
-              variant="service-areas" 
-              title="Need Service in Another Area?" 
+          <motion.div
+            className="mt-12 text-center"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: false, amount: 0.3 }}
+            transition={{ duration: 0.6 }}
+          >
+            <CTASection
+              variant="service-areas"
+              title="Need Service in Another Area?"
               subtitle="Contact us today to find out if we cover your location or to request a new service area"
             />
-          </div>
+          </motion.div>
         </div>
       </section>
     </div>

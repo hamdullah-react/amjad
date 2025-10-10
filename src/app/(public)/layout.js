@@ -13,7 +13,7 @@ import { ServicesProvider } from "@/contexts/ServicesContext";
 import { ServiceAreasProvider } from "@/contexts/service-areas-context";
 import { WhyChooseUsProvider } from "@/contexts/WhyChooseUsContext";
 import { FAQProvider } from "@/contexts/FAQContext";
-import PageTransition from "@/components/ui/page-transition";
+
 import RouteProgress from "@/components/ui/route-progress";
 import ScrollToTop from "@/components/ui/scroll-to-top";
 
@@ -32,9 +32,9 @@ export default function PublicLayout({ children }) {
           <RouteProgress />
           <ScrollToTop />
           <NaveBar />
-          <PageTransition>
+    
             {children}
-          </PageTransition>
+  
           <Footer />
  </FAQProvider>
 </WhyChooseUsProvider>
