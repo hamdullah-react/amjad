@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import FooterSkeleton from "@/components/layout/FooterSkeleton";
 import { useContact } from "@/contexts/contact-context";
+import { useServices } from "@/contexts/ServicesContext";
 import {
   Phone,
   Mail,
@@ -56,15 +57,6 @@ const socialPlatforms = [
   }
 ];
 
-// Services links configuration
-const servicesLinks = [
-  { name: "Residential Moving", href: "/services#residential" },
-  { name: "Commercial Moving", href: "/services#commercial" },
-  { name: "Furniture Packing", href: "/services#packing" },
-  { name: "Storage Solutions", href: "/services#storage" },
-  { name: "International Moving", href: "/services#international" },
-  { name: "Furniture Assembly", href: "/services#assembly" },
-];
 
 // Quick links configuration
 const quickLinks = [
@@ -87,6 +79,15 @@ const bottomLinks = [
 const Footer = () => {
   const currentYear = new Date().getFullYear();
   const { contactInfo, loading } = useContact();
+  const { services } = useServices();
+
+  // Build dynamic services links from API
+  const servicesLinks = services && services.length > 0
+    ? services.slice(0, 6).map(service => ({
+        name: service.title,
+        href: `/services/${service.slug || service.id}`,
+      }))
+    : [];
 
   if (loading) {
     return <FooterSkeleton />;
@@ -136,20 +137,24 @@ const Footer = () => {
           {/* Company Info */}
           <div className="lg:col-span-1">
             <div className="mb-6">
-              <Image
-                src={contactInfo?.logoUrl || "/images/logo.png"}
-                alt={contactInfo?.companyName || "Marhaba Furniture Movers"}
-                width={160}
-                height={60}
-                className="rounded-lg bg-white p-2"
-              />
+              {contactInfo?.logoUrl && (
+                <Image
+                  src={contactInfo.logoUrl}
+                  alt={contactInfo?.companyName || "Company"}
+                  width={160}
+                  height={60}
+                  className="rounded-lg bg-white p-2"
+                />
+              )}
             </div>
-            <p className="text-gray-400 mb-6 text-sm leading-relaxed">
-              Professional furniture moving and packing services in{" "}
-              {contactInfo?.emirate || "Dubai"} and across{" "}
-              {contactInfo?.country || "UAE"}. Licensed, insured, and committed
-              to excellence since 2010.
-            </p>
+            {contactInfo?.emirate && contactInfo?.country && (
+              <p className="text-gray-400 mb-6 text-sm leading-relaxed">
+                Professional furniture moving and packing services in{" "}
+                {contactInfo.emirate} and across{" "}
+                {contactInfo.country}. Licensed, insured, and committed
+                to excellence.
+              </p>
+            )}
 
             {/* Trust Badges */}
             <div className="flex gap-4 mb-6">
@@ -240,15 +245,14 @@ const Footer = () => {
                     Head Office
                   </p>
                   <p className="text-gray-400 text-sm">
-                    {contactInfo?.address || "Al Qusais Industrial Area"}
-                    <br />
+                    {contactInfo?.address && <>{contactInfo.address}<br /></>}
                     {[
                       contactInfo?.city,
                       contactInfo?.emirate,
                       contactInfo?.country,
                     ]
                       .filter(Boolean)
-                      .join(", ") || "Dubai, United Arab Emirates"}
+                      .join(", ")}
                   </p>
                 </div>
               </div>
@@ -280,12 +284,7 @@ const Footer = () => {
                     </Link>
                   )}
                   {!contactInfo?.phone && !contactInfo?.alternatePhone && (
-                    <Link
-                      href="tel:+971568011076"
-                      className="text-gray-400 hover:text-orange-400 transition-colors text-sm"
-                    >
-                      +971 568 011 076
-                    </Link>
+                    <span className="text-gray-500 text-sm">Not available</span>
                   )}
                 </div>
               </div>
@@ -307,21 +306,7 @@ const Footer = () => {
                       {contactInfo.email}
                     </Link>
                   ) : (
-                    <>
-                      <Link
-                        href="mailto:info@marhabamovers.ae"
-                        className="text-gray-400 hover:text-blue-400 transition-colors text-sm"
-                      >
-                        info@marhabamovers.ae
-                      </Link>
-                      <br />
-                      <Link
-                        href="mailto:support@marhabamovers.ae"
-                        className="text-gray-400 hover:text-blue-400 transition-colors text-sm"
-                      >
-                        support@marhabamovers.ae
-                      </Link>
-                    </>
+                    <span className="text-gray-500 text-sm">Not available</span>
                   )}
                 </div>
               </div>
@@ -348,11 +333,7 @@ const Footer = () => {
                           </span>
                         ))
                     ) : (
-                      <>
-                        Mon - Sat: 8:00 AM - 7:00 PM
-                        <br />
-                        Sunday: 9:00 AM - 5:00 PM
-                      </>
+                      <span className="text-gray-500">Not available</span>
                     )}
                   </p>
                 </div>
@@ -368,7 +349,7 @@ const Footer = () => {
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="text-gray-500 text-sm text-center md:text-left">
               © {currentYear}{" "}
-              {contactInfo?.companyName || "Marhaba Furniture Movers & Packers"}
+              {contactInfo?.companyName}
               . All rights reserved.
             </div>
 

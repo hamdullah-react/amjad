@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import {
   Plus, Edit, Trash2, Eye, EyeOff, Save, X, Mail, Phone,
-  Linkedin, Twitter, User, Image as ImageIcon, Facebook, Instagram, MessageCircle
+  Linkedin, Twitter, User, Image as ImageIcon, Facebook, Instagram, MessageCircle, CheckCircle, XCircle, Loader2, AlertCircle
 } from 'lucide-react'
 import {
   Dialog,
@@ -52,15 +52,17 @@ export default function TeamPage() {
   const [members, setMembers] = useState([])
   const [loading, setLoading] = useState(true)
   const [processing, setProcessing] = useState(false)
-  const [processingMessage, setProcessingMessage] = useState('')
+  const [feedback, setFeedback] = useState(null)
+  const showFeedback = (type, message) => {
+    setFeedback({ type, message })
+    setTimeout(() => setFeedback(null), 4000)
+  }
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isImagePickerOpen, setIsImagePickerOpen] = useState(false)
   const [editingMember, setEditingMember] = useState(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [departmentFilter, setDepartmentFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
-  const [error, setError] = useState(null)
-
   // Remove the separate formData state and useEffect that was causing the loop
   const { register, handleSubmit, formState: { errors }, setValue, watch, reset, getValues } = useForm({
     defaultValues: INITIAL_FORM_DATA
@@ -71,7 +73,6 @@ export default function TeamPage() {
   const fetchMembers = useCallback(async () => {
     try {
       setLoading(true)
-      setError(null)
 
       const params = new URLSearchParams({
         search: searchTerm,
@@ -85,12 +86,12 @@ export default function TeamPage() {
       if (result.success) {
         setMembers(result.data)
       } else {
-        setError(result.message || 'Failed to fetch team members')
         console.error('Failed to fetch team members:', result.message)
+        showFeedback('error', result.message || 'Failed to fetch team members')
       }
     } catch (error) {
-      setError('Network error: Failed to fetch team members')
       console.error('Error fetching team members:', error)
+      showFeedback('error', 'Network error: Failed to fetch team members')
     } finally {
       setLoading(false)
     }
@@ -133,7 +134,6 @@ export default function TeamPage() {
   const handleFormSubmit = useCallback(async (data) => {
     try {
       setProcessing(true)
-      setProcessingMessage(editingMember ? 'Updating team member...' : 'Creating team member...')
 
       const url = editingMember
         ? `/api/team/${editingMember.id}`
@@ -165,19 +165,19 @@ export default function TeamPage() {
         setEditingMember(null)
         reset(INITIAL_FORM_DATA)
         await fetchMembers()
+        showFeedback('success', editingMember ? 'Team member updated successfully!' : 'Team member created successfully!')
       } else {
         const errorMessage = result.errors
           ? result.errors.join(', ')
           : result.message || 'Failed to save team member'
         console.error('Failed to save team member:', errorMessage)
-        alert(errorMessage)
+        showFeedback('error', errorMessage)
       }
     } catch (error) {
       console.error('Error saving team member:', error)
-      alert('Network error: Failed to save team member')
+      showFeedback('error', 'Network error: Failed to save team member')
     } finally {
       setProcessing(false)
-      setProcessingMessage('')
     }
   }, [editingMember, fetchMembers, reset])
 
@@ -188,7 +188,6 @@ export default function TeamPage() {
 
     try {
       setProcessing(true)
-      setProcessingMessage('Deleting team member...')
 
       const response = await fetch(`/api/team/${id}`, {
         method: 'DELETE'
@@ -198,23 +197,22 @@ export default function TeamPage() {
 
       if (result.success) {
         await fetchMembers()
+        showFeedback('success', 'Team member deleted successfully!')
       } else {
         console.error('Failed to delete team member:', result.message)
-        alert(result.message || 'Failed to delete team member')
+        showFeedback('error', result.message || 'Failed to delete team member')
       }
     } catch (error) {
       console.error('Error deleting team member:', error)
-      alert('Network error: Failed to delete team member')
+      showFeedback('error', 'Network error: Failed to delete team member')
     } finally {
       setProcessing(false)
-      setProcessingMessage('')
     }
   }, [fetchMembers])
 
   const handleToggleActive = useCallback(async (member) => {
     try {
       setProcessing(true)
-      setProcessingMessage('Updating status...')
 
       const response = await fetch(`/api/team/${member.id}`, {
         method: 'PUT',
@@ -231,16 +229,16 @@ export default function TeamPage() {
 
       if (result.success) {
         await fetchMembers()
+        showFeedback('success', `Member ${!member.isActive ? 'activated' : 'deactivated'} successfully!`)
       } else {
         console.error('Failed to toggle member status:', result.message)
-        alert(result.message || 'Failed to update status')
+        showFeedback('error', result.message || 'Failed to update status')
       }
     } catch (error) {
       console.error('Error toggling member status:', error)
-      alert('Network error: Failed to update status')
+      showFeedback('error', 'Network error: Failed to update status')
     } finally {
       setProcessing(false)
-      setProcessingMessage('')
     }
   }, [fetchMembers])
 
@@ -270,10 +268,9 @@ export default function TeamPage() {
 
   if (loading) {
     return (
-      <div className="p-6">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-muted-foreground">Loading team members...</div>
-        </div>
+      <div className="p-6 flex flex-col items-center justify-center min-h-[60vh]">
+        <Loader2 className="w-10 h-10 animate-spin text-primary mb-4" />
+        <p className="text-muted-foreground text-lg">Loading team members...</p>
       </div>
     )
   }
@@ -285,9 +282,15 @@ export default function TeamPage() {
         <p className="text-muted-foreground mt-2">Manage your company team members</p>
       </div>
 
-      {error && (
-        <div className="mb-4 p-4 bg-destructive/10 border border-destructive/20 rounded-lg text-destructive">
-          {error}
+      {feedback && (
+        <div className={`mb-6 flex items-center gap-3 px-4 py-3 rounded-lg border text-sm font-medium ${
+          feedback.type === 'success'
+            ? 'bg-green-50 border-green-200 text-green-800 dark:bg-green-950 dark:border-green-800 dark:text-green-200'
+            : 'bg-red-50 border-red-200 text-red-800 dark:bg-red-950 dark:border-red-800 dark:text-red-200'
+        }`}>
+          {feedback.type === 'success' ? <CheckCircle className="w-5 h-5 flex-shrink-0" /> : <XCircle className="w-5 h-5 flex-shrink-0" />}
+          <span>{feedback.message}</span>
+          <button onClick={() => setFeedback(null)} className="ml-auto text-current opacity-60 hover:opacity-100">&times;</button>
         </div>
       )}
 
@@ -346,10 +349,12 @@ export default function TeamPage() {
             <tbody className="divide-y divide-gray-200">
               {sortedMembers.length === 0 ? (
                 <tr>
-                  <td colSpan="8" className="px-6 py-8 text-center text-muted-foreground">
-                    {members.length === 0
-                      ? "No team members found. Add your first team member!"
-                      : "No members match your search criteria."}
+                  <td colSpan="8">
+                    <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+                      <AlertCircle className="w-10 h-10 mb-3" />
+                      <p className="text-lg font-medium">No members found</p>
+                      <p className="text-sm">{members.length === 0 ? "Add your first team member to get started." : "No members match your search criteria."}</p>
+                    </div>
                   </td>
                 </tr>
               ) : (
@@ -753,17 +758,6 @@ export default function TeamPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Processing Overlay */}
-      {processing && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-[50000]">
-          <div className="bg-card rounded-lg p-6 shadow-xl">
-            <div className="flex items-center space-x-3">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-              <p className="text-lg font-medium text-foreground">{processingMessage || 'Processing...'}</p>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

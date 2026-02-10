@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import {
   Plus, Edit, Trash2, Eye, EyeOff, Save, X,
   ArrowUp, ArrowDown, Award, Shield, Clock,
-  Users, Truck, CheckCircle, Link
+  Users, Truck, CheckCircle, Link, Loader2, XCircle, AlertCircle
 } from 'lucide-react'
 import {
   Dialog,
@@ -305,7 +305,12 @@ export default function WhyChooseUsPage() {
   const [filteredItems, setFilteredItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [processing, setProcessing] = useState(false)
-  const [processingMessage, setProcessingMessage] = useState('')
+  const [feedback, setFeedback] = useState(null)
+
+  const showFeedback = (type, message) => {
+    setFeedback({ type, message })
+    setTimeout(() => setFeedback(null), 4000)
+  }
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingItem, setEditingItem] = useState(null)
   const [searchTerm, setSearchTerm] = useState('')
@@ -394,11 +399,11 @@ export default function WhyChooseUsPage() {
   const handleSubmit = async () => {
     try {
       setProcessing(true)
-      setProcessingMessage(editingItem ? 'Updating item...' : 'Creating item...')
 
       // Validate required fields
       if (!formData.title.trim() || !formData.description.trim() || !formData.slug.trim()) {
-        alert('Title, slug, and description are required')
+        showFeedback('error', 'Title, slug, and description are required')
+        setProcessing(false)
         return
       }
 
@@ -444,16 +449,14 @@ export default function WhyChooseUsPage() {
         setEditingItem(null)
         setFormData(INITIAL_FORM_DATA)
         await fetchItems()
+        showFeedback('success', editingItem ? 'Item updated successfully' : 'Item created successfully')
       } else {
-        console.error('Failed to save item:', result.message)
-        alert(`Failed to save: ${result.message}`)
+        showFeedback('error', result.message || 'Failed to save item')
       }
     } catch (error) {
-      console.error('Error saving item:', error)
-      alert('Error saving item: ' + error.message)
+      showFeedback('error', 'Error saving item: ' + error.message)
     } finally {
       setProcessing(false)
-      setProcessingMessage('')
     }
   }
 
@@ -462,7 +465,6 @@ export default function WhyChooseUsPage() {
 
     try {
       setProcessing(true)
-      setProcessingMessage('Deleting item...')
 
       const response = await fetch(`/api/why-choose-us/${id}`, {
         method: 'DELETE',
@@ -472,21 +474,20 @@ export default function WhyChooseUsPage() {
 
       if (result.success) {
         await fetchItems()
+        showFeedback('success', 'Item deleted successfully')
       } else {
-        console.error('Failed to delete item:', result.message)
+        showFeedback('error', result.message || 'Failed to delete item')
       }
     } catch (error) {
-      console.error('Error deleting item:', error)
+      showFeedback('error', 'Error deleting item: ' + error.message)
     } finally {
       setProcessing(false)
-      setProcessingMessage('')
     }
   }
 
   const handleToggleStatus = async (item) => {
     try {
       setProcessing(true)
-      setProcessingMessage('Updating status...')
 
       const response = await fetch(`/api/why-choose-us/${item.id}`, {
         method: 'PUT',
@@ -503,14 +504,14 @@ export default function WhyChooseUsPage() {
 
       if (result.success) {
         await fetchItems()
+        showFeedback('success', `Item ${!item.isActive ? 'activated' : 'deactivated'} successfully`)
       } else {
-        console.error('Failed to toggle status:', result.message)
+        showFeedback('error', result.message || 'Failed to toggle status')
       }
     } catch (error) {
-      console.error('Error toggling status:', error)
+      showFeedback('error', 'Error toggling status: ' + error.message)
     } finally {
       setProcessing(false)
-      setProcessingMessage('')
     }
   }
 
@@ -524,7 +525,6 @@ export default function WhyChooseUsPage() {
 
     try {
       setProcessing(true)
-      setProcessingMessage('Updating order...')
 
       // Swap orders
       await Promise.all([
@@ -547,11 +547,11 @@ export default function WhyChooseUsPage() {
       ])
 
       await fetchItems()
+      showFeedback('success', 'Order updated successfully')
     } catch (error) {
-      console.error('Error changing order:', error)
+      showFeedback('error', 'Error changing order: ' + error.message)
     } finally {
       setProcessing(false)
-      setProcessingMessage('')
     }
   }
 
@@ -561,21 +561,33 @@ export default function WhyChooseUsPage() {
     setFormData(INITIAL_FORM_DATA)
   }
 
+  if (loading) {
+    return (
+      <div className="p-6 flex flex-col items-center justify-center min-h-[60vh]">
+        <Loader2 className="w-10 h-10 animate-spin text-primary mb-4" />
+        <p className="text-muted-foreground text-lg">Loading items...</p>
+      </div>
+    )
+  }
+
   return (
     <div className="p-6">
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Why Choose Us</h1>
-          <p className="text-muted-foreground mt-2">Manage your unique selling points and benefits</p>
-        </div>
-        <Button
-          onClick={handleAdd}
-          className="bg-primary hover:bg-primary/90 text-primary-foreground"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Add Item
-        </Button>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-foreground">Why Choose Us</h1>
+        <p className="text-muted-foreground mt-2">Manage your unique selling points and benefits</p>
       </div>
+
+      {feedback && (
+        <div className={`mb-6 flex items-center gap-3 px-4 py-3 rounded-lg border text-sm font-medium ${
+          feedback.type === 'success'
+            ? 'bg-green-50 border-green-200 text-green-800 dark:bg-green-950 dark:border-green-800 dark:text-green-200'
+            : 'bg-red-50 border-red-200 text-red-800 dark:bg-red-950 dark:border-red-800 dark:text-red-200'
+        }`}>
+          {feedback.type === 'success' ? <CheckCircle className="w-5 h-5 flex-shrink-0" /> : <XCircle className="w-5 h-5 flex-shrink-0" />}
+          <span>{feedback.message}</span>
+          <button onClick={() => setFeedback(null)} className="ml-auto text-current opacity-60 hover:opacity-100">&times;</button>
+        </div>
+      )}
 
       {/* Statistics */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
@@ -624,11 +636,7 @@ export default function WhyChooseUsPage() {
           </div>
         </div>
         <div className="overflow-x-auto">
-          {loading ? (
-            <div className="p-12 text-center">
-              <div className="text-muted-foreground">Loading items...</div>
-            </div>
-          ) : filteredItems.length === 0 ? (
+          {filteredItems.length === 0 ? (
             <div className="p-12 text-center">
               <Award className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
               <p className="text-foreground text-lg">No items found</p>
@@ -686,18 +694,6 @@ export default function WhyChooseUsPage() {
           )}
         </div>
       </div>
-
-      {/* Processing Overlay */}
-      {processing && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-[50000]">
-          <div className="bg-card rounded-lg p-6 shadow-xl border">
-            <div className="flex items-center space-x-3">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-              <p className="text-lg font-medium text-foreground">{processingMessage || 'Processing...'}</p>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Add/Edit Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>

@@ -39,6 +39,9 @@ import {
   FileText,
   Loader2,
   RefreshCw,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
 } from "lucide-react";
 
 export default function BlogPage() {
@@ -63,6 +66,11 @@ export default function BlogPage() {
   const [newKeyword, setNewKeyword] = useState("");
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedPost, setSelectedPost] = useState(null);
+  const [feedback, setFeedback] = useState(null);
+  const showFeedback = (type, message) => {
+    setFeedback({ type, message });
+    setTimeout(() => setFeedback(null), 4000);
+  };
 
   const [formData, setFormData] = useState({
     title: "",
@@ -291,14 +299,13 @@ export default function BlogPage() {
       if (result.success) {
         await fetchPosts();
         closeModal();
+        showFeedback('success', editingPost ? 'Blog post updated successfully!' : 'Blog post created successfully!');
       } else {
-        alert(`Error: ${result.message || "Failed to save blog post"}`);
+        showFeedback('error', result.message || "Failed to save blog post");
       }
     } catch (error) {
       console.error("Error saving post:", error);
-      alert(
-        "An error occurred while saving the blog post. Please check the console for details."
-      );
+      showFeedback('error', 'An error occurred while saving the blog post.');
     } finally {
       setProcessing(false);
     }
@@ -315,9 +322,13 @@ export default function BlogPage() {
 
       if (response.ok) {
         await fetchPosts();
+        showFeedback('success', 'Blog post deleted successfully!');
+      } else {
+        showFeedback('error', 'Failed to delete blog post.');
       }
     } catch (error) {
       console.error("Error deleting post:", error);
+      showFeedback('error', 'An error occurred while deleting the blog post.');
     } finally {
       setDeleting(false);
     }
@@ -373,6 +384,15 @@ export default function BlogPage() {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="p-6 flex flex-col items-center justify-center min-h-[60vh]">
+        <Loader2 className="w-10 h-10 animate-spin text-primary mb-4" />
+        <p className="text-muted-foreground text-lg">Loading blog posts...</p>
+      </div>
+    );
+  }
+
   const getContentPreview = (content) => {
     if (!content) return "";
 
@@ -402,12 +422,12 @@ export default function BlogPage() {
   };
 
   return (
-    <div className="flex flex-col gap-4 sm:gap-6 p-3 sm:p-6">
+    <div className="p-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
-          <h3 className="text-xl sm:text-2xl font-semibold">Blog Posts</h3>
-          <p className="text-xs sm:text-sm text-muted-foreground mt-1">
+          <h1 className="text-3xl font-bold text-foreground">Blog Posts</h1>
+          <p className="text-muted-foreground mt-2">
             Manage your blog content and articles
           </p>
         </div>
@@ -425,105 +445,76 @@ export default function BlogPage() {
         </Button>
       </div>
 
+      {/* Feedback Banner */}
+      {feedback && (
+        <div className={`mb-6 flex items-center gap-3 px-4 py-3 rounded-lg border text-sm font-medium ${
+          feedback.type === 'success'
+            ? 'bg-green-50 border-green-200 text-green-800 dark:bg-green-950 dark:border-green-800 dark:text-green-200'
+            : 'bg-red-50 border-red-200 text-red-800 dark:bg-red-950 dark:border-red-800 dark:text-red-200'
+        }`}>
+          {feedback.type === 'success' ? <CheckCircle className="w-5 h-5 flex-shrink-0" /> : <XCircle className="w-5 h-5 flex-shrink-0" />}
+          <span>{feedback.message}</span>
+          <button onClick={() => setFeedback(null)} className="ml-auto text-current opacity-60 hover:opacity-100">&times;</button>
+        </div>
+      )}
+
       {/* Statistics Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        {loading ? (
-          <>
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="bg-card p-3 sm:p-4 rounded-lg border">
-                <div className="flex items-center gap-3">
-                  <Skeleton className="h-10 w-10 rounded-lg" />
-                  <div className="flex-1">
-                    <Skeleton className="h-4 w-16 mb-2" />
-                    <Skeleton className="h-7 w-12" />
-                  </div>
-                </div>
-              </div>
-            ))}
-          </>
-        ) : (
-          <>
-            <div className="bg-card p-3 sm:p-4 rounded-lg border relative">
-              <div className="flex items-center gap-2 sm:gap-3">
-                <div className="p-1.5 sm:p-2 bg-primary/10 rounded-lg">
-                  <BookOpen className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-                </div>
-                <div>
-                  <p className="text-xs sm:text-sm font-medium text-muted-foreground">
-                    Total Posts
-                  </p>
-                  <p className="text-xl sm:text-2xl font-bold">
-                    {searching || deleting ? (
-                      <Loader2 className="h-5 w-5 sm:h-6 sm:w-6 animate-spin inline" />
-                    ) : (
-                      stats.total
-                    )}
-                  </p>
-                </div>
-              </div>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div className="bg-card p-4 rounded-lg border">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <BookOpen className="h-5 w-5 text-primary" />
             </div>
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">
+                Total Posts
+              </p>
+              <p className="text-2xl font-bold">{stats.total}</p>
+            </div>
+          </div>
+        </div>
 
-            <div className="bg-card p-3 sm:p-4 rounded-lg border relative">
-              <div className="flex items-center gap-2 sm:gap-3">
-                <div className="p-1.5 sm:p-2 bg-primary/10 rounded-lg">
-                  <Eye className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-                </div>
-                <div>
-                  <p className="text-xs sm:text-sm font-medium text-muted-foreground">
-                    Published
-                  </p>
-                  <p className="text-xl sm:text-2xl font-bold">
-                    {searching || deleting ? (
-                      <Loader2 className="h-5 w-5 sm:h-6 sm:w-6 animate-spin inline" />
-                    ) : (
-                      stats.published
-                    )}
-                  </p>
-                </div>
-              </div>
+        <div className="bg-card p-4 rounded-lg border">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <Eye className="h-5 w-5 text-primary" />
             </div>
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">
+                Published
+              </p>
+              <p className="text-2xl font-bold">{stats.published}</p>
+            </div>
+          </div>
+        </div>
 
-            <div className="bg-card p-3 sm:p-4 rounded-lg border relative">
-              <div className="flex items-center gap-2 sm:gap-3">
-                <div className="p-1.5 sm:p-2 bg-muted rounded-lg">
-                  <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
-                </div>
-                <div>
-                  <p className="text-xs sm:text-sm font-medium text-muted-foreground">
-                    Drafts
-                  </p>
-                  <p className="text-xl sm:text-2xl font-bold">
-                    {searching || deleting ? (
-                      <Loader2 className="h-5 w-5 sm:h-6 sm:w-6 animate-spin inline" />
-                    ) : (
-                      stats.draft
-                    )}
-                  </p>
-                </div>
-              </div>
+        <div className="bg-card p-4 rounded-lg border">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-muted rounded-lg">
+              <FileText className="h-5 w-5 text-muted-foreground" />
             </div>
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">
+                Drafts
+              </p>
+              <p className="text-2xl font-bold">{stats.draft}</p>
+            </div>
+          </div>
+        </div>
 
-            <div className="bg-card p-3 sm:p-4 rounded-lg border relative">
-              <div className="flex items-center gap-2 sm:gap-3">
-                <div className="p-1.5 sm:p-2 bg-muted rounded-lg">
-                  <Archive className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
-                </div>
-                <div>
-                  <p className="text-xs sm:text-sm font-medium text-muted-foreground">
-                    Archived
-                  </p>
-                  <p className="text-xl sm:text-2xl font-bold">
-                    {searching || deleting ? (
-                      <Loader2 className="h-5 w-5 sm:h-6 sm:w-6 animate-spin inline" />
-                    ) : (
-                      stats.archived
-                    )}
-                  </p>
-                </div>
-              </div>
+        <div className="bg-card p-4 rounded-lg border">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-muted rounded-lg">
+              <Archive className="h-5 w-5 text-muted-foreground" />
             </div>
-          </>
-        )}
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">
+                Archived
+              </p>
+              <p className="text-2xl font-bold">{stats.archived}</p>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Filters */}
@@ -621,39 +612,7 @@ export default function BlogPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {loading
-                ? [...Array(5)].map((_, i) => (
-                    <tr key={i}>
-                      <td className="p-4">
-                        <div className="flex items-start gap-3">
-                          <Skeleton className="h-12 w-12 rounded" />
-                          <div className="flex-1">
-                            <Skeleton className="h-5 w-48 mb-2" />
-                            <Skeleton className="h-4 w-64" />
-                          </div>
-                        </div>
-                      </td>
-                      <td className="p-4">
-                        <Skeleton className="h-4 w-24" />
-                      </td>
-                      <td className="p-4">
-                        <Skeleton className="h-6 w-20 rounded-full" />
-                      </td>
-                      <td className="p-4">
-                        <Skeleton className="h-6 w-20 rounded-full" />
-                      </td>
-                      <td className="p-4">
-                        <Skeleton className="h-4 w-24" />
-                      </td>
-                      <td className="p-4">
-                        <div className="flex gap-2">
-                          <Skeleton className="h-8 w-8 rounded" />
-                          <Skeleton className="h-8 w-8 rounded" />
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                : filteredPosts.map((post) => (
+              {filteredPosts.map((post) => (
                     <tr
                       key={post.id}
                       className="hover:bg-muted/50 cursor-pointer"
@@ -762,30 +721,7 @@ export default function BlogPage() {
 
         {/* Mobile Cards */}
         <div className="md:hidden divide-y divide-gray-200">
-          {loading
-            ? [...Array(5)].map((_, i) => (
-                <div key={i} className="p-4">
-                  <div className="flex items-start gap-3 mb-3">
-                    <Skeleton className="h-16 w-16 rounded" />
-                    <div className="flex-1">
-                      <Skeleton className="h-5 w-32 mb-2" />
-                      <Skeleton className="h-4 w-full" />
-                      <div className="flex gap-2 mt-2">
-                        <Skeleton className="h-5 w-16 rounded-full" />
-                        <Skeleton className="h-5 w-16 rounded-full" />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <Skeleton className="h-4 w-24" />
-                    <div className="flex gap-2">
-                      <Skeleton className="h-8 w-8 rounded" />
-                      <Skeleton className="h-8 w-8 rounded" />
-                    </div>
-                  </div>
-                </div>
-              ))
-            : filteredPosts.map((post) => (
+          {filteredPosts.map((post) => (
                 <div
                   key={post.id}
                   className="p-4 hover:bg-muted/50 cursor-pointer"
@@ -870,7 +806,7 @@ export default function BlogPage() {
               ))}
         </div>
 
-        {filteredPosts.length === 0 && !loading && (
+        {filteredPosts.length === 0 && (
           <div className="text-center py-12">
             <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-lg font-medium text-foreground mb-2">
@@ -2229,31 +2165,6 @@ export default function BlogPage() {
         />
       )}
 
-      {/* Processing Overlay */}
-      {processing && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-[50000]">
-          <div className="bg-white p-6 rounded-lg shadow-lg">
-            <div className="flex items-center space-x-3">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              <span className="text-lg">
-                {editingPost ? "Updating post..." : "Creating post..."}
-              </span>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Deleting Overlay */}
-      {deleting && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-[50000]">
-          <div className="bg-white p-6 rounded-lg shadow-lg">
-            <div className="flex items-center space-x-3">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              <span className="text-lg">Deleting post...</span>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

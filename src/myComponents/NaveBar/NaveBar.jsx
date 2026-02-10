@@ -266,13 +266,15 @@ export const NaveBar = () => {
 
             {/* Logo - Static with dynamic fallback */}
             <Link href="/" className="flex items-center space-x-2 group">
-              <Image
-                src={contactInfo?.logoUrl || "/images/logo.png"}
-                alt={contactInfo?.companyName || "Marhaba Furniture Movers"}
-                width={140}
-                height={50}
-                className="object-contain group-hover:scale-105 transition-transform"
-              />
+              {contactInfo?.logoUrl && (
+                <Image
+                  src={contactInfo.logoUrl}
+                  alt={contactInfo?.companyName || "Company"}
+                  width={140}
+                  height={50}
+                  className="object-contain group-hover:scale-105 transition-transform"
+                />
+              )}
             </Link>
 
             {/* Desktop Navigation - Static Content */}
@@ -322,13 +324,15 @@ export const NaveBar = () => {
                 <SheetContent side="left" className="w-80 p-0">
                   <div className="bg-gradient-to-br from-blue-600 to-orange-600 p-6">
                     <SheetTitle>
-                      <Image
-                        src={contactInfo?.logoUrl || "/images/logo.png"}
-                        alt={contactInfo?.companyName || "Marhaba Furniture Movers"}
-                        width={140}
-                        height={50}
-                        className="object-contain bg-white p-2 rounded"
-                      />
+                      {contactInfo?.logoUrl && (
+                        <Image
+                          src={contactInfo.logoUrl}
+                          alt={contactInfo?.companyName || "Company"}
+                          width={140}
+                          height={50}
+                          className="object-contain bg-white p-2 rounded"
+                        />
+                      )}
                     </SheetTitle>
                   </div>
 

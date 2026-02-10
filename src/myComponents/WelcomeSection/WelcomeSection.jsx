@@ -49,9 +49,6 @@ const WelcomeSection = () => {
                 <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-orange-600">
                   {content.subtitle}
                 </span>
-                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-orange-600">
-                  MOVERS & PACKERS
-                </span>
               </motion.h1>
               <motion.div
                 className="inline-flex items-center justify-center w-16 h-1 bg-gradient-to-r from-blue-500 to-orange-500 rounded-full mb-4"

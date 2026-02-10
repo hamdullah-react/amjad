@@ -248,6 +248,10 @@ const data = {
           title: "SEO Settings",
           url: "/dashboard/website/seo",
         },
+        {
+          title: "Page SEO",
+          url: "/dashboard/website/page-seo",
+        },
       ],
     },
     // {

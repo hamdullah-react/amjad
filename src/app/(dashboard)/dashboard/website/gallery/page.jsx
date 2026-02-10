@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Plus, Edit, Trash2, Eye, EyeOff, Upload, Image, Save, X } from 'lucide-react'
+import { Plus, Edit, Trash2, Eye, EyeOff, Upload, Image, Save, X, CheckCircle, XCircle, Loader2, AlertCircle } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -20,8 +20,11 @@ export default function GalleryPage() {
   const [images, setImages] = useState([])
   const [filteredImages, setFilteredImages] = useState([])
   const [loading, setLoading] = useState(true)
-  const [processing, setProcessing] = useState(false)
-  const [processingMessage, setProcessingMessage] = useState('')
+  const [feedback, setFeedback] = useState(null)
+  const showFeedback = (type, message) => {
+    setFeedback({ type, message })
+    setTimeout(() => setFeedback(null), 4000)
+  }
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingImage, setEditingImage] = useState(null)
   const [searchTerm, setSearchTerm] = useState('')
@@ -145,11 +148,11 @@ export default function GalleryPage() {
           title: formData.title || result.data.title
         })
       } else {
-        alert('Failed to upload image: ' + result.message)
+        showFeedback('error', 'Failed to upload image: ' + result.message)
       }
     } catch (error) {
       console.error('Error uploading image:', error)
-      alert('Error uploading image')
+      showFeedback('error', 'Error uploading image')
     } finally {
       setUploading(false)
     }
@@ -157,9 +160,6 @@ export default function GalleryPage() {
 
   const handleSubmit = async () => {
     try {
-      setProcessing(true)
-      setProcessingMessage(editingImage ? 'Updating image...' : 'Creating image...')
-
       const url = editingImage
         ? `/api/gallery/${editingImage.id}`
         : '/api/gallery'
@@ -190,25 +190,20 @@ export default function GalleryPage() {
         })
         setUploading(false)
         await fetchImages() // Refresh the list
+        showFeedback('success', editingImage ? 'Image updated successfully!' : 'Image created successfully!')
       } else {
         console.error('Failed to save image:', result.message)
-        alert('Failed to save image: ' + result.message)
+        showFeedback('error', 'Failed to save image: ' + result.message)
       }
     } catch (error) {
       console.error('Error saving image:', error)
-      alert('Error saving image')
-    } finally {
-      setProcessing(false)
-      setProcessingMessage('')
+      showFeedback('error', 'Error saving image')
     }
   }
 
   const handleDelete = async (id) => {
     if (confirm('Are you sure you want to delete this image?')) {
       try {
-        setProcessing(true)
-        setProcessingMessage('Deleting image...')
-
         const response = await fetch(`/api/gallery/${id}`, {
           method: 'DELETE'
         })
@@ -217,25 +212,20 @@ export default function GalleryPage() {
 
         if (result.success) {
           await fetchImages() // Refresh the list
+          showFeedback('success', 'Image deleted successfully!')
         } else {
           console.error('Failed to delete image:', result.message)
-          alert('Failed to delete image')
+          showFeedback('error', 'Failed to delete image')
         }
       } catch (error) {
         console.error('Error deleting image:', error)
-        alert('Error deleting image')
-      } finally {
-        setProcessing(false)
-        setProcessingMessage('')
+        showFeedback('error', 'Error deleting image')
       }
     }
   }
 
   const handleToggleActive = async (image) => {
     try {
-      setProcessing(true)
-      setProcessingMessage('Updating status...')
-
       const response = await fetch(`/api/gallery/${image.id}`, {
         method: 'PUT',
         headers: {
@@ -251,14 +241,14 @@ export default function GalleryPage() {
 
       if (result.success) {
         await fetchImages() // Refresh the list
+        showFeedback('success', `Image ${!image.isActive ? 'activated' : 'deactivated'} successfully!`)
       } else {
         console.error('Failed to toggle image status:', result.message)
+        showFeedback('error', 'Failed to update image status')
       }
     } catch (error) {
       console.error('Error toggling image status:', error)
-    } finally {
-      setProcessing(false)
-      setProcessingMessage('')
+      showFeedback('error', 'Error updating image status')
     }
   }
 
@@ -266,20 +256,31 @@ export default function GalleryPage() {
 
   if (loading) {
     return (
-      <div className="p-6">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-muted-foreground">Loading gallery...</div>
-        </div>
+      <div className="p-6 flex flex-col items-center justify-center min-h-[60vh]">
+        <Loader2 className="w-10 h-10 animate-spin text-primary mb-4" />
+        <p className="text-muted-foreground text-lg">Loading gallery...</p>
       </div>
     )
   }
 
   return (
-    <div className="p-6 relative">
-      <div className="mb-6">
+    <div className="p-6">
+      <div className="mb-8">
         <h1 className="text-3xl font-bold text-foreground">Gallery</h1>
         <p className="text-muted-foreground mt-2">Manage your website gallery images</p>
       </div>
+
+      {feedback && (
+        <div className={`mb-6 flex items-center gap-3 px-4 py-3 rounded-lg border text-sm font-medium ${
+          feedback.type === 'success'
+            ? 'bg-green-50 border-green-200 text-green-800 dark:bg-green-950 dark:border-green-800 dark:text-green-200'
+            : 'bg-red-50 border-red-200 text-red-800 dark:bg-red-950 dark:border-red-800 dark:text-red-200'
+        }`}>
+          {feedback.type === 'success' ? <CheckCircle className="w-5 h-5 flex-shrink-0" /> : <XCircle className="w-5 h-5 flex-shrink-0" />}
+          <span>{feedback.message}</span>
+          <button onClick={() => setFeedback(null)} className="ml-auto text-current opacity-60 hover:opacity-100">&times;</button>
+        </div>
+      )}
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
@@ -347,8 +348,10 @@ export default function GalleryPage() {
       {/* Images Grid */}
       <div className="bg-card rounded-lg shadow overflow-hidden">
         {filteredImages.length === 0 ? (
-          <div className="p-8 text-center text-muted-foreground">
-            {images.length === 0 ? "No images found. Upload your first image!" : "No images match your search criteria."}
+          <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+            <AlertCircle className="w-10 h-10 mb-3" />
+            <p className="text-lg font-medium">No images found</p>
+            <p className="text-sm">{images.length === 0 ? "Add your first image to get started." : "No images match your search criteria."}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 p-6">
@@ -546,17 +549,6 @@ export default function GalleryPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Processing Overlay */}
-      {processing && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-[50000]">
-          <div className="bg-card rounded-lg p-6 shadow-xl">
-            <div className="flex items-center space-x-3">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-              <p className="text-lg font-medium text-foreground">{processingMessage || 'Processing...'}</p>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

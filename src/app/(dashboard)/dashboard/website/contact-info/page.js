@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import {
   Save, Mail, Phone, MapPin, Clock, Globe,
   Facebook, Instagram, Twitter, Linkedin, Youtube,
-  Building, MessageSquare, Image
+  Building, MessageSquare, Image, Loader2, CheckCircle, XCircle, AlertCircle
 } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -69,7 +69,11 @@ export default function ContactInfoPage() {
   })
   const [loading, setLoading] = useState(true)
   const [processing, setProcessing] = useState(false)
-  const [processingMessage, setProcessingMessage] = useState('')
+  const [feedback, setFeedback] = useState(null)
+  const showFeedback = (type, message) => {
+    setFeedback({ type, message })
+    setTimeout(() => setFeedback(null), 4000)
+  }
   const [isImagePickerOpen, setIsImagePickerOpen] = useState(false)
   const [imagePickerTarget, setImagePickerTarget] = useState('logoUrl')
 
@@ -100,7 +104,6 @@ export default function ContactInfoPage() {
   const handleSubmit = async () => {
     try {
       setProcessing(true)
-      setProcessingMessage('Saving contact information...')
 
       const response = await fetch('/api/contact-info', {
         method: 'POST',
@@ -113,20 +116,16 @@ export default function ContactInfoPage() {
       const result = await response.json()
 
       if (result.success) {
-        setProcessingMessage('Contact information saved successfully!')
-        setTimeout(() => {
-          setProcessing(false)
-          setProcessingMessage('')
-        }, 2000)
+        showFeedback('success', 'Contact information saved successfully!')
       } else {
         console.error('Failed to save contact info:', result.message)
-        setProcessing(false)
-        setProcessingMessage('')
+        showFeedback('error', 'Failed to save contact information.')
       }
     } catch (error) {
       console.error('Error saving contact info:', error)
+      showFeedback('error', 'An error occurred while saving contact information.')
+    } finally {
       setProcessing(false)
-      setProcessingMessage('')
     }
   }
 
@@ -162,10 +161,9 @@ export default function ContactInfoPage() {
 
   if (loading) {
     return (
-      <div className="p-6">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-muted-foreground">Loading contact information...</div>
-        </div>
+      <div className="p-6 flex flex-col items-center justify-center min-h-[60vh]">
+        <Loader2 className="w-10 h-10 animate-spin text-primary mb-4" />
+        <p className="text-muted-foreground text-lg">Loading contact information...</p>
       </div>
     )
   }
@@ -188,8 +186,21 @@ export default function ContactInfoPage() {
         </Button>
       </div>
 
+      {/* Feedback Banner */}
+      {feedback && (
+        <div className={`mb-6 flex items-center gap-3 px-4 py-3 rounded-lg border text-sm font-medium ${
+          feedback.type === 'success'
+            ? 'bg-green-50 border-green-200 text-green-800 dark:bg-green-950 dark:border-green-800 dark:text-green-200'
+            : 'bg-red-50 border-red-200 text-red-800 dark:bg-red-950 dark:border-red-800 dark:text-red-200'
+        }`}>
+          {feedback.type === 'success' ? <CheckCircle className="w-5 h-5 flex-shrink-0" /> : <XCircle className="w-5 h-5 flex-shrink-0" />}
+          <span>{feedback.message}</span>
+          <button onClick={() => setFeedback(null)} className="ml-auto text-current opacity-60 hover:opacity-100">&times;</button>
+        </div>
+      )}
+
       {/* Info Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <div className="bg-card rounded-lg border p-4 flex items-center gap-3">
           <div className="p-2 bg-primary/10 rounded-lg">
             <Mail className="w-5 h-5 text-primary" />
@@ -215,6 +226,15 @@ export default function ContactInfoPage() {
           <div>
             <p className="text-sm text-muted-foreground">WhatsApp</p>
             <p className="font-medium text-foreground">{formData.whatsapp || 'Not set'}</p>
+          </div>
+        </div>
+        <div className="bg-card rounded-lg border p-4 flex items-center gap-3">
+          <div className="p-2 bg-primary/10 rounded-lg">
+            <MapPin className="w-5 h-5 text-primary" />
+          </div>
+          <div>
+            <p className="text-sm text-muted-foreground">Location</p>
+            <p className="font-medium text-foreground">{formData.city && formData.emirate ? `${formData.city}, ${formData.emirate}` : 'Not set'}</p>
           </div>
         </div>
       </div>
@@ -601,25 +621,6 @@ export default function ContactInfoPage() {
         selectedImageUrl={formData[imagePickerTarget]}
       />
 
-      {/* Processing Overlay */}
-      {processing && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-[50000]">
-          <div className="bg-card rounded-lg border border-primary p-6 shadow-xl">
-            <div className="flex items-center space-x-3">
-              {processingMessage.includes('successfully') ? (
-                <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
-                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-              ) : (
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-              )}
-              <p className="text-lg font-medium text-foreground">{processingMessage || 'Processing...'}</p>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

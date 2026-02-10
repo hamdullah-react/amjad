@@ -1,8 +1,15 @@
 import WhyChooseUs from '@/myComponents/WhyChooseUs/WhyChooseUs'
 import PageHeader from '@/myComponents/PageHeader/PageHeader'
-import React from 'react'
+import { buildPageMetadata } from '@/lib/page-metadata';
 
-const page = () => {
+export async function generateMetadata() {
+  return buildPageMetadata('why-choose-us', {
+    title: 'Why Choose Us',
+    description: 'Discover what makes Marhaba Movers & Packers the preferred choice for thousands of satisfied customers in Dubai and UAE.',
+  });
+}
+
+export default function WhyChooseUsPage() {
   return (
     <div>
       {/* Page Header Banner */}
@@ -18,5 +25,3 @@ const page = () => {
     </div>
   )
 }
-
-export default page

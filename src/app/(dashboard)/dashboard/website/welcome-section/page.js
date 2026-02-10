@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import {
   Plus, Edit, Trash2, Eye, EyeOff, Save, X, Award,
-  Users, CheckCircle, Home
+  Users, CheckCircle, Home, Loader2, XCircle, AlertCircle
 } from 'lucide-react'
 import {
   Dialog,
@@ -73,7 +73,12 @@ export default function WelcomeSectionPage() {
   const [editingSection, setEditingSection] = useState(null)
   const [formData, setFormData] = useState(INITIAL_FORM_DATA)
   const [processing, setProcessing] = useState(false)
-  const [processingMessage, setProcessingMessage] = useState('')
+  const [feedback, setFeedback] = useState(null)
+
+  const showFeedback = (type, message) => {
+    setFeedback({ type, message })
+    setTimeout(() => setFeedback(null), 4000)
+  }
 
   // Fetch sections
   const fetchSections = async () => {
@@ -199,7 +204,6 @@ export default function WelcomeSectionPage() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setProcessing(true)
-    setProcessingMessage(editingSection ? 'Updating welcome section...' : 'Creating welcome section...')
 
     try {
       const url = editingSection
@@ -221,18 +225,19 @@ export default function WelcomeSectionPage() {
       if (data.success) {
         handleCloseDialog()
         fetchSections()
+        showFeedback('success', editingSection ? 'Welcome section updated successfully' : 'Welcome section created successfully')
+      } else {
+        showFeedback('error', data.message || 'Failed to save welcome section')
       }
     } catch (error) {
-      console.error('Error saving section:', error)
+      showFeedback('error', 'Error saving section: ' + error.message)
     } finally {
       setProcessing(false)
-      setProcessingMessage('')
     }
   }
 
   const handleToggleActive = async (section) => {
     setProcessing(true)
-    setProcessingMessage('Updating status...')
     try {
       const response = await fetch(`/api/welcome-section/${section.id}`, {
         method: 'PUT',
@@ -245,12 +250,14 @@ export default function WelcomeSectionPage() {
       const data = await response.json()
       if (data.success) {
         fetchSections()
+        showFeedback('success', `Section ${!section.isActive ? 'activated' : 'deactivated'} successfully`)
+      } else {
+        showFeedback('error', data.message || 'Failed to update status')
       }
     } catch (error) {
-      console.error('Error toggling active state:', error)
+      showFeedback('error', 'Error toggling active state: ' + error.message)
     } finally {
       setProcessing(false)
-      setProcessingMessage('')
     }
   }
 
@@ -258,7 +265,6 @@ export default function WelcomeSectionPage() {
     if (!confirm('Are you sure you want to delete this welcome section?')) return
 
     setProcessing(true)
-    setProcessingMessage('Deleting welcome section...')
     try {
       const response = await fetch(`/api/welcome-section/${sectionId}`, {
         method: 'DELETE',
@@ -267,19 +273,22 @@ export default function WelcomeSectionPage() {
       const data = await response.json()
       if (data.success) {
         fetchSections()
+        showFeedback('success', 'Welcome section deleted successfully')
+      } else {
+        showFeedback('error', data.message || 'Failed to delete welcome section')
       }
     } catch (error) {
-      console.error('Error deleting section:', error)
+      showFeedback('error', 'Error deleting section: ' + error.message)
     } finally {
       setProcessing(false)
-      setProcessingMessage('')
     }
   }
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+      <div className="p-6 flex flex-col items-center justify-center min-h-[60vh]">
+        <Loader2 className="w-10 h-10 animate-spin text-primary mb-4" />
+        <p className="text-muted-foreground text-lg">Loading welcome sections...</p>
       </div>
     )
   }
@@ -291,8 +300,20 @@ export default function WelcomeSectionPage() {
         <p className="text-muted-foreground mt-2">Manage the welcome section content that appears on your homepage</p>
       </div>
 
+      {feedback && (
+        <div className={`mb-6 flex items-center gap-3 px-4 py-3 rounded-lg border text-sm font-medium ${
+          feedback.type === 'success'
+            ? 'bg-green-50 border-green-200 text-green-800 dark:bg-green-950 dark:border-green-800 dark:text-green-200'
+            : 'bg-red-50 border-red-200 text-red-800 dark:bg-red-950 dark:border-red-800 dark:text-red-200'
+        }`}>
+          {feedback.type === 'success' ? <CheckCircle className="w-5 h-5 flex-shrink-0" /> : <XCircle className="w-5 h-5 flex-shrink-0" />}
+          <span>{feedback.message}</span>
+          <button onClick={() => setFeedback(null)} className="ml-auto text-current opacity-60 hover:opacity-100">&times;</button>
+        </div>
+      )}
+
       {/* Statistics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <StatCard title="Total Sections" value={sections.length} />
         <StatCard
           title="Active Section"
@@ -302,6 +323,13 @@ export default function WelcomeSectionPage() {
         <StatCard
           title="Inactive Sections"
           value={sections.filter(s => !s.isActive).length}
+          className="text-muted-foreground"
+        />
+        <StatCard
+          title="Last Updated"
+          value={sections.length > 0
+            ? new Date(Math.max(...sections.map(s => new Date(s.updatedAt || s.createdAt)))).toLocaleDateString()
+            : 'N/A'}
           className="text-muted-foreground"
         />
       </div>
@@ -856,17 +884,6 @@ export default function WelcomeSectionPage() {
         </DialogContent>
       </Dialog>
 
-   
-      {processing && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-[50000]">
-          <div className="bg-card rounded-lg p-6 shadow-xl border">
-            <div className="flex items-center space-x-3">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-              <p className="text-lg font-medium text-foreground">{processingMessage || 'Processing...'}</p>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

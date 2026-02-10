@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Plus, Edit, Trash, Save, X, Loader2, Upload, Image as ImageIcon, Calendar, Target, Eye, Users, Trophy, Heart } from "lucide-react"
+import { Plus, Edit, Trash, Save, X, Loader2, Upload, Image as ImageIcon, Calendar, Target, Eye, Users, Trophy, Heart, CheckCircle, XCircle, AlertCircle } from "lucide-react"
 import {
   Dialog,
   DialogContent,
@@ -69,6 +69,11 @@ export default function AboutPage() {
   const [loading, setLoading] = useState(true)
   const [processing, setProcessing] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [feedback, setFeedback] = useState(null)
+  const showFeedback = (type, message) => {
+    setFeedback({ type, message })
+    setTimeout(() => setFeedback(null), 4000)
+  }
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isImagePickerOpen, setIsImagePickerOpen] = useState(false)
   const [currentImageField, setCurrentImageField] = useState("")
@@ -113,8 +118,10 @@ export default function AboutPage() {
 
       setIsModalOpen(false)
       await fetchAbout()
+      showFeedback('success', about ? 'About page updated successfully!' : 'About page created successfully!')
     } catch (err) {
       console.error("Error saving AboutUs:", err)
+      showFeedback('error', 'Failed to save about page. Please try again.')
     } finally {
       setProcessing(false)
     }
@@ -128,8 +135,10 @@ export default function AboutPage() {
       await fetch(`/api/about/${about.id}`, { method: "DELETE" })
       setAbout(null)
       setFormData(INITIAL_DATA)
+      showFeedback('success', 'About page deleted successfully!')
     } catch (err) {
       console.error("Error deleting AboutUs:", err)
+      showFeedback('error', 'Failed to delete about page. Please try again.')
     } finally {
       setDeleting(false)
     }
@@ -264,7 +273,7 @@ export default function AboutPage() {
     if (!about || !about.data) return null
     
     return (
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <div className="text-center p-4 bg-blue-50 rounded-lg">
           <div className="text-3xl font-bold text-blue-600">{about.data.yearsExperience}+</div>
           <div className="text-sm text-gray-600">Years Experience</div>
@@ -318,38 +327,12 @@ export default function AboutPage() {
   )
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      {/* Processing Overlay */}
-      {processing && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-[50000]">
-          <div className="bg-white p-6 rounded-lg shadow-lg">
-            <div className="flex items-center space-x-3">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              <span className="text-lg">
-                {about ? 'Updating about page...' : 'Creating about page...'}
-              </span>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Deleting Overlay */}
-      {deleting && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-[50000]">
-          <div className="bg-white p-6 rounded-lg shadow-lg">
-            <div className="flex items-center space-x-3">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              <span className="text-lg">Deleting about page...</span>
-            </div>
-          </div>
-        </div>
-      )}
-
+    <div className="p-6">
       {/* Header */}
       <div className="mb-8 flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">About Us Management</h1>
-          <p className="text-gray-600">Manage your company's about page content</p>
+          <h1 className="text-3xl font-bold text-foreground">About Us Management</h1>
+          <p className="text-muted-foreground mt-2">Manage your company's about page content</p>
         </div>
         <div className="flex gap-2">
           {about && (
@@ -377,10 +360,24 @@ export default function AboutPage() {
         </div>
       </div>
 
+      {/* Feedback Banner */}
+      {feedback && (
+        <div className={`mb-6 flex items-center gap-3 px-4 py-3 rounded-lg border text-sm font-medium ${
+          feedback.type === 'success'
+            ? 'bg-green-50 border-green-200 text-green-800 dark:bg-green-950 dark:border-green-800 dark:text-green-200'
+            : 'bg-red-50 border-red-200 text-red-800 dark:bg-red-950 dark:border-red-800 dark:text-red-200'
+        }`}>
+          {feedback.type === 'success' ? <CheckCircle className="w-5 h-5 flex-shrink-0" /> : <XCircle className="w-5 h-5 flex-shrink-0" />}
+          <span>{feedback.message}</span>
+          <button onClick={() => setFeedback(null)} className="ml-auto text-current opacity-60 hover:opacity-100">&times;</button>
+        </div>
+      )}
+
       {/* Display Preview */}
       {loading ? (
-        <div className="flex justify-center items-center h-64">
-          <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+        <div className="flex flex-col items-center justify-center min-h-[60vh]">
+          <Loader2 className="w-10 h-10 animate-spin text-primary mb-4" />
+          <p className="text-muted-foreground text-lg">Loading about page...</p>
         </div>
       ) : !about ? (
         <Card className="text-center p-12">

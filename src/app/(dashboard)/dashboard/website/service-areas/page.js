@@ -8,7 +8,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { Skeleton } from '@/components/ui/skeleton';
 import {
   Plus,
   Edit,
@@ -20,13 +19,13 @@ import {
   X,
   Save,
   Loader2,
-  Map,
-  Package,
   Star,
-  Filter,
   ChevronDown,
   ChevronUp,
-  Link
+  Link,
+  CheckCircle,
+  XCircle,
+  AlertCircle
 } from 'lucide-react';
 
 
@@ -64,6 +63,11 @@ export default function ServiceAreasPage() {
   const [newCoverage, setNewCoverage] = useState('');
   const [newPostalCode, setNewPostalCode] = useState('');
   const [isManualSlug, setIsManualSlug] = useState(false);
+  const [feedback, setFeedback] = useState(null);
+  const showFeedback = (type, message) => {
+    setFeedback({ type, message });
+    setTimeout(() => setFeedback(null), 4000);
+  };
 
   const [formData, setFormData] = useState({
     city: '',
@@ -281,12 +285,13 @@ const emirates = [
       if (result.success) {
         await fetchServiceAreas();
         closeModal();
+        showFeedback('success', editingArea ? 'Service area updated successfully' : 'Service area created successfully');
       } else {
-        alert(result.message || 'Failed to save service area');
+        showFeedback('error', result.message || 'Failed to save service area');
       }
     } catch (error) {
       console.error('Error saving service area:', error);
-      alert('An error occurred while saving');
+      showFeedback('error', 'An error occurred while saving');
     } finally {
       setProcessing(false);
     }
@@ -303,9 +308,13 @@ const emirates = [
 
       if (response.ok) {
         await fetchServiceAreas();
+        showFeedback('success', 'Service area deleted successfully');
+      } else {
+        showFeedback('error', 'Failed to delete service area');
       }
     } catch (error) {
       console.error('Error deleting service area:', error);
+      showFeedback('error', 'An error occurred while deleting');
     } finally {
       setDeleting(false);
     }
@@ -324,13 +333,22 @@ const emirates = [
     });
   }, [serviceAreas, searchTerm]);
 
+  if (loading) {
+    return (
+      <div className="p-6 flex flex-col items-center justify-center min-h-[60vh]">
+        <Loader2 className="w-10 h-10 animate-spin text-primary mb-4" />
+        <p className="text-muted-foreground text-lg">Loading service areas...</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex flex-col gap-4 sm:gap-6 p-3 sm:p-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div className="p-6">
+      {/* Page Header */}
+      <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h3 className="text-xl sm:text-2xl font-semibold">Service Areas</h3>
-          <p className="text-xs sm:text-sm text-muted-foreground mt-1">
+          <h1 className="text-3xl font-bold text-foreground">Service Areas</h1>
+          <p className="text-muted-foreground mt-2">
             Manage your service coverage areas
           </p>
         </div>
@@ -348,97 +366,41 @@ const emirates = [
         </Button>
       </div>
 
+      {/* Feedback Banner */}
+      {feedback && (
+        <div className={`mb-6 flex items-center gap-3 px-4 py-3 rounded-lg border text-sm font-medium ${
+          feedback.type === 'success'
+            ? 'bg-green-50 border-green-200 text-green-800 dark:bg-green-950 dark:border-green-800 dark:text-green-200'
+            : 'bg-red-50 border-red-200 text-red-800 dark:bg-red-950 dark:border-red-800 dark:text-red-200'
+        }`}>
+          {feedback.type === 'success' ? <CheckCircle className="w-5 h-5 flex-shrink-0" /> : <XCircle className="w-5 h-5 flex-shrink-0" />}
+          <span>{feedback.message}</span>
+          <button onClick={() => setFeedback(null)} className="ml-auto text-current opacity-60 hover:opacity-100">&times;</button>
+        </div>
+      )}
+
       {/* Statistics Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
-        {loading ? (
-          [...Array(5)].map((_, i) => (
-            <div key={i} className="bg-card p-3 sm:p-4 rounded-lg border">
-              <div className="flex items-center gap-3">
-                <Skeleton className="h-10 w-10 rounded-lg" />
-                <div className="flex-1">
-                  <Skeleton className="h-4 w-16 mb-2" />
-                  <Skeleton className="h-7 w-12" />
-                </div>
-              </div>
-            </div>
-          ))
-        ) : (
-          <>
-            <div className="bg-card p-3 sm:p-4 rounded-lg border">
-              <div className="flex items-center gap-2 sm:gap-3">
-                <div className="p-1.5 sm:p-2 bg-primary/10 rounded-lg">
-                  <MapPin className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-                </div>
-                <div>
-                  <p className="text-xs sm:text-sm font-medium text-muted-foreground">Total Areas</p>
-                  <p className="text-xl sm:text-2xl font-bold">
-                    {searching || deleting ? <Loader2 className="h-5 w-5 sm:h-6 sm:w-6 animate-spin inline" /> : stats.total}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-card p-3 sm:p-4 rounded-lg border">
-              <div className="flex items-center gap-2 sm:gap-3">
-                <div className="p-1.5 sm:p-2 bg-primary/10 rounded-lg">
-                  <Package className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-                </div>
-                <div>
-                  <p className="text-xs sm:text-sm font-medium text-gray-600">Active</p>
-                  <p className="text-xl sm:text-2xl font-bold">
-                    {searching || deleting ? <Loader2 className="h-5 w-5 sm:h-6 sm:w-6 animate-spin inline" /> : stats.active}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-card p-3 sm:p-4 rounded-lg border">
-              <div className="flex items-center gap-2 sm:gap-3">
-                <div className="p-1.5 sm:p-2 bg-primary/10 rounded-lg">
-                  <Star className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-                </div>
-                <div>
-                  <p className="text-xs sm:text-sm font-medium text-gray-600">Primary</p>
-                  <p className="text-xl sm:text-2xl font-bold">
-                    {searching || deleting ? <Loader2 className="h-5 w-5 sm:h-6 sm:w-6 animate-spin inline" /> : stats.primary}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-card p-3 sm:p-4 rounded-lg border">
-              <div className="flex items-center gap-2 sm:gap-3">
-                <div className="p-1.5 sm:p-2 bg-primary/10 rounded-lg">
-                  <Map className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-                </div>
-                <div>
-                  <p className="text-xs sm:text-sm font-medium text-gray-600">Emirates</p>
-                  <p className="text-xl sm:text-2xl font-bold">
-                    {searching || deleting ? <Loader2 className="h-5 w-5 sm:h-6 sm:w-6 animate-spin inline" /> : stats.emirates}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-card p-3 sm:p-4 rounded-lg border">
-              <div className="flex items-center gap-2 sm:gap-3">
-                <div className="p-1.5 sm:p-2 bg-muted rounded-lg">
-                  <X className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
-                </div>
-                <div>
-                  <p className="text-xs sm:text-sm font-medium text-gray-600">Inactive</p>
-                  <p className="text-xl sm:text-2xl font-bold">
-                    {searching || deleting ? <Loader2 className="h-5 w-5 sm:h-6 sm:w-6 animate-spin inline" /> : stats.inactive}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </>
-        )}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div className="bg-card rounded-lg border p-4">
+          <div className="text-sm text-muted-foreground">Total Areas</div>
+          <div className="text-2xl font-bold text-foreground">{stats.total}</div>
+        </div>
+        <div className="bg-card rounded-lg border p-4">
+          <div className="text-sm text-muted-foreground">Active</div>
+          <div className="text-2xl font-bold text-foreground">{stats.active}</div>
+        </div>
+        <div className="bg-card rounded-lg border p-4">
+          <div className="text-sm text-muted-foreground">Primary</div>
+          <div className="text-2xl font-bold text-foreground">{stats.primary}</div>
+        </div>
+        <div className="bg-card rounded-lg border p-4">
+          <div className="text-sm text-muted-foreground">Emirates</div>
+          <div className="text-2xl font-bold text-foreground">{stats.emirates}</div>
+        </div>
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-3 bg-card p-3 sm:p-4 rounded-lg border">
+      <div className="flex flex-col sm:flex-row gap-3 bg-card p-3 sm:p-4 rounded-lg border mb-6">
         <div className="flex-1">
           <div className="relative">
             {searching ? (
@@ -483,15 +445,7 @@ const emirates = [
       </div>
 
       {/* Table/Cards */}
-      <div className="bg-card rounded-lg border overflow-hidden relative">
-        {searching && (
-          <div className="absolute inset-0 bg-card/80 backdrop-blur-sm flex items-center justify-center z-10">
-            <div className="flex items-center gap-3">
-              <Loader2 className="h-5 w-5 animate-spin text-primary" />
-              <span className="text-sm text-muted-foreground">Searching service areas...</span>
-            </div>
-          </div>
-        )}
+      <div className="bg-card rounded-lg border overflow-hidden">
         {/* Desktop Table */}
         <div className="hidden md:block overflow-x-auto">
           <table className="w-full">
@@ -507,38 +461,7 @@ const emirates = [
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {loading ? (
-                [...Array(5)].map((_, i) => (
-                  <tr key={i}>
-                    <td className="p-4">
-                      <Skeleton className="h-5 w-32 mb-2" />
-                      <Skeleton className="h-4 w-24" />
-                    </td>
-                    <td className="p-4">
-                      <Skeleton className="h-4 w-20" />
-                    </td>
-                    <td className="p-4">
-                      <Skeleton className="h-6 w-20" />
-                    </td>
-                    <td className="p-4">
-                      <Skeleton className="h-4 w-24" />
-                    </td>
-                    <td className="p-4">
-                      <Skeleton className="h-4 w-16" />
-                    </td>
-                    <td className="p-4">
-                      <Skeleton className="h-6 w-16 rounded-full" />
-                    </td>
-                    <td className="p-4">
-                      <div className="flex gap-2">
-                        <Skeleton className="h-8 w-8 rounded" />
-                        <Skeleton className="h-8 w-8 rounded" />
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                filteredAreas.map((area) => (
+              {filteredAreas.map((area) => (
                   <React.Fragment key={area.id}>
                     <tr
                       className="hover:bg-muted/50 cursor-pointer"
@@ -677,27 +600,14 @@ const emirates = [
                       </tr>
                     )}
                   </React.Fragment>
-                ))
-              )}
+                ))}
             </tbody>
           </table>
         </div>
 
         {/* Mobile Cards */}
         <div className="md:hidden divide-y divide-border">
-          {loading ? (
-            [...Array(5)].map((_, i) => (
-              <div key={i} className="p-4">
-                <Skeleton className="h-5 w-32 mb-2" />
-                <Skeleton className="h-4 w-full mb-3" />
-                <div className="flex gap-2">
-                  <Skeleton className="h-6 w-20 rounded-full" />
-                  <Skeleton className="h-6 w-20 rounded-full" />
-                </div>
-              </div>
-            ))
-          ) : (
-            filteredAreas.map((area) => (
+          {filteredAreas.map((area) => (
               <div key={area.id} className="p-4">
                 <div className="flex items-start justify-between mb-2">
                   <div>
@@ -766,19 +676,14 @@ const emirates = [
                   </Button>
                 </div>
               </div>
-            ))
-          )}
+            ))}
         </div>
 
-        {filteredAreas.length === 0 && !loading && (
-          <div className="text-center py-12">
-            <MapPin className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-foreground mb-2">No service areas found</h3>
-            <p className="text-muted-foreground mb-4">Add your first service area to get started.</p>
-            <Button onClick={() => openModal()}>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Service Area
-            </Button>
+        {filteredAreas.length === 0 && (
+          <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+            <AlertCircle className="w-10 h-10 mb-3" />
+            <p className="text-lg font-medium">No service areas found</p>
+            <p className="text-sm">Add your first service area to get started.</p>
           </div>
         )}
       </div>
@@ -998,31 +903,6 @@ const emirates = [
         </div>
       )}
 
-      {/* Processing Overlay */}
-      {processing && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-[50000]">
-          <div className="bg-card p-6 rounded-lg shadow-lg">
-            <div className="flex items-center space-x-3">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-              <span className="text-lg">
-                {editingArea ? 'Updating service area...' : 'Creating service area...'}
-              </span>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Deleting Overlay */}
-      {deleting && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-[50000]">
-          <div className="bg-card p-6 rounded-lg shadow-lg">
-            <div className="flex items-center space-x-3">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-              <span className="text-lg">Deleting service area...</span>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

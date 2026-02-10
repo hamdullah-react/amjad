@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import {
-  Plus, Edit, Trash2, Eye, EyeOff, Save, X, Image, ArrowUp, ArrowDown
+  Plus, Edit, Trash2, Eye, EyeOff, Save, X, Image, ArrowUp, ArrowDown, CheckCircle, XCircle, Loader2, AlertCircle
 } from 'lucide-react'
 import {
   Dialog,
@@ -45,7 +45,11 @@ export default function HeroSliderPage() {
   const [editingSlide, setEditingSlide] = useState(null)
   const [formData, setFormData] = useState(INITIAL_FORM_DATA)
   const [processing, setProcessing] = useState(false)
-  const [processingMessage, setProcessingMessage] = useState('')
+  const [feedback, setFeedback] = useState(null)
+  const showFeedback = (type, message) => {
+    setFeedback({ type, message })
+    setTimeout(() => setFeedback(null), 4000)
+  }
   const [isImagePickerOpen, setIsImagePickerOpen] = useState(false)
 
   // Fetch slides from API
@@ -102,7 +106,6 @@ export default function HeroSliderPage() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setProcessing(true)
-    setProcessingMessage(editingSlide ? 'Updating slide...' : 'Creating slide...')
 
     try {
       const url = editingSlide
@@ -124,18 +127,20 @@ export default function HeroSliderPage() {
       if (data.success) {
         handleCloseDialog()
         fetchSlides()
+        showFeedback('success', editingSlide ? 'Slide updated successfully!' : 'Slide created successfully!')
+      } else {
+        showFeedback('error', 'Failed to save slide')
       }
     } catch (error) {
       console.error('Error saving slide:', error)
+      showFeedback('error', 'Error saving slide')
     } finally {
       setProcessing(false)
-      setProcessingMessage('')
     }
   }
 
   const handleToggleActive = async (slide) => {
     setProcessing(true)
-    setProcessingMessage('Updating status...')
     try {
       const response = await fetch(`/api/hero-slider/${slide.id}`, {
         method: 'PUT',
@@ -148,18 +153,20 @@ export default function HeroSliderPage() {
       const data = await response.json()
       if (data.success) {
         fetchSlides()
+        showFeedback('success', `Slide ${!slide.isActive ? 'activated' : 'deactivated'} successfully!`)
+      } else {
+        showFeedback('error', 'Failed to update slide status')
       }
     } catch (error) {
       console.error('Error toggling active state:', error)
+      showFeedback('error', 'Error updating slide status')
     } finally {
       setProcessing(false)
-      setProcessingMessage('')
     }
   }
 
   const handleOrderChange = async (slide, direction) => {
     setProcessing(true)
-    setProcessingMessage('Updating order...')
 
     try {
       const currentIndex = slides.findIndex(s => s.id === slide.id)
@@ -184,11 +191,12 @@ export default function HeroSliderPage() {
       ])
 
       fetchSlides()
+      showFeedback('success', 'Slide order updated!')
     } catch (error) {
       console.error('Error changing order:', error)
+      showFeedback('error', 'Error changing slide order')
     } finally {
       setProcessing(false)
-      setProcessingMessage('')
     }
   }
 
@@ -196,7 +204,6 @@ export default function HeroSliderPage() {
     if (!confirm('Are you sure you want to delete this slide?')) return
 
     setProcessing(true)
-    setProcessingMessage('Deleting slide...')
     try {
       const response = await fetch(`/api/hero-slider/${slideId}`, {
         method: 'DELETE',
@@ -205,12 +212,15 @@ export default function HeroSliderPage() {
       const data = await response.json()
       if (data.success) {
         fetchSlides()
+        showFeedback('success', 'Slide deleted successfully!')
+      } else {
+        showFeedback('error', 'Failed to delete slide')
       }
     } catch (error) {
       console.error('Error deleting slide:', error)
+      showFeedback('error', 'Error deleting slide')
     } finally {
       setProcessing(false)
-      setProcessingMessage('')
     }
   }
 
@@ -221,8 +231,9 @@ export default function HeroSliderPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+      <div className="p-6 flex flex-col items-center justify-center min-h-[60vh]">
+        <Loader2 className="w-10 h-10 animate-spin text-primary mb-4" />
+        <p className="text-muted-foreground text-lg">Loading slides...</p>
       </div>
     )
   }
@@ -234,8 +245,20 @@ export default function HeroSliderPage() {
         <p className="text-muted-foreground mt-2">Manage the hero slider images and content on your homepage</p>
       </div>
 
+      {feedback && (
+        <div className={`mb-6 flex items-center gap-3 px-4 py-3 rounded-lg border text-sm font-medium ${
+          feedback.type === 'success'
+            ? 'bg-green-50 border-green-200 text-green-800 dark:bg-green-950 dark:border-green-800 dark:text-green-200'
+            : 'bg-red-50 border-red-200 text-red-800 dark:bg-red-950 dark:border-red-800 dark:text-red-200'
+        }`}>
+          {feedback.type === 'success' ? <CheckCircle className="w-5 h-5 flex-shrink-0" /> : <XCircle className="w-5 h-5 flex-shrink-0" />}
+          <span>{feedback.message}</span>
+          <button onClick={() => setFeedback(null)} className="ml-auto text-current opacity-60 hover:opacity-100">&times;</button>
+        </div>
+      )}
+
       {/* Statistics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <StatCard title="Total Slides" value={slides.length} />
         <StatCard
           title="Active Slides"
@@ -246,6 +269,11 @@ export default function HeroSliderPage() {
           title="Inactive Slides"
           value={slides.filter(s => !s.isActive).length}
           className="text-muted-foreground"
+        />
+        <StatCard
+          title="Last Updated"
+          value={slides.length > 0 ? new Date(Math.max(...slides.map(s => new Date(s.updatedAt || s.createdAt)))).toLocaleDateString() : 'N/A'}
+          className="text-sm font-semibold"
         />
       </div>
 
@@ -265,13 +293,10 @@ export default function HeroSliderPage() {
         </div>
 
         {slides.length === 0 ? (
-          <div className="p-12 text-center">
-            <Image className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-            <p className="text-muted-foreground mb-4">No slides found</p>
-            <Button onClick={() => handleOpenDialog()}>
-              <Plus className="mr-2 h-4 w-4" />
-              Create Your First Slide
-            </Button>
+          <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+            <AlertCircle className="w-10 h-10 mb-3" />
+            <p className="text-lg font-medium">No slides found</p>
+            <p className="text-sm">Add your first slide to get started.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -694,17 +719,6 @@ export default function HeroSliderPage() {
         onSelect={handleImageSelect}
       />
 
-      {/* Processing Overlay */}
-      {processing && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-[50000]">
-          <div className="bg-card rounded-lg p-6 shadow-xl border">
-            <div className="flex items-center space-x-3">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-              <p className="text-lg font-medium text-foreground">{processingMessage || 'Processing...'}</p>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

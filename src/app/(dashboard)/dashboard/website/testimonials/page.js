@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import {
   Plus, Edit, Trash2, Eye, EyeOff, Save, X, Star,
-  MapPin, Building, User, Mail, Quote
+  MapPin, Building, User, Mail, Quote, Loader2, CheckCircle, XCircle, AlertCircle
 } from 'lucide-react'
 import {
   Dialog,
@@ -339,7 +339,12 @@ export default function TestimonialsPage() {
   const [filteredTestimonials, setFilteredTestimonials] = useState([])
   const [loading, setLoading] = useState(true)
   const [processing, setProcessing] = useState(false)
-  const [processingMessage, setProcessingMessage] = useState('')
+  const [feedback, setFeedback] = useState(null)
+
+  const showFeedback = (type, message) => {
+    setFeedback({ type, message })
+    setTimeout(() => setFeedback(null), 4000)
+  }
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingTestimonial, setEditingTestimonial] = useState(null)
   const [searchTerm, setSearchTerm] = useState('')
@@ -435,7 +440,6 @@ export default function TestimonialsPage() {
   const handleSubmit = async () => {
     try {
       setProcessing(true)
-      setProcessingMessage(editingTestimonial ? 'Updating testimonial...' : 'Creating testimonial...')
 
       const url = editingTestimonial
         ? `/api/testimonials/${editingTestimonial.id}`
@@ -458,14 +462,14 @@ export default function TestimonialsPage() {
         setEditingTestimonial(null)
         setFormData(INITIAL_FORM_DATA)
         await fetchTestimonials()
+        showFeedback('success', editingTestimonial ? 'Testimonial updated successfully' : 'Testimonial created successfully')
       } else {
-        console.error('Failed to save testimonial:', result.message)
+        showFeedback('error', result.message || 'Failed to save testimonial')
       }
     } catch (error) {
-      console.error('Error saving testimonial:', error)
+      showFeedback('error', 'Error saving testimonial: ' + error.message)
     } finally {
       setProcessing(false)
-      setProcessingMessage('')
     }
   }
 
@@ -474,7 +478,6 @@ export default function TestimonialsPage() {
 
     try {
       setProcessing(true)
-      setProcessingMessage('Deleting testimonial...')
 
       const response = await fetch(`/api/testimonials/${id}`, {
         method: 'DELETE',
@@ -484,21 +487,20 @@ export default function TestimonialsPage() {
 
       if (result.success) {
         await fetchTestimonials()
+        showFeedback('success', 'Testimonial deleted successfully')
       } else {
-        console.error('Failed to delete testimonial:', result.message)
+        showFeedback('error', result.message || 'Failed to delete testimonial')
       }
     } catch (error) {
-      console.error('Error deleting testimonial:', error)
+      showFeedback('error', 'Error deleting testimonial: ' + error.message)
     } finally {
       setProcessing(false)
-      setProcessingMessage('')
     }
   }
 
   const handleToggleStatus = async (testimonial) => {
     try {
       setProcessing(true)
-      setProcessingMessage('Updating status...')
 
       const response = await fetch(`/api/testimonials/${testimonial.id}`, {
         method: 'PUT',
@@ -515,21 +517,20 @@ export default function TestimonialsPage() {
 
       if (result.success) {
         await fetchTestimonials()
+        showFeedback('success', `Testimonial ${!testimonial.isActive ? 'activated' : 'deactivated'} successfully`)
       } else {
-        console.error('Failed to toggle status:', result.message)
+        showFeedback('error', result.message || 'Failed to toggle status')
       }
     } catch (error) {
-      console.error('Error toggling status:', error)
+      showFeedback('error', 'Error toggling status: ' + error.message)
     } finally {
       setProcessing(false)
-      setProcessingMessage('')
     }
   }
 
   const handleToggleFeatured = async (testimonial) => {
     try {
       setProcessing(true)
-      setProcessingMessage('Updating featured status...')
 
       const response = await fetch(`/api/testimonials/${testimonial.id}`, {
         method: 'PUT',
@@ -546,14 +547,14 @@ export default function TestimonialsPage() {
 
       if (result.success) {
         await fetchTestimonials()
+        showFeedback('success', `Testimonial ${!testimonial.isFeatured ? 'featured' : 'unfeatured'} successfully`)
       } else {
-        console.error('Failed to toggle featured status:', result.message)
+        showFeedback('error', result.message || 'Failed to toggle featured status')
       }
     } catch (error) {
-      console.error('Error toggling featured status:', error)
+      showFeedback('error', 'Error toggling featured status: ' + error.message)
     } finally {
       setProcessing(false)
-      setProcessingMessage('')
     }
   }
 
@@ -563,12 +564,33 @@ export default function TestimonialsPage() {
     setFormData(INITIAL_FORM_DATA)
   }
 
+  if (loading) {
+    return (
+      <div className="p-6 flex flex-col items-center justify-center min-h-[60vh]">
+        <Loader2 className="w-10 h-10 animate-spin text-primary mb-4" />
+        <p className="text-muted-foreground text-lg">Loading testimonials...</p>
+      </div>
+    )
+  }
+
   return (
     <div className="p-6">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-foreground">Testimonials</h1>
         <p className="text-muted-foreground mt-2">Manage customer testimonials and reviews</p>
       </div>
+
+      {feedback && (
+        <div className={`mb-6 flex items-center gap-3 px-4 py-3 rounded-lg border text-sm font-medium ${
+          feedback.type === 'success'
+            ? 'bg-green-50 border-green-200 text-green-800 dark:bg-green-950 dark:border-green-800 dark:text-green-200'
+            : 'bg-red-50 border-red-200 text-red-800 dark:bg-red-950 dark:border-red-800 dark:text-red-200'
+        }`}>
+          {feedback.type === 'success' ? <CheckCircle className="w-5 h-5 flex-shrink-0" /> : <XCircle className="w-5 h-5 flex-shrink-0" />}
+          <span>{feedback.message}</span>
+          <button onClick={() => setFeedback(null)} className="ml-auto text-current opacity-60 hover:opacity-100">&times;</button>
+        </div>
+      )}
 
       {/* Statistics */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
@@ -614,11 +636,7 @@ export default function TestimonialsPage() {
             </Select>
           </div>
         </div>
-        {loading ? (
-          <div className="p-12 text-center">
-            <div className="text-muted-foreground">Loading testimonials...</div>
-          </div>
-        ) : filteredTestimonials.length === 0 ? (
+        {filteredTestimonials.length === 0 ? (
           <div className="p-12 text-center">
             <Quote className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
             <p className="text-muted-foreground text-lg">No testimonials found</p>
@@ -675,18 +693,6 @@ export default function TestimonialsPage() {
           </div>
         )}
       </div>
-
-      {/* Processing Overlay */}
-      {processing && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-[50000]">
-          <div className="bg-card rounded-lg p-6 shadow-xl border">
-            <div className="flex items-center space-x-3">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-              <p className="text-lg font-medium text-foreground">{processingMessage || 'Processing...'}</p>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Add/Edit Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>

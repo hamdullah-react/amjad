@@ -1,14 +1,17 @@
 // src/app/sitemap.js
+import prisma from '@/lib/prisma';
+
 export default async function sitemap() {
-  const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
-  
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+
   // Get SEO settings for sitemap configuration
   let seoSettings = null;
   try {
-    const response = await fetch(`${baseUrl}/api/seo`);
-    const data = await response.json();
-    if (data.success) {
-      seoSettings = data.data;
+    const settings = await prisma.companySettings.findUnique({
+      where: { key: 'seo_settings' }
+    });
+    if (settings) {
+      seoSettings = settings.value;
     }
   } catch (error) {
     console.error('Error fetching SEO settings for sitemap:', error);
@@ -18,11 +21,6 @@ export default async function sitemap() {
   if (seoSettings && !seoSettings.sitemapEnabled) {
     return [];
   }
-
-  const sitemapConfig = {
-    changeFrequency: seoSettings?.sitemapChangeFrequency || 'weekly',
-    priority: parseFloat(seoSettings?.sitemapPriority) || 0.8,
-  };
 
   // Static pages
   const staticPages = [
@@ -68,79 +66,69 @@ export default async function sitemap() {
       changeFrequency: 'weekly',
       priority: 0.8,
     },
-    {
-      url: `${baseUrl}/test-container`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.7,
-    },
   ];
 
-  // Fetch dynamic pages from APIs
   try {
-    // Fetch blog posts
-    const blogPosts = await fetchDynamicPages(`${baseUrl}/api/blog`, 'blog');
-    
-    // Fetch services
-    const services = await fetchDynamicPages(`${baseUrl}/api/services`, 'services');
-    
-    // Fetch service areas
-    const serviceAreas = await fetchDynamicPages(`${baseUrl}/api/service-areas`, 'services-area');
-    
-    // Fetch why choose us pages
-    const whyChooseUs = await fetchDynamicPages(`${baseUrl}/api/why-choose-us`, 'why-choose-us');
+    // Fetch all dynamic data from Prisma directly
+    const [blogPosts, services, serviceAreas, whyChooseUs] = await Promise.all([
+      prisma.blogPost.findMany({
+        where: { status: 'PUBLISHED' },
+        select: { slug: true, updatedAt: true },
+      }).catch(() => []),
+      prisma.service.findMany({
+        where: { isActive: true },
+        select: { slug: true, updatedAt: true },
+      }).catch(() => []),
+      prisma.serviceArea.findMany({
+        where: { isActive: true },
+        select: { slug: true, updatedAt: true },
+      }).catch(() => []),
+      prisma.whyChooseUs.findMany({
+        where: { isActive: true },
+        select: { slug: true, updatedAt: true },
+      }).catch(() => []),
+    ]);
 
-    // Combine all pages
-    const allPages = [
-      ...staticPages,
-      ...blogPosts,
-      ...services,
-      ...serviceAreas,
-      ...whyChooseUs,
-    ];
-
-    // Filter out excluded pages if specified in SEO settings
-    const finalPages = seoSettings?.excludedPages?.length > 0 
-      ? allPages.filter(page => {
-          const path = page.url.replace(baseUrl, '');
-          return !seoSettings.excludedPages.includes(path);
-        })
-      : allPages;
-
-    return finalPages;
-
-  } catch (error) {
-    console.error('Error generating sitemap:', error);
-    // Return at least static pages if dynamic fetching fails
-    return staticPages;
-  }
-}
-
-// Helper function to fetch dynamic pages from API
-async function fetchDynamicPages(apiUrl, path) {
-  try {
-    const response = await fetch(apiUrl, {
-      next: { revalidate: 3600 } // Cache for 1 hour
-    });
-    
-    if (!response.ok) {
-      throw new Error(`Failed to fetch ${path}`);
-    }
-    
-    const data = await response.json();
-    
-    if (data.success && data.data && Array.isArray(data.data)) {
-      return data.data.map(item => ({
-        url: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/${path}/${item.slug}`,
-        lastModified: item.updatedAt ? new Date(item.updatedAt) : new Date(),
+    const dynamicPages = [
+      ...blogPosts.map(post => ({
+        url: `${baseUrl}/blog/${post.slug}`,
+        lastModified: post.updatedAt || new Date(),
         changeFrequency: 'weekly',
         priority: 0.7,
-      }));
+      })),
+      ...services.map(service => ({
+        url: `${baseUrl}/services/${service.slug}`,
+        lastModified: service.updatedAt || new Date(),
+        changeFrequency: 'weekly',
+        priority: 0.7,
+      })),
+      ...serviceAreas.map(area => ({
+        url: `${baseUrl}/services-area/${area.slug}`,
+        lastModified: area.updatedAt || new Date(),
+        changeFrequency: 'weekly',
+        priority: 0.7,
+      })),
+      ...whyChooseUs.map(item => ({
+        url: `${baseUrl}/why-choose-us/${item.slug}`,
+        lastModified: item.updatedAt || new Date(),
+        changeFrequency: 'monthly',
+        priority: 0.6,
+      })),
+    ];
+
+    const allPages = [...staticPages, ...dynamicPages];
+
+    // Filter out excluded pages if specified in SEO settings
+    if (seoSettings?.excludedPages?.length > 0) {
+      return allPages.filter(page => {
+        const path = page.url.replace(baseUrl, '');
+        return !seoSettings.excludedPages.includes(path);
+      });
     }
-    
-    return [];
+
+    return allPages;
   } catch (error) {
-    console.error(`Error fetching ${path}:`, error);
-    return [];
+    console.error('Error generating sitemap:', error);
+    return staticPages;
   }
 }

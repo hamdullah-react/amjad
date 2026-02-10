@@ -73,7 +73,7 @@ export const Header = () => {
               {/* Background Image */}
               <div className="absolute inset-0 ">
                 <Image
-                  src={slide.imageUrl || slide.image || '/carousel/1.jpg'}
+                  src={slide.imageUrl || slide.image}
                   alt={slide.title}
                   fill
                   className="object-cover"
@@ -134,7 +134,7 @@ export const Header = () => {
                       variants={fadeInUp}
                     >
                       {slide.buttonText && (
-                        <Link href={slide.buttonUrl || '/contact'}>
+                        <Link href={slide.buttonUrl || '#'}>
                           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                             <Button
                               size="lg"

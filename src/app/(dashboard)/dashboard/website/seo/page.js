@@ -22,7 +22,11 @@ import {
   Code,
   X,
   Plus,
-  Save
+  Save,
+  CheckCircle,
+  XCircle,
+  Clock,
+  Loader2
 } from 'lucide-react';
 
 const StatCard = ({ title, value, className = '' }) => (
@@ -107,6 +111,13 @@ export default function SEOPage() {
   const [newLanguage, setNewLanguage] = useState({ code: '', url: '' });
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [imageTarget, setImageTarget] = useState('');
+  const [feedback, setFeedback] = useState(null);
+  const [newOpeningHour, setNewOpeningHour] = useState({ day: 'Monday', open: '09:00', close: '18:00' });
+
+  const showFeedback = (type, message) => {
+    setFeedback({ type, message })
+    setTimeout(() => setFeedback(null), 4000)
+  }
 
   useEffect(() => {
     fetchSEOData();
@@ -139,13 +150,34 @@ export default function SEOPage() {
 
       const result = await response.json();
       if (result.success) {
-        // Show success message
+        showFeedback('success', 'SEO settings saved successfully!');
+      } else {
+        showFeedback('error', result.message || 'Failed to save SEO settings.');
       }
     } catch (error) {
       console.error('Error saving SEO data:', error);
+      showFeedback('error', 'Failed to save SEO settings. Please try again.');
     } finally {
       setSaving(false);
     }
+  };
+
+  const addOpeningHour = () => {
+    if (newOpeningHour.day && newOpeningHour.open && newOpeningHour.close) {
+      const entry = `${newOpeningHour.day} ${newOpeningHour.open}-${newOpeningHour.close}`;
+      setSeoData({
+        ...seoData,
+        schemaOpeningHours: [...(seoData.schemaOpeningHours || []), entry]
+      });
+      setNewOpeningHour({ day: 'Monday', open: '09:00', close: '18:00' });
+    }
+  };
+
+  const removeOpeningHour = (index) => {
+    setSeoData({
+      ...seoData,
+      schemaOpeningHours: seoData.schemaOpeningHours.filter((_, i) => i !== index)
+    });
   };
 
   const handleImageSelect = (url) => {
@@ -207,8 +239,9 @@ export default function SEOPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-[60vh]">
-        <div className="text-center">Loading...</div>
+      <div className="p-6 flex flex-col items-center justify-center min-h-[60vh]">
+        <Loader2 className="w-10 h-10 animate-spin text-primary mb-4" />
+        <p className="text-muted-foreground text-lg">Loading settings...</p>
       </div>
     );
   }
@@ -227,6 +260,19 @@ export default function SEOPage() {
           </Button>
         </div>
       </div>
+
+      {/* Feedback Banner */}
+      {feedback && (
+        <div className={`mb-6 flex items-center gap-3 px-4 py-3 rounded-lg border text-sm font-medium ${
+          feedback.type === 'success'
+            ? 'bg-green-50 border-green-200 text-green-800 dark:bg-green-950 dark:border-green-800 dark:text-green-200'
+            : 'bg-red-50 border-red-200 text-red-800 dark:bg-red-950 dark:border-red-800 dark:text-red-200'
+        }`}>
+          {feedback.type === 'success' ? <CheckCircle className="w-5 h-5 flex-shrink-0" /> : <XCircle className="w-5 h-5 flex-shrink-0" />}
+          <span>{feedback.message}</span>
+          <button onClick={() => setFeedback(null)} className="ml-auto text-current opacity-60 hover:opacity-100">&times;</button>
+        </div>
+      )}
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
@@ -743,6 +789,74 @@ export default function SEOPage() {
                     onChange={(e) => setSeoData({ ...seoData, schemaRating: e.target.value })}
                     placeholder="4.5"
                   />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="schemaReviewCount">Review Count</Label>
+                <Input
+                  id="schemaReviewCount"
+                  value={seoData.schemaReviewCount}
+                  onChange={(e) => setSeoData({ ...seoData, schemaReviewCount: e.target.value })}
+                  placeholder="150"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Opening Hours</Label>
+                <div className="flex gap-2 items-end">
+                  <div className="space-y-1">
+                    <Label className="text-xs text-muted-foreground">Day</Label>
+                    <Select
+                      value={newOpeningHour.day}
+                      onValueChange={(value) => setNewOpeningHour({ ...newOpeningHour, day: value })}
+                    >
+                      <SelectTrigger className="w-[140px]">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => (
+                          <SelectItem key={day} value={day}>{day}</SelectItem>
+                        ))}
+                        <SelectItem value="Mo-Fr">Mon-Fri</SelectItem>
+                        <SelectItem value="Mo-Sa">Mon-Sat</SelectItem>
+                        <SelectItem value="Mo-Su">Every Day</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs text-muted-foreground">Open</Label>
+                    <Input
+                      type="time"
+                      value={newOpeningHour.open}
+                      onChange={(e) => setNewOpeningHour({ ...newOpeningHour, open: e.target.value })}
+                      className="w-[120px]"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs text-muted-foreground">Close</Label>
+                    <Input
+                      type="time"
+                      value={newOpeningHour.close}
+                      onChange={(e) => setNewOpeningHour({ ...newOpeningHour, close: e.target.value })}
+                      className="w-[120px]"
+                    />
+                  </div>
+                  <Button onClick={addOpeningHour} type="button" variant="outline">
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {seoData.schemaOpeningHours?.map((hour, index) => (
+                    <Badge key={index} variant="secondary" className="gap-1 bg-muted text-muted-foreground hover:bg-muted/50">
+                      <Clock className="h-3 w-3" />
+                      {hour}
+                      <X
+                        className="h-3 w-3 cursor-pointer hover:text-foreground"
+                        onClick={() => removeOpeningHour(index)}
+                      />
+                    </Badge>
+                  ))}
                 </div>
               </div>
 

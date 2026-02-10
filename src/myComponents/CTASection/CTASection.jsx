@@ -27,8 +27,8 @@ const CTASection = ({
 }) => {
   const { contactInfo, loading: isLoadingContact } = useContact();
   
-  // Use contact context phone numbers if available, otherwise use prop or default
-  const primaryPhone = phoneNumber || contactInfo?.whatsapp || contactInfo?.phone ;
+  // Use contact context phone numbers if available, otherwise use prop
+  const primaryPhone = phoneNumber || contactInfo?.whatsapp || contactInfo?.phone;
   const alternatePhone = contactInfo?.alternatePhone;
 
   // Default configurations for each variant

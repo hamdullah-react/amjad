@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import {
   Plus, Edit, Trash2, Eye, EyeOff, Save, X, Package,
-  DollarSign, ArrowUp, ArrowDown, Link, Calendar, Tag
+  DollarSign, ArrowUp, ArrowDown, Link, Calendar, Tag, CheckCircle, XCircle, Loader2, AlertCircle
 } from 'lucide-react'
 import {
   Dialog,
@@ -579,7 +579,11 @@ export default function ServicesContentPage() {
   const [filteredServices, setFilteredServices] = useState([])
   const [loading, setLoading] = useState(true)
   const [processing, setProcessing] = useState(false)
-  const [processingMessage, setProcessingMessage] = useState('')
+  const [feedback, setFeedback] = useState(null)
+  const showFeedback = (type, message) => {
+    setFeedback({ type, message })
+    setTimeout(() => setFeedback(null), 4000)
+  }
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
   const [selectedService, setSelectedService] = useState(null)
@@ -675,7 +679,6 @@ export default function ServicesContentPage() {
   const handleSubmit = async () => {
     try {
       setProcessing(true)
-      setProcessingMessage(editingService ? 'Updating service...' : 'Creating service...')
 
       const url = editingService
         ? `/api/services/${editingService.id}`
@@ -705,17 +708,16 @@ export default function ServicesContentPage() {
         setFormData(INITIAL_FORM_DATA)
         setNewFeature('')
         await fetchServices()
-        alert(editingService ? 'Service updated successfully!' : 'Service created successfully!')
+        showFeedback('success', editingService ? 'Service updated successfully!' : 'Service created successfully!')
       } else {
         console.error('Failed to save service:', result.message)
-        alert(result.message || 'Failed to save service')
+        showFeedback('error', result.message || 'Failed to save service')
       }
     } catch (error) {
       console.error('Error saving service:', error)
-      alert(`Error saving service: ${error.message}. Please check the console for details.`)
+      showFeedback('error', `Error saving service: ${error.message}`)
     } finally {
       setProcessing(false)
-      setProcessingMessage('')
     }
   }
 
@@ -724,7 +726,6 @@ export default function ServicesContentPage() {
 
     try {
       setProcessing(true)
-      setProcessingMessage('Deleting service...')
 
       const response = await fetch(`/api/services/${id}`, {
         method: 'DELETE',
@@ -734,22 +735,22 @@ export default function ServicesContentPage() {
 
       if (result.success) {
         await fetchServices()
+        showFeedback('success', 'Service deleted successfully!')
       } else {
-        alert(result.message || 'Failed to delete service')
+        showFeedback('error', result.message || 'Failed to delete service')
         console.error('Failed to delete service:', result.message)
       }
     } catch (error) {
       console.error('Error deleting service:', error)
+      showFeedback('error', 'Error deleting service')
     } finally {
       setProcessing(false)
-      setProcessingMessage('')
     }
   }
 
   const handleToggleStatus = async (service) => {
     try {
       setProcessing(true)
-      setProcessingMessage('Updating status...')
 
       const response = await fetch(`/api/services/${service.id}`, {
         method: 'PUT',
@@ -766,14 +767,16 @@ export default function ServicesContentPage() {
 
       if (result.success) {
         await fetchServices()
+        showFeedback('success', `Service ${!service.isActive ? 'activated' : 'deactivated'} successfully!`)
       } else {
         console.error('Failed to toggle service status:', result.message)
+        showFeedback('error', 'Failed to update service status')
       }
     } catch (error) {
       console.error('Error toggling service status:', error)
+      showFeedback('error', 'Error updating service status')
     } finally {
       setProcessing(false)
-      setProcessingMessage('')
     }
   }
 
@@ -787,7 +790,6 @@ export default function ServicesContentPage() {
 
     try {
       setProcessing(true)
-      setProcessingMessage('Updating order...')
 
       await Promise.all([
         fetch(`/api/services/${service.id}`, {
@@ -809,11 +811,12 @@ export default function ServicesContentPage() {
       ])
 
       await fetchServices()
+      showFeedback('success', 'Service order updated!')
     } catch (error) {
       console.error('Error changing order:', error)
+      showFeedback('error', 'Error changing service order')
     } finally {
       setProcessing(false)
-      setProcessingMessage('')
     }
   }
 
@@ -824,25 +827,37 @@ export default function ServicesContentPage() {
     setNewFeature('')
   }
 
+  if (loading) {
+    return (
+      <div className="p-6 flex flex-col items-center justify-center min-h-[60vh]">
+        <Loader2 className="w-10 h-10 animate-spin text-primary mb-4" />
+        <p className="text-muted-foreground text-lg">Loading services...</p>
+      </div>
+    )
+  }
+
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Services Content</h1>
-          <p className="text-muted-foreground mt-2">Manage your website services and offerings</p>
-        </div>
-        <Button
-          onClick={handleAdd}
-          className="bg-primary hover:bg-primary/90 text-primary-foreground"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Add Service
-        </Button>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-foreground">Services Content</h1>
+        <p className="text-muted-foreground mt-2">Manage your website services and offerings</p>
       </div>
 
+      {feedback && (
+        <div className={`mb-6 flex items-center gap-3 px-4 py-3 rounded-lg border text-sm font-medium ${
+          feedback.type === 'success'
+            ? 'bg-green-50 border-green-200 text-green-800 dark:bg-green-950 dark:border-green-800 dark:text-green-200'
+            : 'bg-red-50 border-red-200 text-red-800 dark:bg-red-950 dark:border-red-800 dark:text-red-200'
+        }`}>
+          {feedback.type === 'success' ? <CheckCircle className="w-5 h-5 flex-shrink-0" /> : <XCircle className="w-5 h-5 flex-shrink-0" />}
+          <span>{feedback.message}</span>
+          <button onClick={() => setFeedback(null)} className="ml-auto text-current opacity-60 hover:opacity-100">&times;</button>
+        </div>
+      )}
+
       {/* Statistics */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <StatCard title="Total Services" value={stats.total} />
         <StatCard title="Active" value={stats.active} className="text-primary" />
         <StatCard title="Inactive" value={stats.inactive} className="text-muted-foreground" />
@@ -870,23 +885,26 @@ export default function ServicesContentPage() {
               <SelectItem value="inactive">Inactive Only</SelectItem>
             </SelectContent>
           </Select>
+          <Button
+            onClick={handleAdd}
+            className="bg-primary hover:bg-primary/90 text-primary-foreground"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Add Service
+          </Button>
         </div>
       </div>
 
       {/* Services Table */}
       <div className="bg-card rounded-lg shadow overflow-hidden">
-        {loading ? (
-          <div className="p-12 text-center">
-            <div className="text-muted-foreground">Loading services...</div>
-          </div>
-        ) : filteredServices.length === 0 ? (
-          <div className="p-12 text-center">
-            <Package className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-            <p className="text-foreground text-lg">No services found</p>
-            <p className="text-muted-foreground mt-2">
+        {filteredServices.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+            <AlertCircle className="w-10 h-10 mb-3" />
+            <p className="text-lg font-medium">No services found</p>
+            <p className="text-sm">
               {searchTerm || statusFilter !== 'all'
-                ? 'Try adjusting your search or filters'
-                : 'Click "Add Service" to create your first service'}
+                ? 'Try adjusting your search or filters.'
+                : 'Add your first service to get started.'}
             </p>
           </div>
         ) : (
@@ -940,18 +958,6 @@ export default function ServicesContentPage() {
           </div>
         )}
       </div>
-
-      {/* Processing Overlay */}
-      {processing && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-[50000]">
-          <div className="bg-card rounded-lg p-6 shadow-xl">
-            <div className="flex items-center space-x-3">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-              <p className="text-lg font-medium text-foreground">{processingMessage || 'Processing...'}</p>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Service Detail Modal */}
       <ServiceDetailModal

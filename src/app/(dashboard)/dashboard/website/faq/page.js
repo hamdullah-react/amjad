@@ -3,7 +3,8 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import {
   Plus, Edit, Trash2, Eye, EyeOff, Save, X,
-  ArrowUp, ArrowDown, HelpCircle, ChevronDown, ChevronUp
+  ArrowUp, ArrowDown, HelpCircle, ChevronDown, ChevronUp,
+  Loader2, CheckCircle, XCircle, AlertCircle
 } from 'lucide-react'
 import {
   Dialog,
@@ -204,7 +205,11 @@ export default function FAQPage() {
   const [filteredFaqs, setFilteredFaqs] = useState([])
   const [loading, setLoading] = useState(true)
   const [processing, setProcessing] = useState(false)
-  const [processingMessage, setProcessingMessage] = useState('')
+  const [feedback, setFeedback] = useState(null)
+  const showFeedback = (type, message) => {
+    setFeedback({ type, message })
+    setTimeout(() => setFeedback(null), 4000)
+  }
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingFaq, setEditingFaq] = useState(null)
   const [searchTerm, setSearchTerm] = useState('')
@@ -296,7 +301,6 @@ export default function FAQPage() {
   const handleSubmit = async () => {
     try {
       setProcessing(true)
-      setProcessingMessage(editingFaq ? 'Updating FAQ...' : 'Creating FAQ...')
 
       const url = editingFaq
         ? `/api/faq/${editingFaq.id}`
@@ -319,14 +323,16 @@ export default function FAQPage() {
         setEditingFaq(null)
         setFormData(INITIAL_FORM_DATA)
         await fetchFaqs()
+        showFeedback('success', editingFaq ? 'FAQ updated successfully!' : 'FAQ created successfully!')
       } else {
         console.error('Failed to save FAQ:', result.message)
+        showFeedback('error', 'Failed to save FAQ. Please try again.')
       }
     } catch (error) {
       console.error('Error saving FAQ:', error)
+      showFeedback('error', 'An error occurred while saving the FAQ.')
     } finally {
       setProcessing(false)
-      setProcessingMessage('')
     }
   }
 
@@ -335,7 +341,6 @@ export default function FAQPage() {
 
     try {
       setProcessing(true)
-      setProcessingMessage('Deleting FAQ...')
 
       const response = await fetch(`/api/faq/${id}`, {
         method: 'DELETE',
@@ -345,21 +350,22 @@ export default function FAQPage() {
 
       if (result.success) {
         await fetchFaqs()
+        showFeedback('success', 'FAQ deleted successfully!')
       } else {
         console.error('Failed to delete FAQ:', result.message)
+        showFeedback('error', 'Failed to delete FAQ.')
       }
     } catch (error) {
       console.error('Error deleting FAQ:', error)
+      showFeedback('error', 'An error occurred while deleting the FAQ.')
     } finally {
       setProcessing(false)
-      setProcessingMessage('')
     }
   }
 
   const handleToggleStatus = async (faq) => {
     try {
       setProcessing(true)
-      setProcessingMessage('Updating status...')
 
       const response = await fetch(`/api/faq/${faq.id}`, {
         method: 'PUT',
@@ -376,14 +382,16 @@ export default function FAQPage() {
 
       if (result.success) {
         await fetchFaqs()
+        showFeedback('success', `FAQ ${!faq.isActive ? 'activated' : 'deactivated'} successfully!`)
       } else {
         console.error('Failed to toggle status:', result.message)
+        showFeedback('error', 'Failed to update FAQ status.')
       }
     } catch (error) {
       console.error('Error toggling status:', error)
+      showFeedback('error', 'An error occurred while updating status.')
     } finally {
       setProcessing(false)
-      setProcessingMessage('')
     }
   }
 
@@ -397,7 +405,6 @@ export default function FAQPage() {
 
     try {
       setProcessing(true)
-      setProcessingMessage('Updating order...')
 
       // Swap orders
       await Promise.all([
@@ -420,11 +427,12 @@ export default function FAQPage() {
       ])
 
       await fetchFaqs()
+      showFeedback('success', 'FAQ order updated successfully!')
     } catch (error) {
       console.error('Error changing order:', error)
+      showFeedback('error', 'Failed to update FAQ order.')
     } finally {
       setProcessing(false)
-      setProcessingMessage('')
     }
   }
 
@@ -440,6 +448,19 @@ export default function FAQPage() {
         <h1 className="text-3xl font-bold text-foreground">FAQ</h1>
         <p className="text-muted-foreground mt-2">Manage frequently asked questions</p>
       </div>
+
+      {/* Feedback Banner */}
+      {feedback && (
+        <div className={`mb-6 flex items-center gap-3 px-4 py-3 rounded-lg border text-sm font-medium ${
+          feedback.type === 'success'
+            ? 'bg-green-50 border-green-200 text-green-800 dark:bg-green-950 dark:border-green-800 dark:text-green-200'
+            : 'bg-red-50 border-red-200 text-red-800 dark:bg-red-950 dark:border-red-800 dark:text-red-200'
+        }`}>
+          {feedback.type === 'success' ? <CheckCircle className="w-5 h-5 flex-shrink-0" /> : <XCircle className="w-5 h-5 flex-shrink-0" />}
+          <span>{feedback.message}</span>
+          <button onClick={() => setFeedback(null)} className="ml-auto text-current opacity-60 hover:opacity-100">&times;</button>
+        </div>
+      )}
 
       {/* Statistics */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
@@ -500,8 +521,9 @@ export default function FAQPage() {
           </div>
         </div>
         {loading ? (
-          <div className="p-12 text-center">
-            <div className="text-muted-foreground">Loading FAQs...</div>
+          <div className="p-12 flex flex-col items-center justify-center">
+            <Loader2 className="w-10 h-10 animate-spin text-primary mb-4" />
+            <p className="text-muted-foreground text-lg">Loading FAQs...</p>
           </div>
         ) : filteredFaqs.length === 0 ? (
           <div className="p-12 text-center">
@@ -554,18 +576,6 @@ export default function FAQPage() {
           </div>
         )}
       </div>
-
-      {/* Processing Overlay */}
-      {processing && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-[50000]">
-          <div className="bg-card rounded-lg p-6 shadow-xl border">
-            <div className="flex items-center space-x-3">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-              <p className="text-lg font-medium text-foreground">{processingMessage || 'Processing...'}</p>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Add/Edit Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>

@@ -2,6 +2,14 @@ import React from 'react';
 import { blogPosts } from '@/data/blogData';
 import BlogSection from '@/myComponents/BlogSection/BlogSection';
 import PageHeader from '@/myComponents/PageHeader/PageHeader';
+import { buildPageMetadata } from '@/lib/page-metadata';
+
+export async function generateMetadata() {
+  return buildPageMetadata('blog', {
+    title: 'Our Blog',
+    description: 'Stay updated with the latest moving tips, industry news, and helpful guides from Marhaba Movers & Packers.',
+  });
+}
 
 export default function BlogPage() {
   return (
@@ -20,7 +28,7 @@ export default function BlogPage() {
         {/* Display all blog posts */}
         <BlogSection posts={blogPosts} showAll={true} />
       </div>
-      
+
     </div>
   );
 }

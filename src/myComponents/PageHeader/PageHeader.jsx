@@ -6,7 +6,7 @@ import { ChevronRight } from 'lucide-react'
 const PageHeader = ({
   title,
   subtitle,
-  backgroundImage = '/images/banner-default.jpg',
+  backgroundImage,
   breadcrumbs = [],
   height = 'h-[300px] md:h-[400px]'
 }) => {
@@ -14,13 +14,15 @@ const PageHeader = ({
     <div className={`relative ${height} w-full overflow-hidden`}>
       {/* Background Image */}
       <div className="absolute inset-0">
-        <Image
-          src={backgroundImage}
-          alt={title}
-          fill
-          className="object-cover"
-          priority
-        />
+        {backgroundImage && (
+          <Image
+            src={backgroundImage}
+            alt={title}
+            fill
+            className="object-cover"
+            priority
+          />
+        )}
         {/* Overlay with gradient - darker for better text contrast */}
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-blue-900/60 to-orange-900/50"></div>
       </div>
