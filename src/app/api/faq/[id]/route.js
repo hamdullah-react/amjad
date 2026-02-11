@@ -4,7 +4,7 @@ import prisma from '@/lib/prisma';
 // GET single FAQ by ID
 export async function GET(request, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     const faq = await prisma.fAQ.findUnique({
       where: { id }
@@ -30,7 +30,7 @@ export async function GET(request, { params }) {
 // PUT update FAQ by ID
 export async function PUT(request, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
 
     // Remove id from body if present
@@ -66,7 +66,7 @@ export async function PUT(request, { params }) {
 // DELETE FAQ by ID
 export async function DELETE(request, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     await prisma.fAQ.delete({
       where: { id }

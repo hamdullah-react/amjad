@@ -4,7 +4,7 @@ import prisma from '@/lib/prisma';
 // GET single welcome section
 export async function GET(request, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     const welcomeSection = await prisma.welcomeSection.findUnique({
       where: { id }
@@ -33,7 +33,7 @@ export async function GET(request, { params }) {
 // PUT update welcome section
 export async function PUT(request, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
 
     // If setting as active, deactivate all others first
@@ -69,7 +69,7 @@ export async function PUT(request, { params }) {
 // DELETE welcome section
 export async function DELETE(request, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     await prisma.welcomeSection.delete({
       where: { id }

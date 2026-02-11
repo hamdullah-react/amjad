@@ -4,7 +4,7 @@ import prisma from '@/lib/prisma';
 // GET single item by ID
 export async function GET(request, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     const item = await prisma.whyChooseUs.findUnique({
       where: { id }
@@ -30,7 +30,7 @@ export async function GET(request, { params }) {
 // PUT update item by ID
 export async function PUT(request, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
 
     // Remove id from body if present
@@ -66,7 +66,7 @@ export async function PUT(request, { params }) {
 // DELETE item by ID
 export async function DELETE(request, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     await prisma.whyChooseUs.delete({
       where: { id }

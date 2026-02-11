@@ -23,8 +23,9 @@ export async function generateStaticParams() {
 // Generate metadata
 export async function generateMetadata({ params }) {
   try {
+    const { slug } = await params;
     const service = await prisma.service.findUnique({
-      where: { slug: params.slug },
+      where: { slug },
     });
     
     if (!service) {
@@ -51,9 +52,10 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function ServiceDetailPage({ params }) {
+  const { slug } = await params;
   // Use Prisma directly instead of fetch
   const service = await prisma.service.findUnique({
-    where: { slug: params.slug },
+    where: { slug },
   });
 
   if (!service) {

@@ -4,7 +4,7 @@ import prisma from '@/lib/prisma';
 // GET single item by ID
 export async function GET(request, { params }) {
   try {
-    const { slug } = params;
+    const { slug } = await params;
 
     const item = await prisma.whyChooseUs.findUnique({
       where: { slug }

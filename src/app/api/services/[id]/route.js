@@ -40,7 +40,7 @@ async function makeSlugUnique(slug, excludeId = null) {
 // GET single service by ID
 export async function GET(request, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     const service = await prisma.service.findUnique({
       where: { id },
@@ -71,7 +71,7 @@ export async function GET(request, { params }) {
 // PUT update service by ID
 export async function PUT(request, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
 
     // Remove id from body if present
@@ -137,7 +137,7 @@ export async function PUT(request, { params }) {
 // DELETE service by ID
 export async function DELETE(request, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     // Check if service exists and has bookings
     const service = await prisma.service.findUnique({

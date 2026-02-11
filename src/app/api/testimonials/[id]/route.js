@@ -4,7 +4,7 @@ import prisma from '@/lib/prisma';
 // GET single testimonial by ID
 export async function GET(request, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     const testimonial = await prisma.testimonial.findUnique({
       where: { id },
@@ -39,7 +39,7 @@ export async function GET(request, { params }) {
 // PUT update testimonial by ID
 export async function PUT(request, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
 
     // Remove id from body if present
@@ -75,7 +75,7 @@ export async function PUT(request, { params }) {
 // DELETE testimonial by ID
 export async function DELETE(request, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     await prisma.testimonial.delete({
       where: { id }
